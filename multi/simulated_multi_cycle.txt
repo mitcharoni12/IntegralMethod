@@ -1,0 +1,10 @@
+number of runs:20
+number of cycles:20
+event decement:1
+write to file(1) display data(2):2
+x axis range start const end moves (1) x axis range start moves stop const(2):1
+x start value init:0
+x stop value init:60
+x inc per cycle:1
+single source histo (1) or mutli source histo (2):2
+mean difference(1) or seperate mean(2):2
