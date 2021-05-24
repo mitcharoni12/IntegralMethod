@@ -1,0 +1,4 @@
+Histo events:100000
+Histo Bins:10000
+Time generate until:400
+Single run(1) single cylce(2) multiple cycle(3):2

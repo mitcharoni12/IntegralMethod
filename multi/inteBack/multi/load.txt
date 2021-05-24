@@ -1,0 +1,6 @@
+histogram file name:outputFile.root
+histo object name:CSSingleRegularHisto
+time fit until:200
+Single run(1) single cylce(2) multiple cycle(3):1
+write to file(1) display data(2):1
+write file name;outputFile.root
