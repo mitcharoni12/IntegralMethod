@@ -17,6 +17,9 @@
 #include "TList.h"
 #include "ParameterValue.h"
 #include "FitParameterStore.h"
+#include "ChainFitValues.h"
+#include "FitValues.h"
+#include "SingleElementFitValues.h"
 
 using namespace std;
 
@@ -37,14 +40,17 @@ class ElementFit{
         Int_t getNumElements(){return numElements;}
         Int_t getNumBins(){return numBins;}
         Int_t getTimeRunEnd(){return timeRunEnd;}
-        FitParameterStore** getSingleFitParameters(){return singleFitParameters;}
-        FitParameterStore* getTotalFitParameters(){return totalFitParameters;}
+        ChainFitValues* getRegularFitParameters(){return totalRegularFitParameters;}
+        ChainFitValues* getIntegralFitParameters(){return totalIntegralFitParameters;}
+        SingleElementFitValues* getSingleRegularFitParameters(){return singleRegularFitParameters;}
+        SingleElementFitValues* getSingleIntegralFitParameters(){return singleIntegralFitParameters;}
         //setter function
         void setNumBins(Int_t numBins);
         void setNumEvents(Int_t events){this->events = events;} 
         void setTimeRunEnd(Double_t timeRunEnd){this->timeRunEnd = timeRunEnd;}
         void setTimeRunStart(Double_t timeRunStart){this->timeRunStart = timeRunStart;}
         //public functions
+        void createHistoFile(string name);
         void displayIntegralHisto(TCanvas* can);
         void displayRegularHisto(TCanvas* can);
         void displaySingleHistos(TCanvas** can);
@@ -52,13 +58,16 @@ class ElementFit{
         void fitData();
         void fitDataGenOnce();
         void fitDataLoadedHisto();
+        void genIntegralHisto();
+        void genIntegralSingleHistos();
+        void genRandomAlternate();
         void writeToFile();
         void fitRegularHisto();
         void fitIntegralHisto();
     private:
         //private variables
         string* elementNames;
-        Int_t events, numElements, numBins, numParameters;
+        Int_t events, numElements, numBins, numParameters, doubleNumElements;
         TF1* integralFunction, *regularFunction;
         TF1** singleFitFunctions;
         TH1D** singleElementRegularHistos, **singleElementIntegralHistos;
@@ -71,8 +80,10 @@ class ElementFit{
         TRandom3 rand;
         Double_t timeRunStart, timeRunEnd;
         Double_t* randArr;
-        FitParameterStore** singleFitParameters;
-        FitParameterStore* totalFitParameters;
+        ChainFitValues* totalRegularFitParameters;
+        ChainFitValues* totalIntegralFitParameters;
+        SingleElementFitValues* singleRegularFitParameters;
+        SingleElementFitValues* singleIntegralFitParameters;
         ParameterValue** paraVals;
         Int_t globalSeedChanger = 0;
         //helper functions
@@ -80,14 +91,10 @@ class ElementFit{
         TF1** createFitFunctions();
         void createSingleElementRegularHistos();
         void createSingleElementIntegralHistos();
-        void createHistoFile(string name);
         void createTotalFunctions();
         void createTotalHistos();
         void fitSingleHistos();
-        void genIntegralHisto();
         void genIntegralHistoSimulated();
-        void genIntegralSingleHistos();
-        void genRandomAlternate();
         void setFunctionParametersTotal();
         void setFunctionParamersSingle();
         void setParaLimits();
@@ -137,12 +144,10 @@ ElementFit::ElementFit(Int_t events_p, Double_t (*regularFunc)(Double_t*, Double
     //dynamically allocating needed variables and arrays
     histoList = new TList();
     //dynamic array
-    singleFitParameters = new FitParameterStore* [numElements];
-    for(int i = 0; i < numElements; i++)
-    {
-        singleFitParameters[i] = new FitParameterStore(i+1);
-    }
-    totalFitParameters = new FitParameterStore(numElements);
+    singleRegularFitParameters = new SingleElementFitValues(numElements);
+    singleIntegralFitParameters = new SingleElementFitValues(numElements);
+    totalRegularFitParameters = new ChainFitValues(numElements);
+    totalIntegralFitParameters = new ChainFitValues(numElements);
     singleElementRegularHistos = new TH1D* [numElements];
     singleElementIntegralHistos = new TH1D* [numElements];
     randArr = new Double_t [numElements];
@@ -164,7 +169,8 @@ ElementFit::ElementFit(Int_t events_p, Double_t (*regularFunc)(Double_t*, Double
 }
 
 
-//constructor for loading in a histogram
+//constructor for loading in a histogram(NOT MODIFIED WITH NEW STRUCTURE IN MIND)
+/*
 ElementFit::ElementFit(Double_t (*regularFunc)(Double_t*, Double_t*), Double_t (*integralFunc)(Double_t*, Double_t*), Int_t numElements_p, Double_t timeRunEnd_p,
                        ParameterValue** paraVals_p, TH1D* loadedHisto_p, string* elementNames_p)
 {
@@ -190,23 +196,23 @@ ElementFit::ElementFit(Double_t (*regularFunc)(Double_t*, Double_t*), Double_t (
     //parameter limits so we get reasonable values
     setParaLimits();
 }
+*/
 
 ElementFit::~ElementFit()
 {
     delete [] singleElementRegularHistos;
     delete [] singleElementIntegralHistos;
-    for(int i = 0; i < numElements; i++)
-    {
-        delete singleFitParameters[i];
-    }
-    delete [] singleFitParameters;
+    delete singleRegularFitParameters;
+    delete singleIntegralFitParameters;
+    delete totalRegularFitParameters;
+    delete totalIntegralFitParameters;
     for(int i = 0; i < numElements*2; i++)
     {
         delete singleFitFunctions[i];
     }
     delete [] singleFitFunctions;
-    delete totalFitParameters;
     delete randArr;
+    delete histoList;
 }
 
 //used for changing seed between runs
@@ -281,14 +287,38 @@ void ElementFit::displayIntegralHisto(TCanvas* can)
 void ElementFit::displayParameters()
 {  
     cout << endl << "Regular FIT PARAMETERS/ERRORS" << endl;
-    for(int i = 0; i < numParameters; i++)
+    for(int i = 0; i < numElements; i++)
     {
-        cout << i+1 << " Parameter: " << totalFitParameters->getRegularHalfLife()[i] << " Error: " << totalFitParameters->getRegularHalfLifeError()[i] << endl;
+        cout << elementNames[i] << ": " << "\tHalfLife: " << totalRegularFitParameters->GetAnHalfLife(i) << "s" << endl << 
+        "\tError: " << totalRegularFitParameters->GetAnHalfLifeError(i) << "s" << endl;
     }
     cout << endl << "INTEGRAL FIT PARAMETERS/ERRORS" << endl;
-    for(int i = 0; i < numParameters; i++)
+    for(int i = 0; i < numElements; i++)
     {
-        cout << i+1 << " Parameter: " << totalFitParameters->getIntegralHalfLife()[i] << " Error: " << totalFitParameters->getIntegralHalfLifeError()[i] << endl;
+        cout << elementNames[i] << ": " << "\tHalfLife: " << totalIntegralFitParameters->GetAnHalfLife(i) << "s" << endl << 
+        "\tError: " << totalIntegralFitParameters->GetAnHalfLifeError(i) << "s" << endl;
+    }
+    cout << endl << "REGULAR SINGLE FIT PARAMETERS/ERRORS" << endl << endl;
+    for(int i = 0; i < numElements; i++)
+    {
+        cout << elementNames[i] << " Single Fit Values" << endl;
+        for(int k = 0; k < i+1; k++)
+        {
+            cout << elementNames[k] << ": \tHalf Life: " << singleRegularFitParameters->GetAnHalfLife(i, k) << "s" << endl << 
+            "\tHalf Life Error: " << singleRegularFitParameters->GetAnHalfLifeError(i,k) << "s" << endl;
+            cout << endl;
+        }
+    }
+    cout << endl << "INTEGRAL SINGLE FIT PARAMETERS/ERRORS" << endl << endl;
+    for(int i = 0; i < numElements; i++)
+    {
+        cout << elementNames[i] << " Single Fit Values" << endl;
+        for(int k = 0; k < i+1; k++)
+        {
+            cout << elementNames[k] << ": \tHalf Life: " << singleIntegralFitParameters->GetAnHalfLife(i, k) << "s" << endl << 
+            "\tHalf Life Error: " << singleIntegralFitParameters->GetAnHalfLifeError(i,k) << "s" << endl;
+            cout << endl;
+        }
     }
 }
 
@@ -344,6 +374,9 @@ void ElementFit::fitIntegralHisto()
     Double_t errorN0;
     Double_t valueDecayConst;
     Double_t errorDecayConst;
+    Double_t valueHalfLife;
+    Double_t errorHalfLife;
+
     integralHisto->Fit(integralFunction, "L", "", timeRunStart, timeRunEnd);
     for(int i = 0; i < numElements; i++)
     {   
@@ -351,11 +384,13 @@ void ElementFit::fitIntegralHisto()
         errorN0 = integralFunction->GetParError((i*2));
         valueDecayConst = integralFunction->GetParameter((i*2)+1);
         errorDecayConst = integralFunction->GetParError((i*2)+1);
+        valueHalfLife = log(2)/(valueDecayConst);
+        errorHalfLife = ((log(2)/valueDecayConst)*(errorDecayConst/valueDecayConst));
         //used to get either the N0 value or half life value
-        (totalFitParameters->getIntegralN0())[i] = valueN0;
-        (totalFitParameters->getIntegralN0Error())[i] = errorN0;
-        (totalFitParameters->getIntegralHalfLife())[i] = log(2)/(valueDecayConst);
-        (totalFitParameters->getIntegralHalfLifeError())[i] = ((log(2)/valueDecayConst)*(errorDecayConst/valueDecayConst));
+        totalIntegralFitParameters->SetAnN0(i, valueN0);
+        totalIntegralFitParameters->SetAnN0Error(i, errorN0);
+        totalIntegralFitParameters->SetAnHalfLife(i, valueHalfLife);
+        totalIntegralFitParameters->SetAnHalfLifeError(i, errorHalfLife);
     }
 }
 
@@ -367,6 +402,9 @@ void ElementFit::fitRegularHisto()
     Double_t errorN0;
     Double_t valueDecayConst;
     Double_t errorDecayConst;
+    Double_t valueHalfLife;
+    Double_t errorHalfLife;
+
     regularHisto->Fit(this->regularFunction, "L", "", timeRunStart, timeRunEnd);
     for(int i = 0; i < numElements; i++)
     {   
@@ -374,11 +412,13 @@ void ElementFit::fitRegularHisto()
         errorN0 = regularFunction->GetParError((i*2));
         valueDecayConst = regularFunction->GetParameter((i*2)+1);
         errorDecayConst = regularFunction->GetParError((i*2)+1);
+        valueHalfLife = log(2)/(valueDecayConst);
+        errorHalfLife = ((log(2)/valueDecayConst)*(errorDecayConst/valueDecayConst));
         //used to get either the N0 value or half life value
-        (totalFitParameters->getRegularN0())[i] = valueN0;
-        (totalFitParameters->getRegularN0Error())[i] = errorN0;
-        (totalFitParameters->getRegularHalfLife())[i] = log(2)/(valueDecayConst);
-        (totalFitParameters->getRegularHalfLifeError())[i] = ((log(2)/valueDecayConst)*(errorDecayConst/valueDecayConst));
+        totalRegularFitParameters->SetAnN0(i, valueN0);
+        totalRegularFitParameters->SetAnN0Error(i, errorN0);
+        totalRegularFitParameters->SetAnHalfLife(i, valueHalfLife);
+        totalRegularFitParameters->SetAnHalfLifeError(i, errorHalfLife);
     }
 }
 
@@ -389,6 +429,9 @@ void ElementFit::fitSingleHistos()
     Double_t errorN0;
     Double_t valueDecayConst;
     Double_t errorDecayConst;
+    Double_t valueHalfLife;
+    Double_t errorHalfLife;
+
     //loop for fitting and storing value for elements
     for(int i = 0; i < numElements; i++)
     {
@@ -402,22 +445,26 @@ void ElementFit::fitSingleHistos()
             errorN0 = singleFitFunctions[(i*2)]->GetParError((k*2));
             valueDecayConst = singleFitFunctions[(i*2)]->GetParameter((k*2)+1);
             errorDecayConst = singleFitFunctions[(i*2)]->GetParError((k*2)+1);
+            valueHalfLife = log(2)/(valueDecayConst);
+            errorHalfLife = ((log(2)/valueDecayConst)*(errorDecayConst/valueDecayConst));
 
-            (singleFitParameters[i]->getRegularN0())[k] = valueN0;
-            (singleFitParameters[i]->getRegularN0Error())[k] = errorN0;
-            (singleFitParameters[i]->getRegularHalfLife())[k] = log(2)/(valueDecayConst);
-            (singleFitParameters[i]->getRegularHalfLifeError())[k] = ((log(2)/valueDecayConst)*(errorDecayConst/valueDecayConst));
+            singleRegularFitParameters->SetAnN0(i, k, valueN0);
+            singleRegularFitParameters->SetAnN0Error(i, k, errorN0);
+            singleRegularFitParameters->SetAnHalfLife(i, k, valueHalfLife);
+            singleRegularFitParameters->SetAnHalfLifeError(i, k, errorHalfLife);
 
             //storing values for integral part of function
             valueN0 = singleFitFunctions[(i*2)+1]->GetParameter((k*2));
             errorN0 = singleFitFunctions[(i*2)+1]->GetParError((k*2));
             valueDecayConst = singleFitFunctions[(i*2)+1]->GetParameter((k*2)+1);
             errorDecayConst = singleFitFunctions[(i*2)+1]->GetParError((k*2)+1);
+            valueHalfLife = log(2)/(valueDecayConst);
+            errorHalfLife = ((log(2)/valueDecayConst)*(errorDecayConst/valueDecayConst));
 
-            (singleFitParameters[i]->getIntegralN0())[k] = valueN0;
-            (singleFitParameters[i]->getIntegralN0Error())[k] = errorN0;
-            (singleFitParameters[i]->getIntegralHalfLife())[k] = log(2)/(valueDecayConst);
-            (singleFitParameters[i]->getIntegralHalfLifeError())[k] = ((log(2)/valueDecayConst)*(errorDecayConst/valueDecayConst));
+            singleIntegralFitParameters->SetAnN0(i, k, valueN0);
+            singleIntegralFitParameters->SetAnN0Error(i, k, errorN0);
+            singleIntegralFitParameters->SetAnHalfLife(i, k, valueHalfLife);
+            singleIntegralFitParameters->SetAnHalfLifeError(i, k, errorHalfLife);
         }
     }
 }
