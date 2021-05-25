@@ -28,9 +28,9 @@ typedef Double_t (*decayFunction)(Double_t *x, Double_t *par);
 class ElementFit{
     public:
         ElementFit(Int_t events_p, Double_t (*regularFunc)(Double_t*, Double_t*), Double_t (*integralFunc)(Double_t*, Double_t*), Double_t (**fitFunctions)(Double_t*, Double_t*),
-                   Int_t numElements_p, Double_t timeRunEnd_p, Int_t numBins_p, string* elementNames_p,  ParameterValue** paraVals_p);
+                   Int_t numElements_p, Double_t timeRunEnd_p, Int_t numBins_p, string* elementNames_p,  ParameterValue** paraVals_p, Int_t numFits);
         ElementFit(Double_t (*regularFunc)(Double_t*, Double_t*), Double_t (*integralFunc)(Double_t*, Double_t*), Int_t numElements_p, Double_t timeRunEnd_p,
-                   ParameterValue** paraVals_p, TH1D* loadedHisto_p, string* elementNames_p);
+                   ParameterValue** paraVals_p, TH1D* loadedHisto_p, string* elementNames_p, Int_t numFits);
         ~ElementFit();
         //getter function
         Double_t getElementParameters(int i){return paraVals[i]->getValueDecayConst();}
@@ -67,7 +67,7 @@ class ElementFit{
     private:
         //private variables
         string* elementNames;
-        Int_t events, numElements, numBins, numParameters, doubleNumElements;
+        Int_t events, numElements, numBins, numParameters, doubleNumElements, numFits;
         TF1* integralFunction, *regularFunction;
         TF1** singleFitFunctions;
         TH1D** singleElementRegularHistos, **singleElementIntegralHistos;
@@ -112,7 +112,7 @@ class ElementFit{
 
 //constructor for generating a histogram
 ElementFit::ElementFit(Int_t events_p, Double_t (*regularFunc)(Double_t*, Double_t*), Double_t (*integralFunc)(Double_t*, Double_t*), Double_t (**fitFunctions)(Double_t*, Double_t*),
-                       Int_t numElements_p, Double_t timeRunEnd_p, Int_t numBins_p, string* elementNames_p,  ParameterValue** paraVals_p)
+                       Int_t numElements_p, Double_t timeRunEnd_p, Int_t numBins_p, string* elementNames_p,  ParameterValue** paraVals_p, Int_t numFits)
 {
     //setting variables
     this->events = events_p;
@@ -124,7 +124,8 @@ ElementFit::ElementFit(Int_t events_p, Double_t (*regularFunc)(Double_t*, Double
     this->passedRegularFunction = regularFunc;
     this->passedIntegralFunction = integralFunc;
     this->timeRunEnd = timeRunEnd_p;
-    this->paraVals = paraVals_p; 
+    this->paraVals = paraVals_p;
+    this->numFits = numFits;
     /*
     CSCycleResultCanvas = new TCanvas("CSCycleResultCanvas", "CSCycleResultCanvas", 500, 500);
     BACycleResultCanvas = new TCanvas("BACycleResultCanvas", "BACycleResultCanvas", 500, 500);
@@ -172,7 +173,7 @@ ElementFit::ElementFit(Int_t events_p, Double_t (*regularFunc)(Double_t*, Double
 //constructor for loading in a histogram(NOT MODIFIED WITH NEW STRUCTURE IN MIND)
 /*
 ElementFit::ElementFit(Double_t (*regularFunc)(Double_t*, Double_t*), Double_t (*integralFunc)(Double_t*, Double_t*), Int_t numElements_p, Double_t timeRunEnd_p,
-                       ParameterValue** paraVals_p, TH1D* loadedHisto_p, string* elementNames_p)
+                       ParameterValue** paraVals_p, TH1D* loadedHisto_p, string* elementNames_p, Int_t numFits)
 {
     this->passedRegularFunction = regularFunc;
     this->passedIntegralFunction = integralFunc;
