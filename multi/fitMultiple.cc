@@ -5,7 +5,7 @@
 #include "TGraph.h"
 #include "TH1D.h"
 #include "Run.h"
-//#include "Cycle.h"
+#include "Cycle.h"
 #include "TGraphErrors.h"
 #include "ParameterValue.h"
 #include "TF1.h"
@@ -48,8 +48,7 @@ void fitMultiple()
     Double_t timeRun;
     bool rangeOption;
     Double_t valueHolder;
-    int histoSimulateChoice;
-    int rangeValueChoice;
+    int histoSimulateChoice, rangeValueChoice, displayFitsChoice;
     ElementFit* element;
     ifstream inFile;
     
@@ -165,6 +164,8 @@ void fitMultiple()
     //gets histogram choice
     inFile.ignore(256,':');
     inFile >> histoSimulateChoice;
+    inFile.ignore(256, ':');
+    inFile >> displayFitsChoice;
     inFile.close();
     
     //calculates the decay constant values
@@ -410,13 +411,13 @@ void fitMultiple()
 
                     switch(singleSourceHistoChoice)
                     {
-                        resultStorage<Double_t>** cycleResultData;
                         //single histo source
                         case 1:
                         {
                             //mean difference
                             if(cycleSingleChoice == 1)
                             {
+                                /*
                                 cycleSeperateResultData = cycle->runSeperateSingleGen();
                                 cycleDifferenceResultData = cycle->genSingleMeanDifference(cycleSeperateResultData);
                                 cycleResultGraphs = cycle->genMeanDifferenceGraphs(cycleDifferenceResultData);
@@ -440,11 +441,11 @@ void fitMultiple()
                                 delete cycleDifferenceResultData;
                                 delete [] cycleResultGraphs;
                                 delete [] canvasArr;
-
+                                */
                             //seperate mean
                             }else{
-                                cycleResultData = cycle->runSeperateSingleGen();
-                                cycleResultGraphs = cycle->genSeperateMeanGraphs(cycleResultData);
+                                cycle->runSeperateSingleGen();
+                                cycle->genSeperateMeanGraphs();
                                 canvasArr = new TCanvas* [numElements];
                                 for(int i = 0; i < numElements; i++)
                                 {
@@ -452,14 +453,7 @@ void fitMultiple()
                                     canvasArr[i]->Divide(2,2,.02,.02);
                                 }
                                 TCanvas* sacraficeCanvas = new TCanvas("SacraficeCanvas", "SacraficeCanvas", 500, 500);
-                                cycle->displayMeanSeperateGraphs(canvasArr, cycleResultGraphs);
-                                for(int i = 0; i < 8; i++)
-                                {
-                                    delete cycleResultData[i];
-                                }
-                                cout << "WE ARE GOOD" << endl << endl << endl;
-                                delete [] cycleResultData;
-                                //delete [] cycleResultGraphs;
+                                cycle->displayMeanSeperateGraphs(canvasArr);
                                 delete [] canvasArr;
                             }
                         break;
@@ -467,6 +461,7 @@ void fitMultiple()
                         //multi histo source
                         case 2:
                         {
+                            /*
                             //mean difference
                             if(cycleSingleChoice == 1)
                             {
@@ -508,9 +503,9 @@ void fitMultiple()
                                     delete cycleResultData[i];
                                 }
                                 delete [] cycleResultData;
-                                //delete [] cycleResultGraphs;
                                 delete [] canvasArr;
                             }
+                            */
                         break;
                         }
                     }
