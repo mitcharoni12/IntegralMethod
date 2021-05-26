@@ -7,6 +7,7 @@
 #define SINGLEELEMENTFITVALUES_H
 
 #include "ChainFitValues.h"
+#include "TH1D.h"
 
 class SingleElementFitValues{
 private:
