@@ -4,7 +4,7 @@
 #include "ElementFit.h"
 #include "TGraph.h"
 #include "TH1D.h"
-//#include "Run.h"
+#include "Run.h"
 //#include "Cycle.h"
 #include "TGraphErrors.h"
 #include "ParameterValue.h"
@@ -246,7 +246,6 @@ void fitMultiple()
 
                 break;
                 }
-                /*
                 //single cycle of histogram
                 case 2:
                 {
@@ -309,12 +308,10 @@ void fitMultiple()
                         TGraph** totalRunResuts = new TGraph* [numElements*4];
                         TGraph** totalRunResultErrors = new TGraph* [numElements*4];
 
-        */
                         //extracts the fit value graphs from the array of graphs runResultGraphs and runResultSingleElementGraphs
                         /*(I wanted to put the graphs of single element fit value and total element fit value into one array, but
                         the graph array runResultGraphs and runResultSingleElementGraphs both had 18 graphs in them with a lot of extra data
                         so I had to extract the graphs in this really weird way)*/
-        /*
                         for(int i = 0; i < numElements; i++)
                         { 
                             totalRunResuts[(i*4)] = runResultGraphs[(i*6)+2];
@@ -368,6 +365,7 @@ void fitMultiple()
                     }
                 break;
                 }
+                /*
 
 
                 //multiple runs of histogram
