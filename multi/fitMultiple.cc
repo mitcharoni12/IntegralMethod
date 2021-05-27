@@ -209,9 +209,8 @@ void fitMultiple()
                 case 1:
                 {
                     inFile.open("simulated_single_run.txt");
-                    element->fitHistos(1, 1);
+                    element->fitHistos(0, 0);
                     element->displayParameters();
-                    
                     //gets write file choice
                     inFile.ignore(256,':');
                     inFile >> writeToFileChoice;
@@ -229,16 +228,16 @@ void fitMultiple()
                         TCanvas** singleCanvas = new TCanvas* [numElements*2];
                         for(int i = 0; i < numElements; i++)
                         {
-                            singleCanvas[(i*2)] = new TCanvas((elementNames[i] + "SingleHisto").c_str(), (elementNames[i] + "SingleHisto").c_str(), 500, 500);
-                            singleCanvas[(i*2)+1] = new TCanvas((elementNames[i] + "IntegralHisto").c_str(), (elementNames[i] + "IntegralHisto").c_str(), 500, 500);
+                            singleCanvas[(i*2)] = new TCanvas((elementNames[i] + " Single Regular Histo").c_str(), (elementNames[i] + " Single Regular Histo").c_str(), 500, 500);
+                            singleCanvas[(i*2)+1] = new TCanvas((elementNames[i] + " Single Integral Histo").c_str(), (elementNames[i] + " Single Integral Histo").c_str(), 500, 500);
                         }
-                        TCanvas* regularTotalCanvas = new TCanvas("Regular Total Function", "Regular Total Function", 500, 500);
-                        TCanvas* integralTotalCanvas = new TCanvas("Integral Total Function", "Integral Total Function", 500, 500);
+                        TCanvas* regularTotalCanvas = new TCanvas("Total Regular Histo", "Total Regular Histo", 500, 500);
+                        TCanvas* integralTotalCanvas = new TCanvas("Total Integral Histo", "Total Integral Histo", 500, 500);
                         TCanvas* sacraficeCanvas = new TCanvas("SacraficeCanvas", "SacraficeCanvas", 500, 500);
                         element->displaySingleHistos(singleCanvas);
                         element->displayRegularHisto(regularTotalCanvas);
                         element->displayIntegralHisto(integralTotalCanvas);
-                        //delete [] singleCanvas;
+                        delete [] singleCanvas;
                     }
                     inFile.close();
 

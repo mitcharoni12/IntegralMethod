@@ -1,5 +1,6 @@
 /*
     PURPOSE: used to store the single element fitted histograms for a run
+    looking at the execution of the program this class is acctually never used
 */
 #ifndef SINGLERUNHISTOHOLDER_H
 #define SINGLERUNHISTOHOLDER_H
@@ -31,12 +32,15 @@ SingleRunHistoHolder::SingleRunHistoHolder(Int_t cycleNum, Int_t numElements, In
     this->numBins = numBins;
     this->timeRunEnd = timeRunEnd;
     this->elementNames = elementNames;
+    string histoParameter = histoName;
     
     singleHistos = new RunHistoHolder* [numElements];
     for(int i = 0; i < numElements; i++)
     {
         histoName = elementNames[i] + " " + histoName;
+        cout << "HERE " << histoName << endl << endl << endl << endl;
         singleHistos[i] = new RunHistoHolder(cycleNum, numRuns, histoName, numBins, timeRunEnd);
+        histoName = histoParameter;
     }
 }
 

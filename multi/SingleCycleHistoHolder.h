@@ -1,28 +1,28 @@
 /*
     PURPOSE: used to store the single element fitted histograms for a cycle
 */
-#ifndef SingleCycleHistoHolder1_H
-#define SingleCycleHistoHolder1_H
+#ifndef SingleCycleHistoHolder_H
+#define SingleCycleHistoHolder_H
 
 #include "TH1D.h"
 #include "CycleHistoHolder.h"
 
 using namespace std;
 
-class SingleCycleHistoHolder1{
+class SingleCycleHistoHolder{
 private:
     Int_t numCycles, numRuns, numBins, timeRunEnd, numElements;
     CycleHistoHolder** histoArr;
     string histoName;
     string* elementNames;
 public:
-    SingleCycleHistoHolder1(Int_t numCycles, Int_t numElements, Int_t numRuns, string histoName, Int_t numBins, Int_t timeRunEnd, string* elementNames);
-    ~SingleCycleHistoHolder1();
+    SingleCycleHistoHolder(Int_t numCycles, Int_t numElements, Int_t numRuns, string histoName, Int_t numBins, Int_t timeRunEnd, string* elementNames);
+    ~SingleCycleHistoHolder();
     TH1D* GetAHisto(Int_t cycleIndex, Int_t runIndex, Int_t elementIndex);
     void SetAHisto(Int_t cycleIndex, Int_t runIndex, Int_t elementIndex, TH1D* histo);
 };
 
-SingleCycleHistoHolder1::SingleCycleHistoHolder1(Int_t numCycles, Int_t numElements, Int_t numRuns, string histoName, Int_t numBins, Int_t timeRunEnd, string* elementNames)
+SingleCycleHistoHolder::SingleCycleHistoHolder(Int_t numCycles, Int_t numElements, Int_t numRuns, string histoName, Int_t numBins, Int_t timeRunEnd, string* elementNames)
 {
     this->numCycles = numCycles;
     this->numElements = numElements;
@@ -31,26 +31,29 @@ SingleCycleHistoHolder1::SingleCycleHistoHolder1(Int_t numCycles, Int_t numEleme
     this->numBins = numBins;
     this->timeRunEnd = timeRunEnd;
     this->elementNames = elementNames;
+    string histoParameter = histoName;
     
     histoArr = new CycleHistoHolder* [numElements];
     for(int i = 0; i < numElements; i++)
     {
         histoName = elementNames[i] + " " + histoName;
         histoArr[i] = new CycleHistoHolder(numCycles, numRuns, histoName, numBins, timeRunEnd);
+        histoName = histoParameter;
+
     }
 }
 
-SingleCycleHistoHolder1::~SingleCycleHistoHolder1()
+SingleCycleHistoHolder::~SingleCycleHistoHolder()
 {
     delete [] histoArr;
 }
 
-TH1D* SingleCycleHistoHolder1::GetAHisto(Int_t cycleIndex, Int_t runIndex, Int_t elementIndex)
+TH1D* SingleCycleHistoHolder::GetAHisto(Int_t cycleIndex, Int_t runIndex, Int_t elementIndex)
 {
     return histoArr[elementIndex]->GetAHisto(cycleIndex, runIndex);
 }
 
-void SingleCycleHistoHolder1::SetAHisto(Int_t cycleIndex, Int_t runIndex, Int_t elementIndex, TH1D* histo)
+void SingleCycleHistoHolder::SetAHisto(Int_t cycleIndex, Int_t runIndex, Int_t elementIndex, TH1D* histo)
 {
     histoArr[elementIndex]->SetAHisto(cycleIndex, runIndex, histo);
 }
