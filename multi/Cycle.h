@@ -8,6 +8,9 @@
 #include "Run.h"
 #include "ElementFit.h"
 #include "resultStorage.h"
+#include "RunFitValues.h"
+#include "ChainRunFitValues.h"
+#include "SingleChainRunFitVales.h"
 
 using namespace std;
 
@@ -19,6 +22,10 @@ class Cycle{
         Run* decayChainRun;
         ElementFit* element;
         string* elementStrNames;
+        ChainRunFitValues* regularFitValues;
+        ChainRunFitValues* integralFitValues;
+        SingleChainRunFitVales* singleRegularFitValues;
+        SingleChainRunFitVales* singleIntegralFitValues;
         TCanvas* testCan;
         //helper functions
     public:
@@ -46,7 +53,14 @@ Cycle::Cycle(Int_t cycles, Run* decayChainRun, ElementFit* element, Double_t x_s
     this->x_stop = x_stop;
     this->x_inc = x_inc;
     this->incChoice = incChoice;
-    elementStrNames = decayChainRun->elementStringNames();
+    elementStrNames = decayChainRun->getElementStringNames();
+    /*
+    regularFitValues = new ChainRunFitValues(numElements, cycles);
+    integralFitValues = new ChainRunFitValues(numElements, cycles);
+    singleRegularFitValues = new SingleChainRunFitValues(numElements, cycles);
+    singleIntegralFitValues = new SingleChainRunFitValues(numElements, cycles);
+    */
+
 }
 
 Cycle::~Cycle()
@@ -281,7 +295,7 @@ resultStorage<Double_t>** Cycle::runSeperateMean()
 //does runs cycle for the single histogram (dynamic)
 resultStorage<Double_t>** Cycle::runSeperateSingleGen()
 {
-    //setting inital values for time, 1= start const end moving, 2= end const start moving
+    //setting inital values for time, 1 = start const end moving, 2 = start moving end const
     element->setTimeRunStart(x_start);
     element->setTimeRunEnd(x_stop);
 
@@ -304,7 +318,7 @@ resultStorage<Double_t>** Cycle::runSeperateSingleGen()
     //running the cycle and puts the fit values in the arrays
     for(int i = 0; i < cycles; i++)
     {
-        values = decayChainRun->runNoChangeGenOnce();
+        values = decayChainRun->runNoChange();
         for(int k = 0; k < numElements; k++)
         {
             (cycleSingleResult[0]->getDoubleArrStorage())[k][i] = values[2][k];

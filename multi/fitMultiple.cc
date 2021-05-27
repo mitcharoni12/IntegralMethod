@@ -241,7 +241,6 @@ void fitMultiple()
                         element->displayIntegralHisto(integralTotalCanvas);
                         //delete [] singleCanvas;
                     }
-                    //delete element;
                     inFile.close();
 
                 break;
@@ -284,8 +283,9 @@ void fitMultiple()
                             totalResultHisto[(i*4)+2] = runResultHisto[(i*2)+1];
                             totalResultHisto[(i*4)+3] = runResultHistoSingleElements[(i*2)+1];
                         }
-                        delete runResultHisto;
-                        delete runResultHistoSingleElements;
+                        //delete only runResultHisto and runResultHisto arrays because you do not want to delete the individual histograms
+                        delete [] runResultHisto;
+                        delete [] runResultHistoSingleElements;
 
                         //creates canvases to display histos and displays them
                         TCanvas** totalRunResultCanvases = new TCanvas* [numElements];
@@ -296,16 +296,19 @@ void fitMultiple()
                         }
 
                         elementRun->displayMultiRunResultHistos(totalRunResultCanvases, totalResultHisto);
+                        for(int i = 0; i < numElements; i++)
+                        {
+                            totalRunResultCanvases[i];
+                        }
+                        delete [] totalRunResultCanvases;
                         delete [] totalResultHisto;
-                        delete elementRun;
-                        delete element;
 
                     //choice of displaying data via graph
                     }else{
                         TGraph** runResultGraphs = elementRun->genGraphsNoChange();
                         TGraph** runResultSingleElementGraphs = elementRun->genGraphsNoChangeSingleElement();
 
-                        TGraph** totalRunResuts = new TGraph* [numElements*4];
+                        TGraph** totalRunResults = new TGraph* [numElements*4];
                         TGraph** totalRunResultErrors = new TGraph* [numElements*4];
 
                         //extracts the fit value graphs from the array of graphs runResultGraphs and runResultSingleElementGraphs
@@ -314,10 +317,10 @@ void fitMultiple()
                         so I had to extract the graphs in this really weird way)*/
                         for(int i = 0; i < numElements; i++)
                         { 
-                            totalRunResuts[(i*4)] = runResultGraphs[(i*6)+2];
-                            totalRunResuts[(i*4)+1] = runResultSingleElementGraphs[(i*6)+2];
-                            totalRunResuts[(i*4)+2] = runResultGraphs[(i*6)+3];
-                            totalRunResuts[(i*4)+3] = runResultSingleElementGraphs[(i*6)+3];
+                            totalRunResults[(i*4)] = runResultGraphs[(i*6)+2];
+                            totalRunResults[(i*4)+1] = runResultSingleElementGraphs[(i*6)+2];
+                            totalRunResults[(i*4)+2] = runResultGraphs[(i*6)+3];
+                            totalRunResults[(i*4)+3] = runResultSingleElementGraphs[(i*6)+3];
                         }
                         for(int i = 0; i < numElements; i++)
                         { 
@@ -354,24 +357,25 @@ void fitMultiple()
                                 runResultErrorCanvases[i]->Divide(2,2,.02,.02);
                             }
                             TCanvas* sacraficeCanvas = new TCanvas("SacraficeCanvas", "SacraficeCanvas", 500, 500);
-                            elementRun->displayMultiRunResultGraphs(runResultCanvases,totalRunResuts);
+                            elementRun->displayMultiRunResultGraphs(runResultCanvases,totalRunResults);
                             elementRun->displayMultiRunResultGraphs(runResultErrorCanvases, totalRunResultErrors);
+
                             delete [] runResultErrorCanvases;
                             delete [] runResultCanvases;
                         }
                         inFile.close();
-                        delete [] totalRunResuts;
+                        delete [] totalRunResults;
                         delete [] totalRunResultErrors;
                     }
                 break;
+                delete elementRun;
                 }
-                /*
 
 
                 //multiple runs of histogram
                 case 3:
                 {
-                    Int_t numRuns, numCycles, writeToFileChoice, SingleSourceHistoChoice, SeperateMeanChoice, cylceChangeChoice;
+                    Int_t numRuns, numCycles, writeToFileChoice, singleSourceHistoChoice, seperateMeanChoice, cylceChangeChoice;
                     Double_t x_start, x_stop, x_inc, cycleSingleChoice;
 
                     inFile.open("simulated_multi_cycle.txt");
@@ -392,19 +396,19 @@ void fitMultiple()
                     inFile.ignore(256,':');
                     inFile >> x_inc;
                     inFile.ignore(256,':');
-                    inFile >> SingleSourceHistoChoice;
+                    inFile >> singleSourceHistoChoice;
                     inFile.ignore(256,':');
                     inFile >> cycleSingleChoice;
 
                     Run* elementRunsCycle = new Run(numRuns, eventDecrement, element, elementNames);
                     Cycle* cycle = new Cycle(numCycles, elementRunsCycle, element, x_start, x_stop, x_inc, cylceChangeChoice);
 
-                    resultStorage<double_t>** cycleSeperateResultData;
-                    resultStorage<double_t>** cycleDifferenceResultData;
+                    resultStorage<Double_t>** cycleSeperateResultData;
+                    resultStorage<Double_t>** cycleDifferenceResultData;
                     TGraphErrors** cycleResultGraphs;
                     TCanvas** canvasArr;
 
-                    switch(SingleSourceHistoChoice)
+                    switch(singleSourceHistoChoice)
                     {
                         resultStorage<Double_t>** cycleResultData;
                         //single histo source
@@ -514,8 +518,8 @@ void fitMultiple()
                     delete cycle;
                 break;
                 }
-                */
             }
+            delete element;
             break;
         }
 
@@ -587,7 +591,18 @@ void fitMultiple()
             }
         }
         */
+       gDirectory->Close();
     }
+    //delete dyanmically allocated data
+    for(int i = 0; i < numElements; i++)
+    {
+        delete paraVals[i];
+    }
+    delete [] paraVals;
+    delete [] elementNames;
+    //delete [] fitFunctions;
+    //delete [] regularFitFunctions;
+    //delete [] integralFitFunctions;
 }
 
 //formula for CS activity

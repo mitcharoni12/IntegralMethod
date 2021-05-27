@@ -25,7 +25,7 @@ using namespace std;
 
 class Run{
     private:
-        Int_t runs, numElements, eventDecrement;
+        Int_t runs, numElements, eventDecrement, genOnceChoice;
         ElementFit* element;
         ChainRunFitValues* regularFitValues, *integralFitValues;
         SingleChainRunFitValues* singleRegularFitValues, *singleIntegralFitValues;
@@ -49,7 +49,7 @@ class Run{
         Double_t** runNoChangeGenOnce();
         TGraph** genGraphsEventChange();
         TGraph** genGraphsNoChange();
-        TGraph** genGraphsNoChangeSingleElement();
+        //TGraph** genGraphsNoChangeSingleElement();
         TH1D** createRunResultHistos();
         TH1D** createRunResultHistosSingleElements();
         TH1D** fillRunResultHistos(TH1D** multiRunResultHistograms);
@@ -60,7 +60,7 @@ class Run{
         void runNoChange();
         //getter function
         TH1D** getMultiRunResultHistos(){return multiRunResultHistograms;}
-        string* elementStringNames(){return elementNameStrs;}
+        string* getElementStringNames(){return elementNameStrs;}
         //setter function
         void setNumRuns(Int_t numRuns){this->runs = numRuns;}
 };
@@ -72,6 +72,7 @@ Run::Run(Int_t runs, Int_t eventDecrement, ElementFit* element, string* elementN
     this->eventDecrement = eventDecrement;
     this->element = element;
     this->elementNameStrs = elementNameStrs;
+    this->genOnceChoice = genOnceChoice;
     numElements = element->getNumElements();
 
     //dynamically allocating required arrays and root variables
@@ -432,7 +433,6 @@ void Run::runEventChange()
         {
             eventsXAxis[j] = ((Double_t) element->getNumEvents());
 
-
             regularFitErrors[i][j] = (fitParameters->getRegularHalfLifeError())[i];
             integralFitErrors[i][j] = (fitParameters->getIntegralHalfLifeError())[i];
             regularFitValue[i][j] = (fitParameters->getRegularHalfLife())[i];
@@ -460,6 +460,7 @@ void Run::runNoChange()
     for(int j = 0; j < runs; j++)
     {
         //generates random data and fits it. Then extract the fit parametes
+        
         element->fitData();
         
         //gets total regular fit parameters
@@ -536,10 +537,92 @@ void Run::runNoChange()
     }
 }
 
-/*
+
 //fits the singular histogram and puts the data of the singlular fit into the arrays (dynamic)
 Double_t** Run::runNoChangeGenOnce()
 {
+    ChainFitValues* tempFitParameters;
+    SingleElementFitValues* singleTempFitParameters;
+    Double_t tempN0;
+    Double_t tempN0Error;
+    Double_t tempHalfLife;
+    Double_t tempHalfLifeError;
+
+    element->fitDataGenOnce();
+
+    tempFitParameters = element->getRegularFitParameters();
+        
+        //move total regular parameters into respective class
+        for(int i = 0; i < numElements; i++)
+        {
+            tempN0 = tempFitParameters->GetAnN0(i);
+            tempN0Error = tempFitParameters->GetAnN0Error(i);
+            tempHalfLife = tempFitParameters->GetAnHalfLife(i);
+            tempHalfLifeError = tempFitParameters->GetAnHalfLifeError(i);
+
+            regularFitValues->SetAnN0(0, i, tempN0);
+            regularFitValues->SetAnN0Error(0, i, tempN0Error);
+            regularFitValues->SetAnHalfLife(0, i, tempHalfLife);
+            regularFitValues->SetAnHalfLifeError(0, i, tempHalfLifeError);
+        }
+
+        //gets total integral fit parameters
+        tempFitParameters = element->getIntegralFitParameters();
+
+        //move total integral parameters into respective class
+        for(int i = 0; i < numElements; i++)
+        {
+            tempN0 = tempFitParameters->GetAnN0(i);
+            tempN0Error = tempFitParameters->GetAnN0Error(i);
+            tempHalfLife = tempFitParameters->GetAnHalfLife(i);
+            tempHalfLifeError = tempFitParameters->GetAnHalfLifeError(i);
+
+            integralFitValues->SetAnN0(0, i, tempN0);
+            integralFitValues->SetAnN0Error(0, i, tempN0Error);
+            integralFitValues->SetAnHalfLife(0, i, tempHalfLife);
+            integralFitValues->SetAnHalfLifeError(0, i, tempHalfLifeError);
+        }
+
+        //get single regular fit parameters
+        singleTempFitParameters = element->getSingleRegularFitParameters();
+
+        //move single regular fit parameters into respective class
+        for(int i = 0; i < numElements; i++)
+        {
+            for(int subIndex = 0; subIndex < i+1; subIndex++)
+            {
+                tempN0 = singleTempFitParameters->GetAnN0(i, subIndex);
+                singleRegularFitValues->SetAnN0(0, i, subIndex, tempN0);
+                tempN0Error = singleTempFitParameters->GetAnN0Error(i, subIndex);
+                singleRegularFitValues->SetAnN0Error(0, i, subIndex, tempN0Error);
+                tempHalfLife = singleTempFitParameters->GetAnHalfLife(i, subIndex);
+                singleRegularFitValues->SetAnHalfLife(0, i, subIndex, tempHalfLife);
+                tempHalfLifeError = singleTempFitParameters->GetAnHalfLifeError(i, subIndex);
+                singleRegularFitValues->SetAnHalfLifeError(0, i, subIndex, tempHalfLifeError);
+            }
+        }
+
+        //get single integral fit parameters
+        singleTempFitParameters = element->getSingleIntegralFitParameters();
+
+        //move single integral fit parameters into respective class
+        for(int i = 0; i < numElements; i++)
+        {
+            for(int subIndex = 0; subIndex < i+1; subIndex++)
+            {
+                tempN0 = singleTempFitParameters->GetAnN0(i, subIndex);
+                singleIntegralFitValues->SetAnN0(0, i, subIndex, tempN0);
+                tempN0Error = singleTempFitParameters->GetAnN0Error(i, subIndex);
+                singleIntegralFitValues->SetAnN0Error(0, i, subIndex, tempN0Error);
+                tempHalfLife = singleTempFitParameters->GetAnHalfLife(i, subIndex);
+                singleIntegralFitValues->SetAnHalfLife(0, i, subIndex, tempHalfLife);
+                tempHalfLifeError = singleTempFitParameters->GetAnHalfLifeError(i, subIndex);
+                singleIntegralFitValues->SetAnHalfLifeError(0, i, subIndex, tempHalfLifeError);
+            }
+        }
+    
+
+    /*
     FitParameterStore* fitParameters;
     FitParameterStore** singleFitParameters;
     Double_t** value = new Double_t* [12];
@@ -557,8 +640,9 @@ Double_t** Run::runNoChangeGenOnce()
     Double_t* integralFitValueSingleElement= new Double_t [numElements];
     Double_t* initRegularValueSingleElement = new Double_t [numElements];
     Double_t* initIntegralValueSingleElement = new Double_t [numElements];
-
     element->fitDataGenOnce();
+    tempFitParameters = element->getRegularFitParameters();
+
     fitParameters = element->getTotalFitParameters();
     singleFitParameters = element->getSingleFitParameters();
     //takes fit parameters and puts them in their respective arrays
@@ -591,9 +675,9 @@ Double_t** Run::runNoChangeGenOnce()
     value[9] = integralFitValueSingleElement;
     value[10] = initRegularValueSingleElement;
     value[11] = initIntegralValueSingleElement;
+    */
 
     return value;
 }
-*/
 
 #endif

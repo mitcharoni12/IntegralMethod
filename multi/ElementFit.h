@@ -211,8 +211,10 @@ ElementFit::~ElementFit()
         delete singleFitFunctions[i];
     }
     delete [] singleFitFunctions;
-    delete randArr;
+    delete [] randArr;
     delete histoList;
+    delete regularFunction;
+    delete integralFunction;
 }
 
 //used for changing seed between runs
@@ -513,7 +515,7 @@ void ElementFit::genRandomAlternate()
     regularHisto->Reset("ICES");
     for(int i = 0; i < numElements; i++)
     {
-        //singleElementRegularHistos[i]->Reset("ICES");
+        singleElementRegularHistos[i]->Reset("ICES");
     }
     changeSeed();
     for(int i = 0; i < events; i++)
@@ -615,8 +617,8 @@ void ElementFit::setParaLimits()
     {
         if(paraVals[i]->getIsValueInitValue())
         {
-            regularFunction->SetParLimits((i*2), 0., events);
-            integralFunction->SetParLimits((i*2), 0., events);
+            regularFunction->SetParLimits((i*2), 0., events*2);
+            integralFunction->SetParLimits((i*2), 0., events*2);
         }else{
             regularFunction->SetParLimits((i*2), paraVals[i]->getLowerRangeInitValue(), paraVals[i]->getUpperRangeInitValue());
             integralFunction->SetParLimits((i*2), paraVals[i]->getLowerRangeInitValue(), paraVals[i]->getUpperRangeInitValue());
@@ -642,8 +644,8 @@ void ElementFit::setParaLimits()
         {
             if(paraVals[i]->getIsValueInitValue())
             {
-                (singleFitFunctions[(i*2)])->SetParLimits((k*2), 0., events);
-                (singleFitFunctions[(i*2)+1])->SetParLimits((k*2), 0., events);
+                (singleFitFunctions[(i*2)])->SetParLimits((k*2), 0., events*2);
+                (singleFitFunctions[(i*2)+1])->SetParLimits((k*2), 0., events*2);
             }else{
                 (singleFitFunctions[(i*2)])->SetParLimits((k*2), paraVals[i]->getLowerRangeInitValue(), paraVals[i]->getUpperRangeInitValue());
                 (singleFitFunctions[(i*2)+1])->SetParLimits((k*2), paraVals[i]->getLowerRangeInitValue(), paraVals[i]->getUpperRangeInitValue());

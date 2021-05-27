@@ -1,15 +1,19 @@
 #include <iostream>
-#include "../../../root/root-6.24.00-install/include/TF1.h"
+#include "TF1.h"
 
 using namespace std;
+
+typedef Double_t (*decayFunction)(Double_t *x, Double_t *par);
 
 Double_t testFunction(Double_t *x, Double_t* par);
 
 void compile()
 {
-    cout << "BRUH";
-    TF1* testyBoi = new TF1("boi", testFunction, 0., 10.);
-    testyBoi->Draw();   
+    decayFunction* regular = new decayFunction [1];
+    regular[0] = testFunction;
+    TF1* testyBoi = new TF1("boi", regular[0], 0., 10.);
+    testyBoi->Draw();
+    delete [] regular;
 }
 
 Double_t testFunction(Double_t *x, Double_t* par)
