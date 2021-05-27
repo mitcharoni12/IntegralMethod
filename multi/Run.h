@@ -57,7 +57,7 @@ class Run{
         void displayMultiRunResultGraphs(TCanvas** canvasArray, TGraph** multiRunResultGraph);
         void displayCorrelationHisto(TCanvas* canvas);
         void displayMultiRunResultHistos(TCanvas** canvasArray, TH1D** multiRunResultHistograms);
-        void runNoChange();
+        void runNoChange(Int_t cycleIndex);
         //getter function
         ChainRunFitValues* getRegularFitValues(){return regularFitValues;}
         ChainRunFitValues* getIntegralFitValues(){return integralFitValues;}
@@ -65,6 +65,7 @@ class Run{
         SingleChainRunFitValues* getSingleIntegralFitValues(){return singleIntegralFitValues;}
         TH1D** getMultiRunResultHistos(){return multiRunResultHistograms;}
         string* getElementStringNames(){return elementNameStrs;}
+        Int_t getNumRuns(){return runs;}
         //setter function
         void setNumRuns(Int_t numRuns){this->runs = numRuns;}
 };
@@ -77,6 +78,8 @@ Run::Run(Int_t runs, Int_t eventDecrement, ElementFit* element, string* elementN
     this->element = element;
     this->elementNameStrs = elementNameStrs;
     numElements = element->getNumElements();
+    element->setNumRuns(runs);
+    element->genAndFillHistos();
 
     //dynamically allocating required arrays and root variables
     //dynamic array
@@ -450,7 +453,7 @@ void Run::runEventChange()
 */
 
 //does run for no change and puts data in respective array
-void Run::runNoChange()
+void Run::runNoChange(Int_t cycleIndex)
 {
     //dynamic array
     ChainFitValues* tempFitParameters;
@@ -463,9 +466,7 @@ void Run::runNoChange()
     for(int j = 0; j < runs; j++)
     {
         //generates random data and fits it. Then extract the fit parametes
-        
-        element->fitData();
-        
+        element->fitHistos(cycleIndex, j);
         //gets total regular fit parameters
         tempFitParameters = element->getRegularFitParameters();
         

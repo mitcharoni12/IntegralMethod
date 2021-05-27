@@ -55,6 +55,8 @@ Cycle::Cycle(Int_t cycles, Run* decayChainRun, ElementFit* element, Double_t x_s
     this->x_stop = x_stop;
     this->x_inc = x_inc;
     this->incChoice = incChoice;
+    element->setNumRuns(decayChainRun->getNumRuns());
+    element->setNumCycles(cycles);
     elementStrNames = decayChainRun->getElementStringNames();
     regularFitValues = new ChainRunFitValues(numElements, cycles);
     integralFitValues = new ChainRunFitValues(numElements, cycles);
@@ -343,10 +345,6 @@ void Cycle::runSeperateSingleGen()
     SingleChainRunFitValues* singleTempVals;
 
     Double_t** values;
-    //creates the histograms we will fit
-    element->genRandomAlternate();
-    element->genIntegralHisto();
-    element->genIntegralSingleHistos();
 
     //running the cycle and puts the fit values in the arrays
     for(int i = 0; i < cycles; i++)

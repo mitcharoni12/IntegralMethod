@@ -4,7 +4,7 @@
 #include "ElementFit.h"
 #include "TGraph.h"
 #include "TH1D.h"
-//#include "Run.h"
+#include "Run.h"
 //#include "Cycle.h"
 #include "TGraphErrors.h"
 #include "ParameterValue.h"
@@ -197,7 +197,7 @@ void fitMultiple()
             inFile >> numBins;
             inFile.ignore(256,':');
             inFile >> timeRun;
-            element = new ElementFit(events, RegularDecaybyActivity, IntegralDecaybyActivity, fitFunctions, numElements, timeRun, numBins, elementNames, paraVals, 1, 1);
+            element = new ElementFit(events, RegularDecaybyActivity, IntegralDecaybyActivity, fitFunctions, numElements, timeRun, numBins, elementNames, paraVals);
             //gets the fit generation choice
             inFile.ignore(256,':');
             inFile >> fitGenerationChoice;
@@ -209,6 +209,7 @@ void fitMultiple()
                 case 1:
                 {
                     inFile.open("simulated_single_run.txt");
+                    element->genAndFillHistos();
                     element->fitHistos(0, 0);
                     element->displayParameters();
                     //gets write file choice
@@ -243,7 +244,6 @@ void fitMultiple()
 
                 break;
                 }
-                /*
                 //single cycle of histogram
                 case 2:
                 {
@@ -259,10 +259,10 @@ void fitMultiple()
                     inFile >> writeToFileChoice;
                     inFile.ignore(256,':');
                     inFile >> graphOrHistoChoice;
-
+                    
                     Run* elementRun = new Run(runs, eventDecrement, element, elementNames); 
-
-                    elementRun->runNoChange();
+                    
+                    elementRun->runNoChange(0);
                     
                     if(displayFitsChoice == 1)
                     {
@@ -314,12 +314,12 @@ void fitMultiple()
 
                         TGraph** totalRunResults = new TGraph* [numElements*4];
                         TGraph** totalRunResultErrors = new TGraph* [numElements*4];
-                */
+                
+                
                         //extracts the fit value graphs from the array of graphs runResultGraphs and runResultSingleElementGraphs
                         /*(I wanted to put the graphs of single element fit value and total element fit value into one array, but
                         the graph array runResultGraphs and runResultSingleElementGraphs both had 18 graphs in them with a lot of extra data
                         so I had to extract the graphs in this really weird way)*/
-                        /*
                         for(int i = 0; i < numElements; i++)
                         { 
                             totalRunResults[(i*4)] = runResultGraphs[(i*6)+2];
@@ -376,7 +376,6 @@ void fitMultiple()
                 delete elementRun;
                 }
 
-
                 //multiple runs of histogram
                 case 3:
                 {
@@ -421,7 +420,6 @@ void fitMultiple()
                             //mean difference
                             if(cycleSingleChoice == 1)
                             {
-                        */
                                 /*
                                 cycleSeperateResultData = cycle->runSeperateSingleGen();
                                 cycleDifferenceResultData = cycle->genSingleMeanDifference(cycleSeperateResultData);
@@ -448,7 +446,6 @@ void fitMultiple()
                                 delete [] canvasArr;
                                 */
                             //seperate mean
-                        /*
                             }else{
                                 cycle->runSeperateSingleGen();
                                 cycle->genSeperateMeanGraphs();
@@ -464,7 +461,6 @@ void fitMultiple()
                             }
                         break;
                         }
-                        */
                         //multi histo source
                             /*
                         case 2:
