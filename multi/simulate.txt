@@ -1,5 +1,5 @@
 Histo events:10000
 Histo Bins:1000
 Time generate until:400
-Single run(1) single cylce(2) multiple cycle(3):2
+Single run(1) single cylce(2) multiple cycle(3):1
 Display individual fits(1) dont display(2):1

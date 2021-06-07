@@ -3,6 +3,7 @@
 
 #include <ctime>
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <math.h>
 
@@ -546,8 +547,9 @@ void ElementFit::genRandomAlternate()
         }
 
         //copy generated histogram to all other histos
+        /*
         originalHisto = regularHisto->GetAHisto(0, 0);
-        for(int i = 0; i < numElement; i++)
+        for(int i = 0; i < numElements; i++)
         {
             originalSingleHisto = singleRegularHisto(0, 0, i);
         }
@@ -558,8 +560,10 @@ void ElementFit::genRandomAlternate()
                 
             }
         }
+        */
     }else{
     //case for multiple histogram generation
+    cout << "IM DOING THE SECOND ONE" << endl << endl << endl;
         for(int cycleIndex = 0; cycleIndex < numCycles; cycleIndex++)
         {
             for(int runIndex = 0; runIndex < numRuns; runIndex++)
@@ -585,6 +589,16 @@ void ElementFit::genRandomAlternate()
                         tempHisto->Fill(stack);
                     }
                     stack = 0.0f;
+                }
+                ofstream myFile;
+                Double_t binData;
+                myFile.open("regularValues.txt");
+                //temp for fitting with python
+                for(int i = 0; i < numBins; i++)
+                {
+                    binData = tempHisto->GetBinContent(i);
+                    myFile << binData;
+                    myFile << "\n";
                 }
             }
         }

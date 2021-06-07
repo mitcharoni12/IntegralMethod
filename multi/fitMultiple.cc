@@ -377,6 +377,7 @@ void fitMultiple()
                 }
 
                 //multiple runs of histogram
+                /*
                 case 3:
                 {
                     Int_t numRuns, numCycles, writeToFileChoice, singleSourceHistoChoice, seperateMeanChoice, cylceChangeChoice;
@@ -420,6 +421,7 @@ void fitMultiple()
                             //mean difference
                             if(cycleSingleChoice == 1)
                             {
+                /*
                                 /*
                                 cycleSeperateResultData = cycle->runSeperateSingleGen();
                                 cycleDifferenceResultData = cycle->genSingleMeanDifference(cycleSeperateResultData);
@@ -446,6 +448,7 @@ void fitMultiple()
                                 delete [] canvasArr;
                                 */
                             //seperate mean
+                /*
                             }else{
                                 cycle->runSeperateSingleGen();
                                 cycle->genSeperateMeanGraphs();
@@ -461,6 +464,7 @@ void fitMultiple()
                             }
                         break;
                         }
+                */
                         //multi histo source
                             /*
                         case 2:
