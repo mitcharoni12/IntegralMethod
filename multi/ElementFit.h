@@ -14,8 +14,6 @@
 #include "TMath.h"
 #include "TRandom3.h"
 #include "TCanvas.h"
-#include "TFile.h"
-#include "TList.h"
 #include "SingleCycleHistoHolder.h"
 #include "ParameterValue.h"
 #include "ChainFitValues.h"
@@ -55,7 +53,6 @@ class ElementFit{
         void setNumCycles(Int_t numCycles){this->numCycles = numCycles;}
         //public functions
         void createHistoHolders();
-        void createHistoFile(string name);
         void displayIntegralHisto(TCanvas* can);
         void displayRegularHisto(TCanvas* can);
         void displaySingleHistos(TCanvas** can);
@@ -70,7 +67,6 @@ class ElementFit{
         void genIntegralSingleHistos();
         void genRandomAlternate();
         void genAndFillHistos();
-        void writeToFile();
         void fitRegularHisto(Int_t cycleIndex, Int_t runIndex);
         void fitIntegralHisto(Int_t cycleIndex, Int_t runIndex);
     private:
@@ -81,8 +77,6 @@ class ElementFit{
         TF1** singleFitFunctions;
         CycleHistoHolder* regularHisto, *integralHisto;
         SingleCycleHistoHolder* singleRegularHisto, *singleIntegralHisto;
-        TList* histoList;
-        TFile* histoFile;
         //passed fit functions used to make the TF1 for fitting
         decayFunction* fitFunctions;
         decayFunction passedRegularFunction, passedIntegralFunction;
@@ -105,6 +99,9 @@ class ElementFit{
         void setFunctionParamersSingle();
         void setParaLimits();
         TCanvas* test = new TCanvas("test", "test", 500, 500);
+        TCanvas* test2 = new TCanvas("test2", "test2", 500, 500);
+        TCanvas* test3 = new TCanvas("test3", "test3", 500, 500);
+        TCanvas* test4 = new TCanvas("test4", "test4", 500, 500);
         clock_t Tclock;
 };  
 
@@ -129,7 +126,6 @@ ElementFit::ElementFit(Int_t events_p, Double_t (*regularFunc)(Double_t*, Double
     singleHistoChoice = 0;
 
     //dynamically allocating needed variables and arrays
-    histoList = new TList();
     //dynamic array
     singleRegularFitParameters = new SingleElementFitValues(numElements);
     singleIntegralFitParameters = new SingleElementFitValues(numElements);
@@ -147,6 +143,16 @@ ElementFit::ElementFit(Int_t events_p, Double_t (*regularFunc)(Double_t*, Double
     setFunctionParamersSingle();
     //parameter limits so we get reasonable values
     setParaLimits();
+    test->cd();
+    cout << "regular function memory address " << regularFunction << endl << endl;
+    regularFunction->Draw();
+    cout << "regular function memory address " << regularFunction << endl << endl;
+    test2->cd();
+    regularFunction->Draw();
+    test3->cd();
+    regularFunction->Draw();
+    test4->cd();
+    regularFunction->Draw();
 }
 
 
@@ -191,7 +197,6 @@ ElementFit::~ElementFit()
     }
     delete [] singleFitFunctions;
     delete [] randArr;
-    delete histoList;
     delete regularFunction;
     delete integralFunction;
     delete regularHisto;
@@ -233,17 +238,12 @@ void ElementFit::createHistoHolders()
     singleIntegralHisto = new SingleCycleHistoHolder(numCycles, numElements, numRuns, histoName, numBins, timeRunEnd, elementNames);
 }
 
-//creates file to export histograms to
-void ElementFit::createHistoFile(string name)
-{
-    histoFile = new TFile((name).c_str(), "recreate");
-}
-
 //dynamically allocates the total fit functions
 void ElementFit::createTotalFunctions()
 {
     regularFunction = new TF1("TotalregularFunction", passedRegularFunction, 0., timeRunEnd, numParameters);
     integralFunction = new TF1("TotalIntegralFunction", passedIntegralFunction, 0., timeRunEnd, numParameters);
+    cout << "regular function memory address " << regularFunction << endl << endl;
 }
 
 //USED FOR TROUBLESHOOTING displays integral histogram based on canvas passed in
@@ -474,6 +474,17 @@ void ElementFit::genIntegralHisto()
             {
                 tempIntegralHisto->SetBinContent(i, tempRegularHisto->GetBinContent(i) + tempIntegralHisto->GetBinContent(i-1));
             }
+
+            ofstream myFile;
+            Double_t binData;
+            myFile.open("integralValues.txt");
+                for(int i = 0; i < numBins; i++)
+                {
+                    binData = tempIntegralHisto->GetBinContent(i+1);
+                    myFile << binData;
+                    myFile << "\n";
+                }
+                myFile.close();
         }
     }
 }
@@ -504,6 +515,37 @@ void ElementFit::genIntegralSingleHistos()
                     tempIntegralHisto->SetBinContent(k, tempIntegralHisto->GetBinContent(k-1) + tempRegularHisto->GetBinContent(k));
                 }
             }
+
+            cout << "LA SINGLE HISTO MEM ADDRESS " << singleIntegralHisto->GetAHisto(0, 0, 2) << endl;
+
+            ofstream myFile;
+            Double_t binData;
+            myFile.open("CsIntegralValues.txt");
+                for(int i = 0; i < numBins; i++)
+                {
+                    binData = singleIntegralHisto->GetAHisto(0, 0, 0)->GetBinContent(i+1);
+                    myFile << binData;
+                    myFile << "\n";
+                }
+                myFile.close();
+
+            myFile.open("BaIntegralValues.txt");
+                for(int i = 0; i < numBins; i++)
+                {
+                    binData = singleIntegralHisto->GetAHisto(0, 0, 1)->GetBinContent(i+1);
+                    myFile << binData;
+                    myFile << "\n";
+                }
+                myFile.close();
+            
+            myFile.open("LaIntegralValues.txt");
+                for(int i = 0; i < numBins; i++)
+                {
+                    binData = singleIntegralHisto->GetAHisto(0, 0, 2)->GetBinContent(i+1);
+                    myFile << binData;
+                    myFile << "\n";
+                }
+                myFile.close();
         }
     }
 }
@@ -563,7 +605,6 @@ void ElementFit::genRandomAlternate()
         */
     }else{
     //case for multiple histogram generation
-    cout << "IM DOING THE SECOND ONE" << endl << endl << endl;
         for(int cycleIndex = 0; cycleIndex < numCycles; cycleIndex++)
         {
             for(int runIndex = 0; runIndex < numRuns; runIndex++)
@@ -596,10 +637,38 @@ void ElementFit::genRandomAlternate()
                 //temp for fitting with python
                 for(int i = 0; i < numBins; i++)
                 {
-                    binData = tempHisto->GetBinContent(i);
+                    binData = tempHisto->GetBinContent(i+1);
                     myFile << binData;
                     myFile << "\n";
                 }
+                myFile.close();
+                
+                myFile.open("CsRegularValues.txt");
+                for(int i = 0; i < numBins; i++)
+                {
+                    binData = singleTempHisto[0]->GetBinContent(i+1);
+                    myFile << binData;
+                    myFile << "\n";
+                }
+                myFile.close();
+
+                myFile.open("BaRegularValues.txt");
+                for(int i = 0; i < numBins; i++)
+                {
+                    binData = singleTempHisto[1]->GetBinContent(i+1);
+                    myFile << binData;
+                    myFile << "\n";
+                }
+                myFile.close();
+
+                myFile.open("LaRegularValues.txt");
+                for(int i = 0; i < numBins; i++)
+                {
+                    binData = singleTempHisto[2]->GetBinContent(i+1);
+                    myFile << binData;
+                    myFile << "\n";
+                }
+                myFile.close();
             }
         }
     }
@@ -743,9 +812,4 @@ void ElementFit::setParaLimits()
     }
 }
 
-void ElementFit::writeToFile()
-{
-    histoList->Write();
-    histoFile->Close();
-}
 #endif

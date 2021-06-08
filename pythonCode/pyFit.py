@@ -3,6 +3,10 @@ from scipy.optimize import curve_fit
 from drawnow import *
 import numpy as np
 import math
+from decimal import Decimal
+
+Cs0, Ba0, La0 = 10000, 0, 0
+lambdaCs, lambdaBa, lambdaLa = .69733, .060273, .016988
 
 def CSDecayIntegral(x, Cs0, lambdaCs):
     f = Cs0 * (1 - np.exp(-lambdaCs * x))
@@ -97,16 +101,34 @@ def totalRegular(x, Cs0, lambdaCs, Ba0, lambdaBa, La0, lambdaLa):
     return f
 
 myFile = open("/home/rlmitchell43/integralMethod/IntegralMethod/multi/regularValues.txt", "r")
-binAxis = []
-eventAxis = []
+binXAxis = []
+eventYAxis = []
 for x in range(1000):
-    binAxis.append(x)
+    binXAxis.append(x)
     binData = myFile.readline()
-    eventAxis.append(binData)
+    binData = Decimal(binData)
+    eventYAxis.append(binData)
 
-plt.plot(binAxis, eventAxis)
+boundArr = (
+            (0, .01 * lambdaCs, 0, .01 * lambdaBa, 0, .01 * lambdaLa),
+            (2 * Cs0, 100 * lambdaCs, 2 * Cs0, 100 * lambdaBa, 2 * Cs0, 100 * lambdaLa)
+            )
+fitData, conv = curve_fit(totalRegular, binXAxis, binData, bounds = boundArr, method = 'trf')
+Cs0Fit, lambdaCsFit, Ba0Fit, lambdaBaFit, La0Fit, lambdaLaFit = fitData
+
+print(Cs0Fit)
+print(lambdaCsFit)
+print(Ba0Fit)
+print(lambdaBaFit)
+print(La0Fit)
+print(lambdaLaFit)
+
+x = np.linspace(0, 400, 10000)
+
 plt.ylabel("Number Events")
 plt.xlabel("Bin number")
+plt.plot(x, totalRegular(x, Cs0, lambdaCs, Ba0, lambdaBa, La0, lambdaLa), label = "fit")
+plt.plot(binXAxis, eventYAxis)
 plt.show()
 
 '''
