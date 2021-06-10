@@ -100,29 +100,47 @@ def totalRegular(x, Cs0, lambdaCs, Ba0, lambdaBa, La0, lambdaLa):
 
     return f
 
-myFile = open("/home/rlmitchell43/integralMethod/IntegralMethod/multi/regularValues.txt", "r")
-binXAxis = []
+myFile = open("/home/rlmitchell43/integralMethod/IntegralMethod/multi/LaRegularValues.txt", "r")
 eventYAxis = []
-for x in range(1000):
-    binXAxis.append(x)
+for x in range(10000):
     binData = myFile.readline()
     binData = Decimal(binData)
     eventYAxis.append(binData)
+
+binCenters = []
+center = .2
+for x in range(1000):
+    binCenters.append(center)
+    center = center + .4
+
+#fig, axs = plt.subplots(1, 1, sharey = True, tight_layout = True)
+(n, bins, patches) = plt.hist(eventYAxis, bins = 1000, range = (0, 400))
 
 boundArr = (
             (0, .01 * lambdaCs, 0, .01 * lambdaBa, 0, .01 * lambdaLa),
             (2 * Cs0, 100 * lambdaCs, 2 * Cs0, 100 * lambdaBa, 2 * Cs0, 100 * lambdaLa)
             )
-fitData, conv = curve_fit(totalRegular, binXAxis, binData, bounds = boundArr, method = 'trf')
+'''
+boundArr = (
+            (0, .01 * lambdaCs, 0, .01 * lambdaBa),
+            (2 * Cs0, 100 * lambdaCs, 2 * Cs0, 100 * lambdaBa)
+            )
+'''
+fitData, conv = curve_fit(LaDecayRegular, binCenters, n, bounds = boundArr, method = 'trf', maxfev = 10000000000000000000)
 Cs0Fit, lambdaCsFit, Ba0Fit, lambdaBaFit, La0Fit, lambdaLaFit = fitData
+#Cs0Fit, lambdaCsFit, Ba0Fit, lambdaBaFit = fitData
 
-print(Cs0Fit)
-print(lambdaCsFit)
-print(Ba0Fit)
-print(lambdaBaFit)
-print(La0Fit)
-print(lambdaLaFit)
+print("Cs0:           " + str(Cs0Fit))
+print("Cs Half Life:  " + str(np.log(2)/lambdaCsFit))
+print("Ba0:           " + str(Ba0Fit))
+print("Ba Half Life:  " + str(np.log(2)/lambdaBaFit))
+print("La0:           " + str(La0Fit))
+print("La Half Life:  " + str(np.log(2)/lambdaLaFit))
 
+plt.plot(binCenters, n)
+plt.show()
+
+'''
 x = np.linspace(0, 400, 10000)
 
 plt.ylabel("Number Events")
@@ -130,7 +148,7 @@ plt.xlabel("Bin number")
 plt.plot(x, totalRegular(x, Cs0, lambdaCs, Ba0, lambdaBa, La0, lambdaLa), label = "fit")
 plt.plot(binXAxis, eventYAxis)
 plt.show()
-
+'''
 '''
 xData = []
 yData = []

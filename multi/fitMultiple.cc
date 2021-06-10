@@ -224,19 +224,19 @@ void fitMultiple()
                         inFile >> fileName;
                     //case for displaying histogram
                     }else{
-                        //TCanvas** singleCanvas = new TCanvas* [numElements*2];
-                        //for(int i = 0; i < numElements; i++)
-                        //{
-                        //    singleCanvas[(i*2)] = new TCanvas((elementNames[i] + " Single Regular Histo").c_str(), (elementNames[i] + " Single Regular Histo").c_str(), 500, 500);
-                        //    singleCanvas[(i*2)+1] = new TCanvas((elementNames[i] + " Single Integral Histo").c_str(), (elementNames[i] + " Single Integral Histo").c_str(), 500, 500);
-                        //}
-                        //TCanvas* regularTotalCanvas = new TCanvas("Total Regular Histo", "Total Regular Histo", 500, 500);
-                        //TCanvas* integralTotalCanvas = new TCanvas("Total Integral Histo", "Total Integral Histo", 500, 500);
-                        //TCanvas* sacraficeCanvas = new TCanvas("SacraficeCanvas", "SacraficeCanvas", 500, 500);
-                        //element->displaySingleHistos(singleCanvas);
-                        //element->displayRegularHisto(regularTotalCanvas);
-                        //element->displayIntegralHisto(integralTotalCanvas);
-                        //delete [] singleCanvas;
+                        TCanvas** singleCanvas = new TCanvas* [numElements*2];
+                        for(int i = 0; i < numElements; i++)
+                        {
+                            singleCanvas[(i*2)] = new TCanvas((elementNames[i] + " Single Regular Histo").c_str(), (elementNames[i] + " Single Regular Histo").c_str(), 500, 500);
+                            singleCanvas[(i*2)+1] = new TCanvas((elementNames[i] + " Single Integral Histo").c_str(), (elementNames[i] + " Single Integral Histo").c_str(), 500, 500);
+                        }
+                        TCanvas* regularTotalCanvas = new TCanvas("Total Regular Histo", "Total Regular Histo", 500, 500);
+                        TCanvas* integralTotalCanvas = new TCanvas("Total Integral Histo", "Total Integral Histo", 500, 500);
+                        TCanvas* sacraficeCanvas = new TCanvas("SacraficeCanvas", "SacraficeCanvas", 500, 500);
+                        element->displaySingleHistos(singleCanvas);
+                        element->displayRegularHisto(regularTotalCanvas);
+                        element->displayIntegralHisto(integralTotalCanvas);
+                        delete [] singleCanvas;
                     }
                     inFile.close();
                 break;

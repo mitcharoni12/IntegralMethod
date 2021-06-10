@@ -98,10 +98,7 @@ class ElementFit{
         void setFunctionParametersTotal();
         void setFunctionParamersSingle();
         void setParaLimits();
-        TCanvas* test = new TCanvas("test", "test", 500, 500);
-        TCanvas* test2 = new TCanvas("test2", "test2", 500, 500);
-        TCanvas* test3 = new TCanvas("test3", "test3", 500, 500);
-        TCanvas* test4 = new TCanvas("test4", "test4", 500, 500);
+        //TCanvas* test = new TCanvas("test", "test", 500, 500);
         clock_t Tclock;
 };  
 
@@ -143,16 +140,6 @@ ElementFit::ElementFit(Int_t events_p, Double_t (*regularFunc)(Double_t*, Double
     setFunctionParamersSingle();
     //parameter limits so we get reasonable values
     setParaLimits();
-    test->cd();
-    cout << "regular function memory address " << regularFunction << endl << endl;
-    regularFunction->Draw();
-    cout << "regular function memory address " << regularFunction << endl << endl;
-    test2->cd();
-    regularFunction->Draw();
-    test3->cd();
-    regularFunction->Draw();
-    test4->cd();
-    regularFunction->Draw();
 }
 
 
@@ -243,7 +230,6 @@ void ElementFit::createTotalFunctions()
 {
     regularFunction = new TF1("TotalregularFunction", passedRegularFunction, 0., timeRunEnd, numParameters);
     integralFunction = new TF1("TotalIntegralFunction", passedIntegralFunction, 0., timeRunEnd, numParameters);
-    cout << "regular function memory address " << regularFunction << endl << endl;
 }
 
 //USED FOR TROUBLESHOOTING displays integral histogram based on canvas passed in
@@ -261,12 +247,16 @@ void ElementFit::displayParameters()
     {
         cout << elementNames[i] << ": " << "\tHalfLife: " << totalRegularFitParameters->GetAnHalfLife(i) << "s" << endl << 
         "\tError: " << totalRegularFitParameters->GetAnHalfLifeError(i) << "s" << endl;
+        cout << "\tN0: " << totalRegularFitParameters->GetAnN0(i) << "" << endl << 
+        "\tError: " << totalRegularFitParameters->GetAnN0Error(i) << "" << endl;
     }
     cout << endl << "INTEGRAL FIT PARAMETERS/ERRORS" << endl;
     for(int i = 0; i < numElements; i++)
     {
         cout << elementNames[i] << ": " << "\tHalfLife: " << totalIntegralFitParameters->GetAnHalfLife(i) << "s" << endl << 
         "\tError: " << totalIntegralFitParameters->GetAnHalfLifeError(i) << "s" << endl;
+        cout << "\tN0: " << totalIntegralFitParameters->GetAnN0(i) << "" << endl << 
+        "\tError: " << totalIntegralFitParameters->GetAnN0Error(i) << "" << endl;
     }
     cout << endl << "REGULAR SINGLE FIT PARAMETERS/ERRORS" << endl << endl;
     for(int i = 0; i < numElements; i++)
@@ -276,6 +266,8 @@ void ElementFit::displayParameters()
         {
             cout << elementNames[k] << ": \tHalf Life: " << singleRegularFitParameters->GetAnHalfLife(i, k) << "s" << endl << 
             "\tHalf Life Error: " << singleRegularFitParameters->GetAnHalfLifeError(i,k) << "s" << endl;
+            cout << "\tN0: " << singleRegularFitParameters->GetAnN0(i, k) << "" << endl << 
+            "\tN0 Error: " << singleRegularFitParameters->GetAnN0Error(i,k) << "" << endl;
             cout << endl;
         }
     }
@@ -287,6 +279,8 @@ void ElementFit::displayParameters()
         {
             cout << elementNames[k] << ": \tHalf Life: " << singleIntegralFitParameters->GetAnHalfLife(i, k) << "s" << endl << 
             "\tHalf Life Error: " << singleIntegralFitParameters->GetAnHalfLifeError(i,k) << "s" << endl;
+            cout << "\tN0: " << singleIntegralFitParameters->GetAnN0(i, k) << "" << endl << 
+            "\tN0 Error: " << singleIntegralFitParameters->GetAnN0Error(i,k) << "" << endl;
             cout << endl;
         }
     }
@@ -478,13 +472,13 @@ void ElementFit::genIntegralHisto()
             ofstream myFile;
             Double_t binData;
             myFile.open("integralValues.txt");
-                for(int i = 0; i < numBins; i++)
-                {
-                    binData = tempIntegralHisto->GetBinContent(i+1);
-                    myFile << binData;
-                    myFile << "\n";
-                }
-                myFile.close();
+            for(int i = 0; i < numBins; i++)
+            {
+                binData = tempIntegralHisto->GetBinContent(i+1);
+                myFile << binData;
+                myFile << "\n";
+            }
+            myFile.close();
         }
     }
 }
@@ -515,8 +509,6 @@ void ElementFit::genIntegralSingleHistos()
                     tempIntegralHisto->SetBinContent(k, tempIntegralHisto->GetBinContent(k-1) + tempRegularHisto->GetBinContent(k));
                 }
             }
-
-            cout << "LA SINGLE HISTO MEM ADDRESS " << singleIntegralHisto->GetAHisto(0, 0, 2) << endl;
 
             ofstream myFile;
             Double_t binData;
@@ -605,6 +597,18 @@ void ElementFit::genRandomAlternate()
         */
     }else{
     //case for multiple histogram generation
+    string fileNames [3] = {"CsRegularValues.txt", "BaRegularValues.txt", "LaRegularValues.txt"};
+    ofstream myFile;
+    Double_t binData;
+    for(int i = 0; i < numElements; i++)
+    {
+        myFile.open(fileNames[i]);
+        myFile << "";
+        myFile.close();
+    }
+    myFile.open("regularValues.txt");
+    myFile << "";
+    myFile.close();
         for(int cycleIndex = 0; cycleIndex < numCycles; cycleIndex++)
         {
             for(int runIndex = 0; runIndex < numRuns; runIndex++)
@@ -628,47 +632,18 @@ void ElementFit::genRandomAlternate()
                         stack += randArr[k];
                         singleTempHisto[k]->Fill(stack);
                         tempHisto->Fill(stack);
+
+                        myFile.open(fileNames[k], ios::out | ios::app);
+                        myFile << stack;
+                        myFile << endl;
+                        myFile.close();
+                        myFile.open("regularValues.txt", ios::out | ios::app);
+                        myFile << stack;
+                        myFile << endl;
+                        myFile.close();
                     }
                     stack = 0.0f;
                 }
-                ofstream myFile;
-                Double_t binData;
-                myFile.open("regularValues.txt");
-                //temp for fitting with python
-                for(int i = 0; i < numBins; i++)
-                {
-                    binData = tempHisto->GetBinContent(i+1);
-                    myFile << binData;
-                    myFile << "\n";
-                }
-                myFile.close();
-                
-                myFile.open("CsRegularValues.txt");
-                for(int i = 0; i < numBins; i++)
-                {
-                    binData = singleTempHisto[0]->GetBinContent(i+1);
-                    myFile << binData;
-                    myFile << "\n";
-                }
-                myFile.close();
-
-                myFile.open("BaRegularValues.txt");
-                for(int i = 0; i < numBins; i++)
-                {
-                    binData = singleTempHisto[1]->GetBinContent(i+1);
-                    myFile << binData;
-                    myFile << "\n";
-                }
-                myFile.close();
-
-                myFile.open("LaRegularValues.txt");
-                for(int i = 0; i < numBins; i++)
-                {
-                    binData = singleTempHisto[2]->GetBinContent(i+1);
-                    myFile << binData;
-                    myFile << "\n";
-                }
-                myFile.close();
             }
         }
     }
