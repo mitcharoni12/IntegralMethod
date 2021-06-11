@@ -140,6 +140,9 @@ ElementFit::ElementFit(Int_t events_p, Double_t (*regularFunc)(Double_t*, Double
     setFunctionParamersSingle();
     //parameter limits so we get reasonable values
     setParaLimits();
+    //ROOT::Math::MinimizerOptions::SetDefaultMinimizer("Minuit");
+    ROOT::Math::MinimizerOptions::SetDefaultMaxIterations(100000000);
+    ROOT::Math::MinimizerOptions::SetDefaultMaxFunctionCalls(100000000);
 }
 
 

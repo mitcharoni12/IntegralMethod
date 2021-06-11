@@ -13,18 +13,6 @@
 
 using namespace std;
 
-//parent nuclei
-Int_t events = 100000;
-Double_t csHalfT = 0.994;// seconds
-Double_t baHalfT = 11.5;// seconds
-Double_t laHalfT = 40.8;// seconds
-Double_t lambdaCS = TMath::Log(2.0) / csHalfT;// seconds
-Double_t lambdaBA = TMath::Log(2.0) / baHalfT;// seconds
-Double_t lambdaLA = TMath::Log(2.0) / laHalfT;// seconds
-Double_t CS0 = events * lambdaCS;
-Double_t BA0 = 0;
-Double_t LA0 = 0;
-
 Double_t BADecaybyActivityIntegral(Double_t *x, Double_t *par);
 Double_t CSDecaybyActivityIntegral(Double_t *x, Double_t *par);
 Double_t LADecaybyActivityIntegral(Double_t *x, Double_t *par);
@@ -97,6 +85,7 @@ void fitMultiple()
     inFile.ignore(256,':');
     inFile >> numElements;
 
+    //create storage for the read in parameter values
     ParameterValue** paraVals = new ParameterValue* [numElements];
     //ENTERING VALUES FROM PARAMETER VALUES
     for(int i = 0; i < numElements; i++)
