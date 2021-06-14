@@ -51,6 +51,7 @@ class ElementFit{
         void setTimeRunStart(Double_t timeRunStart){this->timeRunStart = timeRunStart;}
         void setNumRuns(Int_t numRuns){this->numRuns = numRuns;}
         void setNumCycles(Int_t numCycles){this->numCycles = numCycles;}
+        void setSingleHistoChoice(Int_t singleHistoChoice){this->singleHistoChoice = singleHistoChoice;}
         //public functions
         void createHistoHolders();
         void displayIntegralHisto(TCanvas* can);
@@ -60,7 +61,7 @@ class ElementFit{
         
         void fitHistos(Int_t cycleIndex, Int_t runIndex);
         void fitSingleHisto(Int_t cycleIndex, Int_t runIndex, Int_t elementIndex);
-        void fitDataGenOnce();
+        void fitDataGenOnce(Int_t cycleIndex, Int_t runIndex);
         void fitDataLoadedHisto();
         
         void genIntegralHisto();
@@ -120,7 +121,7 @@ ElementFit::ElementFit(Int_t events_p, Double_t (*regularFunc)(Double_t*, Double
     this->paraVals = paraVals_p;
     numRuns = 1;
     numCycles = 1;
-    singleHistoChoice = 0;
+    singleHistoChoice = 2;
 
     //dynamically allocating needed variables and arrays
     //dynamic array
@@ -329,11 +330,11 @@ void ElementFit::fitHistos(Int_t cycleIndex, Int_t runIndex)
 }
 
 //fits data of the one histogram generated
-void ElementFit::fitDataGenOnce()
+void ElementFit::fitDataGenOnce(Int_t cycleIndex, Int_t runIndex)
 {
-    //fitRegularHisto();
-    //fitIntegralHisto();
-    //fitSingleHistos();
+    fitRegularHisto(cycleIndex, runIndex);
+    fitIntegralHisto(cycleIndex, runIndex);
+    fitSingleHistos(cycleIndex, runIndex);
 }
 
 //fit data for loaded in histogram(not updated)
@@ -471,17 +472,6 @@ void ElementFit::genIntegralHisto()
             {
                 tempIntegralHisto->SetBinContent(i, tempRegularHisto->GetBinContent(i) + tempIntegralHisto->GetBinContent(i-1));
             }
-
-            ofstream myFile;
-            Double_t binData;
-            myFile.open("integralValues.txt");
-            for(int i = 0; i < numBins; i++)
-            {
-                binData = tempIntegralHisto->GetBinContent(i+1);
-                myFile << binData;
-                myFile << "\n";
-            }
-            myFile.close();
         }
     }
 }
@@ -512,35 +502,6 @@ void ElementFit::genIntegralSingleHistos()
                     tempIntegralHisto->SetBinContent(k, tempIntegralHisto->GetBinContent(k-1) + tempRegularHisto->GetBinContent(k));
                 }
             }
-
-            ofstream myFile;
-            Double_t binData;
-            myFile.open("CsIntegralValues.txt");
-                for(int i = 0; i < numBins; i++)
-                {
-                    binData = singleIntegralHisto->GetAHisto(0, 0, 0)->GetBinContent(i+1);
-                    myFile << binData;
-                    myFile << "\n";
-                }
-                myFile.close();
-
-            myFile.open("BaIntegralValues.txt");
-                for(int i = 0; i < numBins; i++)
-                {
-                    binData = singleIntegralHisto->GetAHisto(0, 0, 1)->GetBinContent(i+1);
-                    myFile << binData;
-                    myFile << "\n";
-                }
-                myFile.close();
-            
-            myFile.open("LaIntegralValues.txt");
-                for(int i = 0; i < numBins; i++)
-                {
-                    binData = singleIntegralHisto->GetAHisto(0, 0, 2)->GetBinContent(i+1);
-                    myFile << binData;
-                    myFile << "\n";
-                }
-                myFile.close();
         }
     }
 }
@@ -557,7 +518,7 @@ void ElementFit::genRandomAlternate()
     if(singleHistoChoice == 1)
     {   //generate the single histogram
         TH1D* originalHisto;
-        TH1D**originalSingleHisto;
+        TH1D** originalSingleHisto;
         originalSingleHisto = new TH1D* [numElements];
 
         tempHisto = regularHisto->GetAHisto(0, 0);
@@ -584,25 +545,28 @@ void ElementFit::genRandomAlternate()
         }
 
         //copy generated histogram to all other histos
-        /*
         originalHisto = regularHisto->GetAHisto(0, 0);
         for(int i = 0; i < numElements; i++)
         {
-            originalSingleHisto = singleRegularHisto(0, 0, i);
+            originalSingleHisto[i] = singleRegularHisto->GetAHisto(0, 0, i);
         }
         for(int cycleIndex = 1; cycleIndex < numCycles; cycleIndex++)
         {
             for(int runIndex = 1; runIndex < numRuns; runIndex++)
             {
-                
+                regularHisto->SetAHisto(cycleIndex, runIndex, originalHisto);
+                for(int i = 0; i < numElements; i++)
+                {
+                    singleRegularHisto->SetAHisto(cycleIndex, runIndex, i, originalSingleHisto[i]);
+                }
             }
         }
-        */
     }else{
     //case for multiple histogram generation
     string fileNames [3] = {"CsRegularValues.txt", "BaRegularValues.txt", "LaRegularValues.txt"};
     ofstream myFile;
     Double_t binData;
+    /*
     for(int i = 0; i < numElements; i++)
     {
         myFile.open(fileNames[i]);
@@ -612,6 +576,7 @@ void ElementFit::genRandomAlternate()
     myFile.open("regularValues.txt");
     myFile << "";
     myFile.close();
+    */
         for(int cycleIndex = 0; cycleIndex < numCycles; cycleIndex++)
         {
             for(int runIndex = 0; runIndex < numRuns; runIndex++)
@@ -635,7 +600,8 @@ void ElementFit::genRandomAlternate()
                         stack += randArr[k];
                         singleTempHisto[k]->Fill(stack);
                         tempHisto->Fill(stack);
-
+                        
+                        /*
                         myFile.open(fileNames[k], ios::out | ios::app);
                         myFile << stack;
                         myFile << endl;
@@ -644,6 +610,7 @@ void ElementFit::genRandomAlternate()
                         myFile << stack;
                         myFile << endl;
                         myFile.close();
+                        */
                     }
                     stack = 0.0f;
                 }

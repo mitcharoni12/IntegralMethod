@@ -46,7 +46,7 @@ class Run{
     public:
         Run(Int_t runs, Int_t eventDecrement, ElementFit* element, string* elementNameStrs);
         ~Run();
-        void runNoChangeGenOnce();
+        void runNoChangeGenOnce(Int_t cycleIndex, Int_t runIndex);
         TGraph** genGraphsEventChange();
         TGraph** genGraphsNoChange();
         TGraph** genGraphsNoChangeSingleElement();
@@ -543,7 +543,7 @@ void Run::runNoChange(Int_t cycleIndex)
 
 
 //fits the singular histogram and puts the data of the singlular fit into the arrays (dynamic)
-void Run::runNoChangeGenOnce()
+void Run::runNoChangeGenOnce(Int_t cycleIndex, Int_t runIndex)
 {
     ChainFitValues* tempFitParameters;
     SingleElementFitValues* singleTempFitParameters;
@@ -552,7 +552,7 @@ void Run::runNoChangeGenOnce()
     Double_t tempHalfLife;
     Double_t tempHalfLifeError;
 
-    element->fitDataGenOnce();
+    element->fitDataGenOnce(cycleIndex, runIndex);
 
     tempFitParameters = element->getRegularFitParameters();
         

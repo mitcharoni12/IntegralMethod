@@ -26,7 +26,7 @@ class Cycle{
         ChainRunFitValues* integralFitValues;
         SingleChainRunFitValues* singleRegularFitValues;
         SingleChainRunFitValues* singleIntegralFitValues;
-        TGraphErrors** regularFitMeanGraphs, **integralFitMeanGraphs, **singleRegularFitMeanGraph
+        TGraphErrors** regularFitMeanGraphs, **integralFitMeanGraphs, **singleRegularFitMeanGraphs
         ,**singleIntegralFitMeanGraphs, **fitDifferenceGraphs, **singleFitDifferenceGraphs;
         TCanvas* testCan;
         //helper functions
@@ -64,16 +64,16 @@ Cycle::Cycle(Int_t cycles, Run* decayChainRun, ElementFit* element, Double_t x_s
     singleIntegralFitValues = new SingleChainRunFitValues(numElements, cycles);
     regularFitMeanGraphs = new TGraphErrors* [numElements];
     integralFitMeanGraphs = new TGraphErrors* [numElements];
-    singleRegularFitMeanGraph = new TGraphErrors* [numElements];
-    singleIntegralFitValues = new TGraphErrors* [numElements];
+    singleRegularFitMeanGraphs = new TGraphErrors* [numElements];
+    singleIntegralFitMeanGraphs = new TGraphErrors* [numElements];
     fitDifferenceGraphs = new TGraphErrors* [numElements];
     singleFitDifferenceGraphs = new TGraphErrors* [numElements];
     for(int i = 0; i < numElements; i++)
     {
         regularFitMeanGraphs[i] = nullptr;
         integralFitMeanGraphs[i] = nullptr;
-        singleRegularFitMeanGraph[i] = nullptr;
-        singleIntegralFitValues[i] = nullptr;
+        singleRegularFitMeanGraphs[i] = nullptr;
+        singleIntegralFitMeanGraphs[i] = nullptr;
         fitDifferenceGraphs[i] = nullptr;
         singleFitDifferenceGraphs[i] = nullptr;
     }
@@ -86,15 +86,15 @@ Cycle::~Cycle()
     {
         delete regularFitMeanGraphs[i];
         delete integralFitMeanGraphs[i];
-        delete singleRegularFitMeanGraph[i];
-        delete singleIntegralFitValues[i];
+        delete singleRegularFitMeanGraphs[i];
+        delete singleIntegralFitMeanGraphs[i];
         delete fitDifferenceGraphs[i];
         delete singleFitDifferenceGraphs[i];
     }
     delete [] regularFitMeanGraphs;
     delete [] integralFitMeanGraphs;
-    delete [] singleRegularFitMeanGraph;
-    delete [] singleIntegralFitValues;
+    delete [] singleRegularFitMeanGraphs;
+    delete [] singleIntegralFitMeanGraphs;
     delete [] fitDifferenceGraphs;
     delete [] singleFitDifferenceGraphs;
 }
@@ -121,7 +121,7 @@ void Cycle::displayMeanSeperateGraphs(TCanvas** canvasArr)
         canvasArr[i]->cd(2);
         integralFitMeanGraphs[i]->Draw();
         canvasArr[i]->cd(3);
-        singleRegularFitMeanGraph[i]->Draw();
+        singleRegularFitMeanGraphs[i]->Draw();
         canvasArr[i]->cd(4);
         singleIntegralFitMeanGraphs[i]->Draw();
     }
@@ -189,7 +189,7 @@ void Cycle::genSeperateMeanGraphs()
     for(int i = 0; i < numElements; i++)
     {
         tempFitVals = regularFitValues->GetHalfLifeArr(i);
-        tempFitErrors = regularFItValues->GetHalfLifeErrorArr(i);
+        tempFitErrors = regularFitValues->GetHalfLifeErrorArr(i);
         regularFitMeanGraphs[i] = new TGraphErrors(cycles, timeArr, tempFitVals, zero, tempFitErrors);
         regularFitMeanGraphs[i]->GetXaxis()->SetTitle("Time");
         regularFitMeanGraphs[i]->GetYaxis()->SetTitle("Fit Value");
@@ -197,10 +197,10 @@ void Cycle::genSeperateMeanGraphs()
 
         tempFitVals = singleRegularFitValues->GetHalfLifeArr(i, i);
         tempFitErrors = singleRegularFitValues->GetHalfLifeErrorArr(i, i);
-        singleRegularFitMeanGraph[i] = new TGraphErrors(cycles, timeArr, tempFitVals, zero, tempFitErrors);
-        singleRegularFitMeanGraph[i]->GetXaxis()->SetTitle("Time");
-        singleRegularFitMeanGraph[i]->GetYaxis()->SetTitle("Fit Value");
-        singleRegularFitMeanGraph[i]->SetTitle((elementStrNames[i] + " Single Regular Graph Mean").c_str());
+        singleRegularFitMeanGraphs[i] = new TGraphErrors(cycles, timeArr, tempFitVals, zero, tempFitErrors);
+        singleRegularFitMeanGraphs[i]->GetXaxis()->SetTitle("Time");
+        singleRegularFitMeanGraphs[i]->GetYaxis()->SetTitle("Fit Value");
+        singleRegularFitMeanGraphs[i]->SetTitle((elementStrNames[i] + " Single Regular Graph Mean").c_str());
 
         tempFitVals = integralFitValues->GetHalfLifeArr(i);
         tempFitErrors = integralFitValues->GetHalfLifeErrorArr(i);
@@ -209,12 +209,12 @@ void Cycle::genSeperateMeanGraphs()
         integralFitMeanGraphs[i]->GetYaxis()->SetTitle("Fit Value");
         integralFitMeanGraphs[i]->SetTitle((elementStrNames[i] + " Integral Graph Mean").c_str());
 
-        tempFitVals = singleIntegralFitValues->GetHalfLifeArr(i);
-        tempFitErrors = singleIntegralFitValues->GetHalfLifeErrorArr(i);
-        singleIntegralFitValues[i] = new TGraphErrors(cycles, timeArr, tempFitVals, zero, tempFitErrors);
-        singleIntegralFitValues[i]->GetXaxis()->SetTitle("Time");
-        singleIntegralFitValues[i]->GetYaxis()->SetTitle("Fit Value");
-        singleIntegralFitValues[i]->SetTitle((elementStrNames[i] + " Single Integral Graph Mean").c_str());
+        tempFitVals = singleIntegralFitValues->GetHalfLifeArr(i, i);
+        tempFitErrors = singleIntegralFitValues->GetHalfLifeErrorArr(i, i);
+        singleIntegralFitMeanGraph[i] = new TGraphErrors(cycles, timeArr, tempFitVals, zero, tempFitErrors);
+        singleIntegralFitMeanGraph[i]->GetXaxis()->SetTitle("Time");
+        singleIntegralFitMeanGraph[i]->GetYaxis()->SetTitle("Fit Value");
+        singleIntegralFitMeanGraph[i]->SetTitle((elementStrNames[i] + " Single Integral Graph Mean").c_str());
 
     }
     delete [] zero;
@@ -290,7 +290,7 @@ resultStorage<Double_t>** Cycle::runSeperateMean()
     //running the cycle and putting histograms means in respective arrays
     for(int i = 0; i < cycles; i++)
     {
-        decayChainRun->runNoChange();
+        decayChainRun->runNoChange(i);
         multiRunHisto = decayChainRun->fillRunResultHistos(multiRunHisto);
         multiRunHistoSingle = decayChainRun->fillRunResultHistosSingleElement(multiRunHistoSingle);
         for(int k = 0; k < numElements; k++)
@@ -350,10 +350,10 @@ void Cycle::runSeperateSingleGen()
     for(int i = 0; i < cycles; i++)
     {
         //runs the fit
-        decayChainRun->runNoChangeGenOnce();
+        decayChainRun->runNoChangeGenOnce(i, 0);
         
         //gets total regular fit data from fit
-        tempVals = decayChainRun->getRegularFitVlaues();
+        tempVals = decayChainRun->getRegularFitValues();
 
         //move total regular parameters in to respective class
         for(int k = 0; k < numElements; k++)

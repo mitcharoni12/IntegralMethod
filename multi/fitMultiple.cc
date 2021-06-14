@@ -5,7 +5,7 @@
 #include "TGraph.h"
 #include "TH1D.h"
 #include "Run.h"
-//#include "Cycle.h"
+#include "Cycle.h"
 #include "TGraphErrors.h"
 #include "ParameterValue.h"
 #include "TF1.h"
@@ -230,7 +230,7 @@ void fitMultiple()
                     inFile.close();
                 break;
                 }
-                //single cycle of histogram
+                //multi run of histogram
                 case 2:
                 {
                     Int_t runs;
@@ -361,7 +361,6 @@ void fitMultiple()
                 }
 
                 //multiple runs of histogram
-                /*
                 case 3:
                 {
                     Int_t numRuns, numCycles, writeToFileChoice, singleSourceHistoChoice, seperateMeanChoice, cylceChangeChoice;
@@ -402,11 +401,10 @@ void fitMultiple()
                         //single histo source
                         case 1:
                         {
+                                /*
                             //mean difference
                             if(cycleSingleChoice == 1)
                             {
-                                */
-                                /*
                                 cycleSeperateResultData = cycle->runSeperateSingleGen();
                                 cycleDifferenceResultData = cycle->genSingleMeanDifference(cycleSeperateResultData);
                                 cycleResultGraphs = cycle->genMeanDifferenceGraphs(cycleDifferenceResultData);
@@ -432,7 +430,6 @@ void fitMultiple()
                                 delete [] canvasArr;
                             //seperate mean
                                 */
-                /*
                             }else{
                                 cycle->runSeperateSingleGen();
                                 cycle->genSeperateMeanGraphs();
@@ -446,11 +443,11 @@ void fitMultiple()
                                 cycle->displayMeanSeperateGraphs(canvasArr);
                                 delete [] canvasArr;
                             }
+                
                         break;
                         }
-                */
                         //multi histo source
-                            /*
+                        /*
                         case 2:
                         {
                             //mean difference
@@ -475,7 +472,9 @@ void fitMultiple()
                                 delete [] cycleResultData;
                                 delete [] cycleResultGraphs;
                                 delete [] canvasArr;
+                                */
                             //seperate mean
+                            /*
                             }else if(cycleSingleChoice == 2)
                             {
                                 cycleResultData = cycle->runSeperateMean();
@@ -496,6 +495,7 @@ void fitMultiple()
                                 delete [] cycleResultData;
                                 delete [] canvasArr;
                             }
+                            */
                         break;
                         }
                     }
@@ -503,7 +503,6 @@ void fitMultiple()
                     delete cycle;
                 break;
                 }
-                            */
             }
             delete element;
             break;
