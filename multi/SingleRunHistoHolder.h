@@ -38,7 +38,6 @@ SingleRunHistoHolder::SingleRunHistoHolder(Int_t cycleNum, Int_t numElements, In
     for(int i = 0; i < numElements; i++)
     {
         histoName = elementNames[i] + " " + histoName;
-        cout << "HERE " << histoName << endl << endl << endl << endl;
         singleHistos[i] = new RunHistoHolder(cycleNum, numRuns, histoName, numBins, timeRunEnd);
         histoName = histoParameter;
     }

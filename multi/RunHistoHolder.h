@@ -31,7 +31,7 @@ RunHistoHolder::RunHistoHolder(Int_t cycleNum, Int_t numRuns, string histoName, 
     histoArr = new TH1D* [numRuns];
     for(int i = 0; i < numRuns; i++)
     {
-        histoName = histoName + " " + "Run: " + (i+1) + " Cycle: " + (cycleNum+1);
+        histoName = histoName + " " + "Run: " + (to_string(i+1)).c_str() + " Cycle: " + (to_string(cycleNum+1)).c_str();
         histoArr[i] = new TH1D(histoName.c_str(), histoName.c_str(), numBins, 0., timeRunEnd);
     }
 }

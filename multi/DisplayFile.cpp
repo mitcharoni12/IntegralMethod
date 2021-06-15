@@ -1,6 +1,7 @@
 #include <iomanip>
 #include <utility>
 #include <vector>
+#include <string>
 #include <cstdio>
 #include <sys/stat.h>
 #include "TGraph.h"

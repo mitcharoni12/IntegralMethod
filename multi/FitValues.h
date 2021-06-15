@@ -17,6 +17,7 @@ public:
     void SetN0Error(Double_t N0Error){this->N0Error = N0Error;}
     void SetHalfLife(Double_t halfLife){this->halfLife = halfLife;}
     void SetHalfLifeError(Double_t halfLifeError){this->halfLifeError = halfLifeError;}
+    
     Double_t GetN0(){return N0;}
     Double_t GetN0Error(){return N0Error;}
     Double_t GetHalfLife(){return halfLife;}

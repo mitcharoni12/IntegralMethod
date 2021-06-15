@@ -2,6 +2,7 @@
 #define RUN_H
 
 #include <iostream>
+#include <string>
 #include <iomanip>
 #include <utility>
 #include <vector>
@@ -79,7 +80,6 @@ Run::Run(Int_t runs, Int_t eventDecrement, ElementFit* element, string* elementN
     this->elementNameStrs = elementNameStrs;
     numElements = element->getNumElements();
     element->setNumRuns(runs);
-    element->genAndFillHistos();
 
     //dynamically allocating required arrays and root variables
     //dynamic array
@@ -596,12 +596,13 @@ void Run::runNoChangeGenOnce(Int_t cycleIndex, Int_t runIndex)
             for(int subIndex = 0; subIndex < i+1; subIndex++)
             {
                 tempN0 = singleTempFitParameters->GetAnN0(i, subIndex);
-                singleRegularFitValues->SetAnN0(0, i, subIndex, tempN0);
                 tempN0Error = singleTempFitParameters->GetAnN0Error(i, subIndex);
-                singleRegularFitValues->SetAnN0Error(0, i, subIndex, tempN0Error);
                 tempHalfLife = singleTempFitParameters->GetAnHalfLife(i, subIndex);
-                singleRegularFitValues->SetAnHalfLife(0, i, subIndex, tempHalfLife);
                 tempHalfLifeError = singleTempFitParameters->GetAnHalfLifeError(i, subIndex);
+
+                singleRegularFitValues->SetAnN0(0, i, subIndex, tempN0);
+                singleRegularFitValues->SetAnN0Error(0, i, subIndex, tempN0Error);
+                singleRegularFitValues->SetAnHalfLife(0, i, subIndex, tempHalfLife);
                 singleRegularFitValues->SetAnHalfLifeError(0, i, subIndex, tempHalfLifeError);
             }
         }

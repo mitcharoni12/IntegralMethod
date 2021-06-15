@@ -29,10 +29,10 @@ typedef Double_t (*decayFunction)(Double_t *x, Double_t *par);
 
 class ElementFit{
     public:
-        ElementFit(Int_t events_p, Double_t (*regularFunc)(Double_t*, Double_t*), Double_t (*integralFunc)(Double_t*, Double_t*), Double_t (**fitFunctions)(Double_t*, Double_t*),
-                   Int_t numElements_p, Double_t timeRunEnd_p, Int_t numBins_p, string* elementNames_p,  ParameterValue** paraVals_p);
-        ElementFit(Double_t (*regularFunc)(Double_t*, Double_t*), Double_t (*integralFunc)(Double_t*, Double_t*), Int_t numElements_p, Double_t timeRunEnd_p,
-                   ParameterValue** paraVals_p, TH1D* loadedHisto_p, string* elementNames_p);
+        ElementFit(Int_t events, Int_t numRuns, Int_t numCycles, Double_t (*regularFunc)(Double_t*, Double_t*), Double_t (*integralFunc)(Double_t*, Double_t*), Double_t (**fitFunctions)(Double_t*, Double_t*),
+                   Int_t numElements, Double_t timeRunEnd, Int_t numBins, string* elementNames,  ParameterValue** paraVals, Int_t singleHistoChoice);
+        ElementFit(Double_t (*regularFunc)(Double_t*, Double_t*), Double_t (*integralFunc)(Double_t*, Double_t*), Int_t numElements, Double_t timeRunEnd,
+                   ParameterValue** paraVals, TH1D* loadedHisto, string* elementNames);
         ~ElementFit();
         //getter function
         Double_t getElementParameters(int i){return paraVals[i]->getValueDecayConst();}
@@ -46,12 +46,10 @@ class ElementFit{
         SingleElementFitValues* getSingleIntegralFitParameters(){return singleIntegralFitParameters;}
         //setter function
         //void setNumBins(Int_t numBins);
-        void setNumEvents(Int_t events){this->events = events;} 
-        void setTimeRunEnd(Double_t timeRunEnd){this->timeRunEnd = timeRunEnd;}
         void setTimeRunStart(Double_t timeRunStart){this->timeRunStart = timeRunStart;}
+        void setTimeRunEnd(Double_t timeRunEnd){this->timeRunEnd = timeRunEnd;}
         void setNumRuns(Int_t numRuns){this->numRuns = numRuns;}
         void setNumCycles(Int_t numCycles){this->numCycles = numCycles;}
-        void setSingleHistoChoice(Int_t singleHistoChoice){this->singleHistoChoice = singleHistoChoice;}
         //public functions
         void createHistoHolders();
         void displayIntegralHisto(TCanvas* can);
@@ -105,23 +103,23 @@ class ElementFit{
 
 
 //constructor for generating a histogram
-ElementFit::ElementFit(Int_t events_p, Double_t (*regularFunc)(Double_t*, Double_t*), Double_t (*integralFunc)(Double_t*, Double_t*), Double_t (**fitFunctions)(Double_t*, Double_t*),
-                       Int_t numElements_p, Double_t timeRunEnd_p, Int_t numBins_p, string* elementNames_p,  ParameterValue** paraVals_p)
+ElementFit::ElementFit(Int_t events, Int_t numRuns, Int_t numCycles, Double_t (*regularFunc)(Double_t*, Double_t*), Double_t (*integralFunc)(Double_t*, Double_t*), Double_t (**fitFunctions)(Double_t*, Double_t*),
+                       Int_t numElements, Double_t timeRunEnd, Int_t numBins, string* elementNames,  ParameterValue** paraVals, Int_t singleHistoChoice)
 {
     //setting variables
-    this->events = events_p;
-    this->elementNames = elementNames_p;
+    this->events = events;
+    this->numRuns = numRuns;
+    this->numCycles = numCycles;
+    this->elementNames = elementNames;
     this->fitFunctions = fitFunctions;
-    this->numElements = numElements_p;
+    this->numElements = numElements;
     this->numParameters = numElements*2;
-    this->numBins = numBins_p;
+    this->numBins = numBins;
     this->passedRegularFunction = regularFunc;
     this->passedIntegralFunction = integralFunc;
-    this->timeRunEnd = timeRunEnd_p;
-    this->paraVals = paraVals_p;
-    numRuns = 1;
-    numCycles = 1;
-    singleHistoChoice = 2;
+    this->timeRunEnd = timeRunEnd;
+    this->paraVals = paraVals;
+    this->singleHistoChoice = singleHistoChoice;
 
     //dynamically allocating needed variables and arrays
     //dynamic array
@@ -141,7 +139,9 @@ ElementFit::ElementFit(Int_t events_p, Double_t (*regularFunc)(Double_t*, Double
     setFunctionParamersSingle();
     //parameter limits so we get reasonable values
     setParaLimits();
-    //ROOT::Math::MinimizerOptions::SetDefaultMinimizer("Minuit");
+    //generates all the histo objects and 
+    genAndFillHistos();
+    //removes restrictions on fitting function calls and itterations
     ROOT::Math::MinimizerOptions::SetDefaultMaxIterations(100000000);
     ROOT::Math::MinimizerOptions::SetDefaultMaxFunctionCalls(100000000);
 }
@@ -149,16 +149,16 @@ ElementFit::ElementFit(Int_t events_p, Double_t (*regularFunc)(Double_t*, Double
 
 //constructor for loading in a histogram(NOT MODIFIED WITH NEW STRUCTURE IN MIND)
 /*
-ElementFit::ElementFit(Double_t (*regularFunc)(Double_t*, Double_t*), Double_t (*integralFunc)(Double_t*, Double_t*), Int_t numElements_p, Double_t timeRunEnd_p,
-                       ParameterValue** paraVals_p, TH1D* loadedHisto_p, string* elementNames_p, Int_t numFits)
+ElementFit::ElementFit(Double_t (*regularFunc)(Double_t*, Double_t*), Double_t (*integralFunc)(Double_t*, Double_t*), Int_t numElements, Double_t timeRunEnd.
+                       ParameterValue** paraVals, TH1D* loadedHisto, string* elementNames, Int_t numFits)
 {
     this->passedRegularFunction = regularFunc;
     this->passedIntegralFunction = integralFunc;
-    this->timeRunEnd = timeRunEnd_p;
-    this->paraVals = paraVals_p;
-    this->numElements = numElements_p;
-    this->regularHisto = loadedHisto_p;
-    this->elementNames = elementNames_p;
+    this->timeRunEnd = timeRunEnd;
+    this->paraVals = paraVals;
+    this->numElements = numElements;
+    this->regularHisto = loadedHisto;
+    this->elementNames = elementNames;
     numBins = regularHisto->GetNbinsX();
 
     totalFitParameters = new FitParameterStore(numElements);
@@ -311,14 +311,9 @@ void ElementFit::displaySingleHistos(TCanvas** can)
 
 void ElementFit::genAndFillHistos()
 {
-    if(singleHistoChoice == 1)
-    {
-        createHistoHolders();
-    }else{
-        createHistoHolders();
-        genRandomAlternate();
-        genIntegralHistoSimulated();
-    }
+    createHistoHolders();
+    genRandomAlternate();
+    genIntegralHistoSimulated();
 }
 
 //fits all histos
@@ -550,9 +545,9 @@ void ElementFit::genRandomAlternate()
         {
             originalSingleHisto[i] = singleRegularHisto->GetAHisto(0, 0, i);
         }
-        for(int cycleIndex = 1; cycleIndex < numCycles; cycleIndex++)
+        for(int cycleIndex = 0; cycleIndex < numCycles; cycleIndex++)
         {
-            for(int runIndex = 1; runIndex < numRuns; runIndex++)
+            for(int runIndex = 0; runIndex < numRuns; runIndex++)
             {
                 regularHisto->SetAHisto(cycleIndex, runIndex, originalHisto);
                 for(int i = 0; i < numElements; i++)

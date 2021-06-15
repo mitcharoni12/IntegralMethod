@@ -9,7 +9,6 @@
 #include "TGraphErrors.h"
 #include "ParameterValue.h"
 #include "TF1.h"
-#include "resultStorage.h"
 
 using namespace std;
 
@@ -186,7 +185,6 @@ void fitMultiple()
             inFile >> numBins;
             inFile.ignore(256,':');
             inFile >> timeRun;
-            element = new ElementFit(events, RegularDecaybyActivity, IntegralDecaybyActivity, fitFunctions, numElements, timeRun, numBins, elementNames, paraVals);
             //gets the fit generation choice
             inFile.ignore(256,':');
             inFile >> fitGenerationChoice;
@@ -197,6 +195,7 @@ void fitMultiple()
                 //single run of histogam
                 case 1:
                 {
+                    element = new ElementFit(events, 1, 1, RegularDecaybyActivity, IntegralDecaybyActivity, fitFunctions, numElements, timeRun, numBins, elementNames, paraVals, 2);
                     inFile.open("simulated_single_run.txt");
                     element->genAndFillHistos();
                     element->fitHistos(0, 0);
@@ -228,6 +227,7 @@ void fitMultiple()
                         delete [] singleCanvas;
                     }
                     inFile.close();
+                    delete element;
                 break;
                 }
                 //multi run of histogram
@@ -246,6 +246,7 @@ void fitMultiple()
                     inFile.ignore(256,':');
                     inFile >> graphOrHistoChoice;
                     
+                    element = new ElementFit(events, runs, 1, RegularDecaybyActivity, IntegralDecaybyActivity, fitFunctions, numElements, timeRun, numBins, elementNames, paraVals, 2);
                     Run* elementRun = new Run(runs, eventDecrement, element, elementNames); 
                     
                     elementRun->runNoChange(0);
@@ -357,6 +358,7 @@ void fitMultiple()
                         delete [] totalRunResultErrors;
                     }
                 break;
+                delete element;
                 delete elementRun;
                 }
 
@@ -388,11 +390,10 @@ void fitMultiple()
                     inFile.ignore(256,':');
                     inFile >> cycleSingleChoice;
 
+                    element = new ElementFit(events, numRuns, numCycles, RegularDecaybyActivity, IntegralDecaybyActivity, fitFunctions, numElements, timeRun, numBins, elementNames, paraVals, singleSourceHistoChoice);
                     Run* elementRunsCycle = new Run(numRuns, eventDecrement, element, elementNames);
                     Cycle* cycle = new Cycle(numCycles, elementRunsCycle, element, x_start, x_stop, x_inc, cylceChangeChoice);
 
-                    resultStorage<Double_t>** cycleSeperateResultData;
-                    resultStorage<Double_t>** cycleDifferenceResultData;
                     TGraphErrors** cycleResultGraphs;
                     TCanvas** canvasArr;
 
@@ -401,10 +402,10 @@ void fitMultiple()
                         //single histo source
                         case 1:
                         {
-                                /*
                             //mean difference
                             if(cycleSingleChoice == 1)
                             {
+                                /*
                                 cycleSeperateResultData = cycle->runSeperateSingleGen();
                                 cycleDifferenceResultData = cycle->genSingleMeanDifference(cycleSeperateResultData);
                                 cycleResultGraphs = cycle->genMeanDifferenceGraphs(cycleDifferenceResultData);
@@ -428,8 +429,8 @@ void fitMultiple()
                                 delete cycleDifferenceResultData;
                                 delete [] cycleResultGraphs;
                                 delete [] canvasArr;
-                            //seperate mean
                                 */
+                            //seperate mean
                             }else{
                                 cycle->runSeperateSingleGen();
                                 cycle->genSeperateMeanGraphs();
@@ -443,16 +444,15 @@ void fitMultiple()
                                 cycle->displayMeanSeperateGraphs(canvasArr);
                                 delete [] canvasArr;
                             }
-                
                         break;
                         }
                         //multi histo source
-                        /*
                         case 2:
                         {
                             //mean difference
                             if(cycleSingleChoice == 1)
                             {
+                        /*
                                 cycleResultData = cycle->runDifferenceMean();
                                 cycleResultGraphs = cycle->genMeanDifferenceGraphs(cycleResultData);
                                 canvasArr = new TCanvas* [numElements];
@@ -474,7 +474,6 @@ void fitMultiple()
                                 delete [] canvasArr;
                                 */
                             //seperate mean
-                            /*
                             }else if(cycleSingleChoice == 2)
                             {
                                 cycleResultData = cycle->runSeperateMean();
@@ -495,16 +494,16 @@ void fitMultiple()
                                 delete [] cycleResultData;
                                 delete [] canvasArr;
                             }
-                            */
                         break;
                         }
-                    }
+                    } 
+                    delete element;
                     delete elementRunsCycle;
                     delete cycle;
+                
                 break;
                 }
             }
-            delete element;
             break;
         }
 
