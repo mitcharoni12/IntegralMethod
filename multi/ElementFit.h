@@ -23,6 +23,11 @@
 #include "SingleRunHistoHolder.h"
 #include "CycleHistoHolder.h"
 
+#include "RunCanvasHolder.h"
+#include "SingleRunCanvasHolder.h"
+#include "CycleCanvasHolder.h"
+#include "SingleCycleCanvasHolder.h"
+
 using namespace std;
 
 typedef Double_t (*decayFunction)(Double_t *x, Double_t *par);
@@ -34,6 +39,8 @@ class ElementFit{
         ElementFit(Double_t (*regularFunc)(Double_t*, Double_t*), Double_t (*integralFunc)(Double_t*, Double_t*), Int_t numElements, Double_t timeRunEnd,
                    ParameterValue** paraVals, TH1D* loadedHisto, string* elementNames);
         ~ElementFit();
+        void DrawIndividualHistos(CycleCanvasHolder* regularTotalCanvases, CycleCanvasHolder* integralTotalCanvases, SingleCycleCanvasHolder* singleRegularCanvases, SingleCycleCanvasHolder* singleIntegralCanvases,
+                                      Int_t lowerRunIndex, Int_t upperRunIndex, Int_t lowerCycleIndex, Int_t upperCycleIndex);
         //getter function
         Double_t getElementParameters(int i){return paraVals[i]->getValueDecayConst();}
         Int_t getNumEvents(){return events;}
@@ -199,7 +206,13 @@ ElementFit::~ElementFit()
 //used for changing seed between runs
 void ElementFit::changeSeed()
 {
-    rand.SetSeed(Tclock + globalSeedChanger);
+    Double_t seederSeed;
+    Double_t randNumber;
+
+    randNumber = rand.Uniform();
+    seederSeed = Tclock + globalSeedChanger + randNumber;
+
+    rand.SetSeed(Tclock + globalSeedChanger + seederSeed);
     globalSeedChanger++;
 }
 
@@ -306,6 +319,37 @@ void ElementFit::displaySingleHistos(TCanvas** can)
         singleRegularHisto->GetAHisto(0, 0, i)->Draw();
         can[(i*2)+1]->cd();
         singleIntegralHisto->GetAHisto(0, 0, i)->Draw();
+    }
+}
+
+//used to display the individual histograms
+void ElementFit::DrawIndividualHistos(CycleCanvasHolder* regularTotalCanvases, CycleCanvasHolder* integralTotalCanvases, SingleCycleCanvasHolder* singleRegularCanvases, SingleCycleCanvasHolder* singleIntegralCanvases,
+                                      Int_t lowerRunIndex, Int_t upperRunIndex, Int_t lowerCycleIndex, Int_t upperCycleIndex)
+{
+    Int_t numRuns, numCycles;
+
+    numRuns = upperRunIndex - lowerRunIndex;
+    numCycles = upperCycleIndex - lowerCycleIndex;
+
+    for(int cycleIndex = lowerCycleIndex; cycleIndex < upperCycleIndex; cycleIndex++)
+    {
+        for(int runIndex = lowerRunIndex; runIndex < upperRunIndex; runIndex++)
+        {
+            regularTotalCanvases->GetACanvas(cycleIndex, runIndex)->cd();
+            regularHisto->GetAHisto(cycleIndex, runIndex)->Draw();
+
+            integralTotalCanvases->GetACanvas(cycleIndex, runIndex)->cd();
+            integralHisto->GetAHisto(cycleIndex, runIndex)->Draw();
+
+            for(int elementIndex = 0; elementIndex < numElements; elementIndex++)
+            {
+                singleRegularCanvases->GetACanvas(cycleIndex, runIndex, elementIndex)->cd();
+                singleRegularHisto->GetAHisto(cycleIndex, runIndex, elementIndex)->Draw();
+
+                singleIntegralCanvases->GetACanvas(cycleIndex, runIndex, elementIndex)->cd();
+                singleIntegralHisto->GetAHisto(cycleIndex, runIndex, elementIndex)->Draw();
+            }
+        }
     }
 }
 

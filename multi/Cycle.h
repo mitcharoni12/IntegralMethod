@@ -21,14 +21,12 @@ class Cycle{
         Run* decayChainRun;
         ElementFit* element;
         string* elementStrNames;
-        ChainRunFitValues* regularFitValues;
-        ChainRunFitValues* integralFitValues;
-        SingleChainRunFitValues* singleRegularFitValues;
-        SingleChainRunFitValues* singleIntegralFitValues;
+        ChainRunFitValues* regularFitValues, *integralFitValues;
+        SingleChainRunFitValues* singleRegularFitValues, *singleIntegralFitValues;
         TGraphErrors** regularFitMeanGraphs, **integralFitMeanGraphs, **singleRegularFitMeanGraphs
         ,**singleIntegralFitMeanGraphs, **fitDifferenceGraphs, **singleFitDifferenceGraphs;
-        TCanvas* test = new TCanvas("test", "test", 500, 500);
-        TCanvas* test2 = new TCanvas("test2", "test2", 500, 500);
+        //TCanvas* test = new TCanvas("test", "test", 500, 500);
+        //TCanvas* test2 = new TCanvas("test2", "test2", 500, 500);
         //helper functions
     public:
         Cycle(Int_t cycles, Run* decayChainRun, ElementFit* element, Double_t x_start, Double_t x_stop, Double_t x_inc, Int_t incChoice);
@@ -87,6 +85,10 @@ Cycle::~Cycle()
     delete [] singleIntegralFitMeanGraphs;
     delete [] fitDifferenceGraphs;
     delete [] singleFitDifferenceGraphs;
+    delete regularFitValues;
+    delete integralFitValues;
+    delete singleRegularFitValues;
+    delete singleIntegralFitValues;
 }
 
 /*
@@ -273,16 +275,8 @@ void Cycle::runSeperateMean()
     //setting inital values for time, 1= start const end moving, 2= end const start moving
     element->setTimeRunStart(x_start);
     element->setTimeRunEnd(x_stop);
-
-    resultStorage<Double_t>** cycleSeperateMeanResult = new resultStorage<Double_t>* [8];
-    cycleSeperateMeanResult[0] = new resultStorage<Double_t>(2, cycles, numElements); //Total regular
-    cycleSeperateMeanResult[1] = new resultStorage<Double_t>(2, cycles, numElements); //Total regular error
-    cycleSeperateMeanResult[2] = new resultStorage<Double_t>(2, cycles, numElements); //Total integral
-    cycleSeperateMeanResult[3] = new resultStorage<Double_t>(2, cycles, numElements); //Total integral error
-    cycleSeperateMeanResult[4] = new resultStorage<Double_t>(2, cycles, numElements); //Single regular
-    cycleSeperateMeanResult[5] = new resultStorage<Double_t>(2, cycles, numElements); //Single regular error
-    cycleSeperateMeanResult[6] = new resultStorage<Double_t>(2, cycles, numElements); //Single integral
-    cycleSeperateMeanResult[7] = new resultStorage<Double_t>(2, cycles, numElements); //single integral error
+    Double_t tempMeanVal;
+    Double_t tempErrorVal;
 
     TH1D** multiRunHisto = decayChainRun->createRunResultHistos();
     TH1D** multiRunHistoSingle = decayChainRun->createRunResultHistosSingleElements();
@@ -291,33 +285,33 @@ void Cycle::runSeperateMean()
     for(int i = 0; i < cycles; i++)
     {
         decayChainRun->runNoChange(i);
+        //fills histograms with results from multiple runs in order to extract means
         multiRunHisto = decayChainRun->fillRunResultHistos(multiRunHisto);
         multiRunHistoSingle = decayChainRun->fillRunResultHistosSingleElement(multiRunHistoSingle);
+
+        //moves histo means into respective data storages
         for(int k = 0; k < numElements; k++)
         {
-            regularFitValues->SetAnN0()
+            tempMeanVal = multiRunHisto[(k*2)]->GetMean();
+            regularFitValues->SetAnHalfLifeError(i, k, tempMeanVal);
+            tempErrorVal = multiRunHisto[(k*2)]->GetMeanError();
+            regularFitValues->SetAnHalfLife(i, k, tempErrorVal);
+            tempMeanVal = multiRunHisto[(k*2)+1]->GetMean();
+            integralFitValues->SetAnHalfLifeError(i, k, tempMeanVal);
+            tempErrorVal = multiRunHisto[(k*2)+1]->GetMeanError();
+            integralFitValues->SetAnHalfLife(i, k, tempErrorVal);
+
+            tempMeanVal = multiRunHistoSingle[(k*2)]->GetMean();
+            singleRegularFitValues->SetAnHalfLife(i, k, k, tempMeanVal);
+            tempErrorVal = multiRunHistoSingle[(k*2)]->GetMean();
+            singleRegularFitValues->SetAnHalfLifeError(i, k, k, tempErrorVal);
+            tempMeanVal = multiRunHistoSingle[(k*2)+1]->GetMean();
+            singleIntegralFitValues->SetAnHalfLife(i, k, k, tempMeanVal);
+            tempErrorVal = multiRunHistoSingle[(k*2)+1]->GetMean();
+            singleIntegralFitValues->SetAnHalfLifeError(i, k, k, tempErrorVal);
         }
-        for(int k = 0; k < numElements; k++)
-        {
-            (cycleSeperateMeanResult[0]->getDoubleArrStorage())[k][i] = multiRunHisto[(k*2)]->GetMean();
-            //cout << "REG: " << multiRunHisto[(k*2)]->GetMean() << endl;
-            (cycleSeperateMeanResult[1]->getDoubleArrStorage())[k][i] = multiRunHisto[(k*2)]->GetMeanError();
-            //cout << "REG ERR: " << multiRunHisto[(k*2)]->GetMeanError() << endl << endl;
-            (cycleSeperateMeanResult[2]->getDoubleArrStorage())[k][i] = multiRunHisto[(k*2)+1]->GetMean();
-            //cout << "INTE: " << multiRunHisto[(k*2)+1]->GetMean() << endl;
-            (cycleSeperateMeanResult[3]->getDoubleArrStorage())[k][i] = multiRunHisto[(k*2)+1]->GetMeanError();
-            //cout << "INTE ERR: " << multiRunHisto[(k*2)+1]->GetMeanError() << endl << endl;
-            (cycleSeperateMeanResult[4]->getDoubleArrStorage())[k][i] = multiRunHistoSingle[(k*2)]->GetMean();
-            //cout << "REG: " << multiRunHistoSingle[(k*2)]->GetMean() << endl;
-            (cycleSeperateMeanResult[5]->getDoubleArrStorage())[k][i] = multiRunHistoSingle[(k*2)]->GetMeanError();
-            //cout << "REG ERR: " << multiRunHistoSingle[(k*2)]->GetMeanError() << endl << endl;
-            (cycleSeperateMeanResult[6]->getDoubleArrStorage())[k][i] = multiRunHistoSingle[(k*2)+1]->GetMean();
-            //cout << "INTE: " << multiRunHistoSingle[(k*2)+1]->GetMean() << endl;
-            (cycleSeperateMeanResult[7]->getDoubleArrStorage())[k][i] = multiRunHistoSingle[(k*2)+1]->GetMeanError();
-            //cout << "INTE ERR: " << multiRunHistoSingle[(k*2)+1]->GetMeanError() << endl << endl;
-        }
+
         //sets next range for time and sets current time in array, 1= start const end moving, 2= end const start moving
-        
         if(incChoice == 1)
         {
             element->setTimeRunEnd((i+1.0)*x_inc + x_stop);
@@ -328,9 +322,8 @@ void Cycle::runSeperateMean()
             timeArr[i] = ((i*x_inc) + x_start);
         }
     }
-
     delete [] multiRunHisto;
-    return cycleSeperateMeanResult;
+    delete [] multiRunHistoSingle;
 }
 
 //does runs cycle for the single histogram (dynamic)

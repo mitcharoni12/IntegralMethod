@@ -9,6 +9,10 @@
 #include "TGraphErrors.h"
 #include "ParameterValue.h"
 #include "TF1.h"
+#include "RunCanvasHolder.h"
+#include "SingleRunCanvasHolder.h"
+#include "CycleCanvasHolder.h"
+#include "SingleCycleCanvasHolder.h"
 
 using namespace std;
 
@@ -35,7 +39,7 @@ void fitMultiple()
     Double_t timeRun;
     bool rangeOption;
     Double_t valueHolder;
-    int histoSimulateChoice, rangeValueChoice, displayFitsChoice;
+    int histoSimulateChoice, rangeValueChoice, displayIndividualFitsChoice;
     ElementFit* element;
     ifstream inFile;
     
@@ -152,8 +156,6 @@ void fitMultiple()
     //gets histogram choice
     inFile.ignore(256,':');
     inFile >> histoSimulateChoice;
-    inFile.ignore(256, ':');
-    inFile >> displayFitsChoice;
     inFile.close();
     
     //calculates the decay constant values
@@ -234,7 +236,7 @@ void fitMultiple()
                 case 2:
                 {
                     Int_t runs;
-                    int graphOrHistoChoice;
+                    int graphOrHistoChoice, lowerCanvasIndex, upperCanvasIndex;
 
                     inFile.open("simulated_single_cylce.txt");
                     inFile.ignore(256,':');
@@ -245,16 +247,17 @@ void fitMultiple()
                     inFile >> writeToFileChoice;
                     inFile.ignore(256,':');
                     inFile >> graphOrHistoChoice;
+                    inFile.ignore(256, ':');
+                    inFile >> displayIndividualFitsChoice;
+                    inFile.ignore(256, ':');
+                    inFile >> lowerCanvasIndex;
+                    inFile.ignore(256, ':');
+                    inFile >> upperCanvasIndex;
                     
                     element = new ElementFit(events, runs, 1, RegularDecaybyActivity, IntegralDecaybyActivity, fitFunctions, numElements, timeRun, numBins, elementNames, paraVals, 2);
                     Run* elementRun = new Run(runs, eventDecrement, element, elementNames); 
                     
                     elementRun->runNoChange(0);
-                    
-                    if(displayFitsChoice == 1)
-                    {
-                        //function
-                    }
 
                     //choice for displaying data via histogram
                     if(graphOrHistoChoice == 1)
@@ -357,9 +360,27 @@ void fitMultiple()
                         delete [] totalRunResults;
                         delete [] totalRunResultErrors;
                     }
-                break;
+
+                if(displayIndividualFitsChoice == 1)
+                {
+                    cout << "made is here" << endl << endl;
+                    CycleCanvasHolder* regularCanvases = new CycleCanvasHolder(lowerCanvasIndex, upperCanvasIndex, 0, 0, "Total Regular Fit");
+                    CycleCanvasHolder* integralCanvases = new CycleCanvasHolder(lowerCanvasIndex, upperCanvasIndex, 0, 0, "Total Integral Fit");
+                    SingleCycleCanvasHolder* singleRegularCanvases = new SingleCycleCanvasHolder(lowerCanvasIndex, upperCanvasIndex, 0, 0, numElements, elementNames, "Single Regular Fit");
+                    SingleCycleCanvasHolder* singleIntegralCanvases = new SingleCycleCanvasHolder(lowerCanvasIndex, upperCanvasIndex, 0, 0, numElements, elementNames, "Single Regular Fit");
+                    
+                    element->DrawIndividualHistos(regularCanvases, integralCanvases, singleRegularCanvases, singleIntegralCanvases, lowerCanvasIndex, upperCanvasIndex, 0, 0);
+
+                    delete regularCanvases;
+                    delete integralCanvases;
+                    delete singleRegularCanvases;
+                    delete singleIntegralCanvases;
+                }
+
+                
                 delete element;
                 delete elementRun;
+                break;
                 }
 
                 //multiple runs of histogram
@@ -476,8 +497,8 @@ void fitMultiple()
                             //seperate mean
                             }else if(cycleSingleChoice == 2)
                             {
-                                cycleResultData = cycle->runSeperateMean();
-                                cycleResultGraphs = cycle->genSeperateMeanGraphs(cycleResultData);
+                                cycle->runSeperateMean();
+                                cycle->genSeperateMeanGraphs();
                                 canvasArr = new TCanvas* [numElements];
                                 for(int i = 0; i < numElements; i++)
                                 {
@@ -486,12 +507,7 @@ void fitMultiple()
                                 }
                                 TCanvas* sacraficeCanvas = new TCanvas("SacraficeCanvas", "SacraficeCanvas", 500, 500);
                                 
-                                cycle->displayMeanSeperateGraphs(canvasArr, cycleResultGraphs);
-                                for(int i = 0; i < 4; i++)
-                                {
-                                    delete cycleResultData[i];
-                                }
-                                delete [] cycleResultData;
+                                cycle->displayMeanSeperateGraphs(canvasArr);
                                 delete [] canvasArr;
                             }
                         break;
