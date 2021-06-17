@@ -17,12 +17,12 @@ public:
 };
 
 CycleCanvasHolder::CycleCanvasHolder(Int_t lowerRunIndex, Int_t upperRunIndex, Int_t lowerCycleIndex, Int_t upperCycleIndex, string name)
-{
-    numCycles = upperCycleIndex - lowerCycleIndex;
+{   //have to add one because if we want just cycle 0, that would be 0 to 0 and for our looks and num cycles we need the plus one
+    numCycles = upperCycleIndex - lowerCycleIndex + 1;
     cycleCanvasHolder = new RunCanvasHolder* [numCycles];
     for(int i = 0; i < numCycles; i++)
     {
-        cycleCanvasHolder[i] = new RunCanvasHolder(lowerRunIndex, upperRunIndex, i, name);
+        cycleCanvasHolder[i] = new RunCanvasHolder(lowerRunIndex, upperRunIndex, i+1, name);
     }
 }
 
@@ -37,6 +37,7 @@ CycleCanvasHolder::~CycleCanvasHolder()
 
 TCanvas* CycleCanvasHolder::GetACanvas(Int_t cycleIndex, Int_t canvasIndex)
 {
+    cout << "IN GET A CANVAS cycle index: " << cycleIndex << " run index: " << canvasIndex << endl;
     return cycleCanvasHolder[cycleIndex]->GetACanvas(canvasIndex);
 }
 

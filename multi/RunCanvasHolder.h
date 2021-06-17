@@ -20,7 +20,8 @@ RunCanvasHolder::RunCanvasHolder(Int_t lowerRunIndex, Int_t upperRunIndex, Int_t
     string totalHistoName;
     Int_t numRuns;
 
-    numRuns = upperRunIndex - lowerRunIndex;
+    //need the plus one becuase if we want run 0 to 0, for our loops and num runs we need the plus one to accuratly calculate
+    numRuns = upperRunIndex - lowerRunIndex + 1;
     canvasArr = new TCanvas* [numRuns];
     for(int i = 0; i < numRuns; i++)
     {
@@ -36,6 +37,7 @@ RunCanvasHolder::~RunCanvasHolder()
 
 TCanvas* RunCanvasHolder::GetACanvas(Int_t canvasIndex)
 {
+    cout << "IN RUN PART run index: " << canvasIndex << endl;
     return canvasArr[canvasIndex];
 }
 

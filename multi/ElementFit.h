@@ -19,12 +19,7 @@
 #include "ChainFitValues.h"
 #include "FitValues.h"
 #include "SingleElementFitValues.h"
-#include "RunHistoHolder.h"
-#include "SingleRunHistoHolder.h"
 #include "CycleHistoHolder.h"
-
-#include "RunCanvasHolder.h"
-#include "SingleRunCanvasHolder.h"
 #include "CycleCanvasHolder.h"
 #include "SingleCycleCanvasHolder.h"
 
@@ -326,18 +321,19 @@ void ElementFit::displaySingleHistos(TCanvas** can)
 void ElementFit::DrawIndividualHistos(CycleCanvasHolder* regularTotalCanvases, CycleCanvasHolder* integralTotalCanvases, SingleCycleCanvasHolder* singleRegularCanvases, SingleCycleCanvasHolder* singleIntegralCanvases,
                                       Int_t lowerRunIndex, Int_t upperRunIndex, Int_t lowerCycleIndex, Int_t upperCycleIndex)
 {
-    Int_t numRuns, numCycles;
-
-    numRuns = upperRunIndex - lowerRunIndex;
-    numCycles = upperCycleIndex - lowerCycleIndex;
+    upperRunIndex = upperRunIndex + 1;
+    upperCycleIndex = upperCycleIndex + 1;
 
     for(int cycleIndex = lowerCycleIndex; cycleIndex < upperCycleIndex; cycleIndex++)
     {
         for(int runIndex = lowerRunIndex; runIndex < upperRunIndex; runIndex++)
         {
+            cout << "cycle index: " << cycleIndex << endl;
+            cout << "run index: " << runIndex << endl << endl;
             regularTotalCanvases->GetACanvas(cycleIndex, runIndex)->cd();
+            cout << "crash .5" << endl;
             regularHisto->GetAHisto(cycleIndex, runIndex)->Draw();
-
+            cout << "crash 1" << endl;
             integralTotalCanvases->GetACanvas(cycleIndex, runIndex)->cd();
             integralHisto->GetAHisto(cycleIndex, runIndex)->Draw();
 
@@ -346,8 +342,10 @@ void ElementFit::DrawIndividualHistos(CycleCanvasHolder* regularTotalCanvases, C
                 singleRegularCanvases->GetACanvas(cycleIndex, runIndex, elementIndex)->cd();
                 singleRegularHisto->GetAHisto(cycleIndex, runIndex, elementIndex)->Draw();
 
+                cout << "crash 2" << endl;
                 singleIntegralCanvases->GetACanvas(cycleIndex, runIndex, elementIndex)->cd();
                 singleIntegralHisto->GetAHisto(cycleIndex, runIndex, elementIndex)->Draw();
+                cout << "crash 3" << endl;
             }
         }
     }

@@ -38,7 +38,7 @@ SingleCycleCanvasHolder::~SingleCycleCanvasHolder()
     delete [] singleCycleCanvasHolder;
 }
 
-TCanvas* SingleCycleCanvasHolder::GetACanvas(Int_t elementIndex, Int_t cycleIndex, Int_t canvasIndex)
+TCanvas* SingleCycleCanvasHolder::GetACanvas(Int_t cycleIndex, Int_t canvasIndex, Int_t elementIndex)
 {
     return singleCycleCanvasHolder[elementIndex]->GetACanvas(cycleIndex, canvasIndex);
 }

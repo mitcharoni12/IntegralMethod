@@ -9,8 +9,6 @@
 #include "TGraphErrors.h"
 #include "ParameterValue.h"
 #include "TF1.h"
-#include "RunCanvasHolder.h"
-#include "SingleRunCanvasHolder.h"
 #include "CycleCanvasHolder.h"
 #include "SingleCycleCanvasHolder.h"
 
@@ -363,14 +361,13 @@ void fitMultiple()
 
                 if(displayIndividualFitsChoice == 1)
                 {
-                    cout << "made is here" << endl << endl;
                     CycleCanvasHolder* regularCanvases = new CycleCanvasHolder(lowerCanvasIndex, upperCanvasIndex, 0, 0, "Total Regular Fit");
                     CycleCanvasHolder* integralCanvases = new CycleCanvasHolder(lowerCanvasIndex, upperCanvasIndex, 0, 0, "Total Integral Fit");
                     SingleCycleCanvasHolder* singleRegularCanvases = new SingleCycleCanvasHolder(lowerCanvasIndex, upperCanvasIndex, 0, 0, numElements, elementNames, "Single Regular Fit");
-                    SingleCycleCanvasHolder* singleIntegralCanvases = new SingleCycleCanvasHolder(lowerCanvasIndex, upperCanvasIndex, 0, 0, numElements, elementNames, "Single Regular Fit");
-                    
-                    element->DrawIndividualHistos(regularCanvases, integralCanvases, singleRegularCanvases, singleIntegralCanvases, lowerCanvasIndex, upperCanvasIndex, 0, 0);
+                    SingleCycleCanvasHolder* singleIntegralCanvases = new SingleCycleCanvasHolder(lowerCanvasIndex, upperCanvasIndex, 0, 0, numElements, elementNames, "Single Integral Fit");
 
+                    element->DrawIndividualHistos(regularCanvases, integralCanvases, singleRegularCanvases, singleIntegralCanvases, lowerCanvasIndex, upperCanvasIndex, 0, 0);
+                    
                     delete regularCanvases;
                     delete integralCanvases;
                     delete singleRegularCanvases;
