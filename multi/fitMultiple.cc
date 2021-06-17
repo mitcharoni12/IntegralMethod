@@ -234,7 +234,7 @@ void fitMultiple()
                 case 2:
                 {
                     Int_t runs;
-                    int graphOrHistoChoice, lowerCanvasIndex, upperCanvasIndex;
+                    int graphOrHistoChoice, lowerRunHistoIndex, upperRunHistoIndex;
 
                     inFile.open("simulated_single_cylce.txt");
                     inFile.ignore(256,':');
@@ -248,9 +248,9 @@ void fitMultiple()
                     inFile.ignore(256, ':');
                     inFile >> displayIndividualFitsChoice;
                     inFile.ignore(256, ':');
-                    inFile >> lowerCanvasIndex;
+                    inFile >> lowerRunHistoIndex;
                     inFile.ignore(256, ':');
-                    inFile >> upperCanvasIndex;
+                    inFile >> upperRunHistoIndex;
                     
                     element = new ElementFit(events, runs, 1, RegularDecaybyActivity, IntegralDecaybyActivity, fitFunctions, numElements, timeRun, numBins, elementNames, paraVals, 2);
                     Run* elementRun = new Run(runs, eventDecrement, element, elementNames); 
@@ -354,19 +354,19 @@ void fitMultiple()
                             delete [] runResultErrorCanvases;
                             delete [] runResultCanvases;
                         }
-                        inFile.close();
                         delete [] totalRunResults;
                         delete [] totalRunResultErrors;
                     }
 
+                //case for displaying the individual fits for runs
                 if(displayIndividualFitsChoice == 1)
                 {
-                    CycleCanvasHolder* regularCanvases = new CycleCanvasHolder(lowerCanvasIndex, upperCanvasIndex, 0, 0, "Total Regular Fit");
-                    CycleCanvasHolder* integralCanvases = new CycleCanvasHolder(lowerCanvasIndex, upperCanvasIndex, 0, 0, "Total Integral Fit");
-                    SingleCycleCanvasHolder* singleRegularCanvases = new SingleCycleCanvasHolder(lowerCanvasIndex, upperCanvasIndex, 0, 0, numElements, elementNames, "Single Regular Fit");
-                    SingleCycleCanvasHolder* singleIntegralCanvases = new SingleCycleCanvasHolder(lowerCanvasIndex, upperCanvasIndex, 0, 0, numElements, elementNames, "Single Integral Fit");
+                    CycleCanvasHolder* regularCanvases = new CycleCanvasHolder(lowerRunHistoIndex, upperRunHistoIndex, 0, 0, "Total Regular Fit");
+                    CycleCanvasHolder* integralCanvases = new CycleCanvasHolder(lowerRunHistoIndex, upperRunHistoIndex, 0, 0, "Total Integral Fit");
+                    SingleCycleCanvasHolder* singleRegularCanvases = new SingleCycleCanvasHolder(lowerRunHistoIndex, upperRunHistoIndex, 0, 0, numElements, elementNames, "Single Regular Fit");
+                    SingleCycleCanvasHolder* singleIntegralCanvases = new SingleCycleCanvasHolder(lowerRunHistoIndex, upperRunHistoIndex, 0, 0, numElements, elementNames, "Single Integral Fit");
 
-                    element->DrawIndividualHistos(regularCanvases, integralCanvases, singleRegularCanvases, singleIntegralCanvases, lowerCanvasIndex, upperCanvasIndex, 0, 0);
+                    element->DrawIndividualHistos(regularCanvases, integralCanvases, singleRegularCanvases, singleIntegralCanvases, lowerRunHistoIndex, upperRunHistoIndex, 0, 0);
                     
                     delete regularCanvases;
                     delete integralCanvases;
@@ -374,7 +374,7 @@ void fitMultiple()
                     delete singleIntegralCanvases;
                 }
 
-                
+                inFile.close();
                 delete element;
                 delete elementRun;
                 break;
@@ -383,20 +383,21 @@ void fitMultiple()
                 //multiple runs of histogram
                 case 3:
                 {
-                    Int_t numRuns, numCycles, writeToFileChoice, singleSourceHistoChoice, seperateMeanChoice, cylceChangeChoice;
-                    Double_t x_start, x_stop, x_inc, cycleSingleChoice;
+                    Int_t numRuns, numCycles, writeToFileChoice, singleSourceHistoChoice, seperateMeanChoice, cycleChangeChoice,
+                          lowerRunHistoIndex, upperRunHistoIndex, lowerCycleHistoIndex, upperCycleHistoIndex;
+                    Double_t x_start, x_stop, x_inc, cycleMeanChoice;
 
                     inFile.open("simulated_multi_cycle.txt");
-                    inFile.ignore(256, ':');
+                    inFile.ignore(256,':');
                     inFile >> numRuns;
-                    inFile.ignore(256, ':');
+                    inFile.ignore(256,':');
                     inFile >> numCycles;
                     inFile.ignore(256,':');
                     inFile >> eventDecrement;
                     inFile.ignore(256,':');
                     inFile >> writeToFileChoice;
                     inFile.ignore(256,':');
-                    inFile >> cylceChangeChoice;
+                    inFile >> cycleChangeChoice;
                     inFile.ignore(256,':');
                     inFile >> x_start;
                     inFile.ignore(256,':');
@@ -406,11 +407,21 @@ void fitMultiple()
                     inFile.ignore(256,':');
                     inFile >> singleSourceHistoChoice;
                     inFile.ignore(256,':');
-                    inFile >> cycleSingleChoice;
+                    inFile >> cycleMeanChoice;
+                    inFile.ignore(256,':');
+                    inFile >> displayIndividualFitsChoice;
+                    inFile.ignore(256,':');
+                    inFile >> lowerRunHistoIndex;
+                    inFile.ignore(256,':');
+                    inFile >> upperRunHistoIndex;
+                    inFile.ignore(256,':');
+                    inFile >> lowerCycleHistoIndex;
+                    inFile.ignore(256,':');
+                    inFile >> upperCycleHistoIndex;
 
                     element = new ElementFit(events, numRuns, numCycles, RegularDecaybyActivity, IntegralDecaybyActivity, fitFunctions, numElements, timeRun, numBins, elementNames, paraVals, singleSourceHistoChoice);
                     Run* elementRunsCycle = new Run(numRuns, eventDecrement, element, elementNames);
-                    Cycle* cycle = new Cycle(numCycles, elementRunsCycle, element, x_start, x_stop, x_inc, cylceChangeChoice);
+                    Cycle* cycle = new Cycle(numCycles, elementRunsCycle, element, x_start, x_stop, x_inc, cycleChangeChoice);
 
                     TGraphErrors** cycleResultGraphs;
                     TCanvas** canvasArr;
@@ -421,11 +432,10 @@ void fitMultiple()
                         case 1:
                         {
                             //mean difference
-                            if(cycleSingleChoice == 1)
+                            if(cycleMeanChoice == 1)
                             {
-                                /*
-                                cycleSeperateResultData = cycle->runSeperateSingleGen();
-                                cycleDifferenceResultData = cycle->genSingleMeanDifference(cycleSeperateResultData);
+                                cycle->runSeperateSingleGen();
+                                cycle->genSingleMeanDifference();
                                 cycleResultGraphs = cycle->genMeanDifferenceGraphs(cycleDifferenceResultData);
                                 canvasArr = new TCanvas* [numElements];
                                 for(int i = 0; i < numElements; i++)
@@ -447,7 +457,6 @@ void fitMultiple()
                                 delete cycleDifferenceResultData;
                                 delete [] cycleResultGraphs;
                                 delete [] canvasArr;
-                                */
                             //seperate mean
                             }else{
                                 cycle->runSeperateSingleGen();
@@ -468,7 +477,7 @@ void fitMultiple()
                         case 2:
                         {
                             //mean difference
-                            if(cycleSingleChoice == 1)
+                            if(cycleMeanChoice == 1)
                             {
                         /*
                                 cycleResultData = cycle->runDifferenceMean();
@@ -492,7 +501,7 @@ void fitMultiple()
                                 delete [] canvasArr;
                                 */
                             //seperate mean
-                            }else if(cycleSingleChoice == 2)
+                            }else if(cycleMeanChoice == 2)
                             {
                                 cycle->runSeperateMean();
                                 cycle->genSeperateMeanGraphs();
@@ -509,11 +518,28 @@ void fitMultiple()
                             }
                         break;
                         }
-                    } 
+                    }
+
+                    //case for displaying the individual fits for runs
+                    if(displayIndividualFitsChoice == 1)
+                    {
+                        CycleCanvasHolder* regularCanvases = new CycleCanvasHolder(lowerRunHistoIndex, upperRunHistoIndex, lowerCycleHistoIndex, upperCycleHistoIndex, "Total Regular Fit");
+                        CycleCanvasHolder* integralCanvases = new CycleCanvasHolder(lowerRunHistoIndex, upperRunHistoIndex, lowerCycleHistoIndex, upperCycleHistoIndex, "Total Integral Fit");
+                        SingleCycleCanvasHolder* singleRegularCanvases = new SingleCycleCanvasHolder(lowerRunHistoIndex, upperRunHistoIndex, lowerCycleHistoIndex, upperCycleHistoIndex, numElements, elementNames, "Single Regular Fit");
+                        SingleCycleCanvasHolder* singleIntegralCanvases = new SingleCycleCanvasHolder(lowerRunHistoIndex, upperRunHistoIndex, lowerCycleHistoIndex, upperCycleHistoIndex, numElements, elementNames, "Single Integral Fit");
+
+                        element->DrawIndividualHistos(regularCanvases, integralCanvases, singleRegularCanvases, singleIntegralCanvases, lowerRunHistoIndex, upperRunHistoIndex, lowerCycleHistoIndex, upperCycleHistoIndex);
+                        
+                        delete regularCanvases;
+                        delete integralCanvases;
+                        delete singleRegularCanvases;
+                        delete singleIntegralCanvases;
+                    }
+
                     delete element;
                     delete elementRunsCycle;
                     delete cycle;
-                
+                    inFile.close();
                 break;
                 }
             }

@@ -9,6 +9,7 @@ using namespace std;
 class RunCanvasHolder{
 private:
     TCanvas** canvasArr;
+    Int_t lowerRunIndex;
 public:
     RunCanvasHolder(Int_t lowerRunIndex, Int_t upperRunIndex, Int_t cycleIndex, string name);
     ~RunCanvasHolder();
@@ -19,6 +20,8 @@ RunCanvasHolder::RunCanvasHolder(Int_t lowerRunIndex, Int_t upperRunIndex, Int_t
 {
     string totalHistoName;
     Int_t numRuns;
+
+    this->lowerRunIndex = lowerRunIndex;
 
     //need the plus one becuase if we want run 0 to 0, for our loops and num runs we need the plus one to accuratly calculate
     numRuns = upperRunIndex - lowerRunIndex + 1;
@@ -35,9 +38,12 @@ RunCanvasHolder::~RunCanvasHolder()
     delete [] canvasArr;
 }
 
+//need - lowerRunIndex because if we want to display index 4 through 7, that is a array of size 4
+//however, the index of the array is only 0-3, not 4-7, so we have to index a bit weird
+//EX: if we want to get canvas 4, that is the 0th element in the array, so for canvas index we get 4 but need 0, so we subtract lower run index
 TCanvas* RunCanvasHolder::GetACanvas(Int_t canvasIndex)
 {
-    cout << "IN RUN PART run index: " << canvasIndex << endl;
+    canvasIndex = canvasIndex - lowerRunIndex;
     return canvasArr[canvasIndex];
 }
 

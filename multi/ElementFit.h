@@ -328,12 +328,9 @@ void ElementFit::DrawIndividualHistos(CycleCanvasHolder* regularTotalCanvases, C
     {
         for(int runIndex = lowerRunIndex; runIndex < upperRunIndex; runIndex++)
         {
-            cout << "cycle index: " << cycleIndex << endl;
-            cout << "run index: " << runIndex << endl << endl;
             regularTotalCanvases->GetACanvas(cycleIndex, runIndex)->cd();
-            cout << "crash .5" << endl;
             regularHisto->GetAHisto(cycleIndex, runIndex)->Draw();
-            cout << "crash 1" << endl;
+
             integralTotalCanvases->GetACanvas(cycleIndex, runIndex)->cd();
             integralHisto->GetAHisto(cycleIndex, runIndex)->Draw();
 
@@ -342,10 +339,8 @@ void ElementFit::DrawIndividualHistos(CycleCanvasHolder* regularTotalCanvases, C
                 singleRegularCanvases->GetACanvas(cycleIndex, runIndex, elementIndex)->cd();
                 singleRegularHisto->GetAHisto(cycleIndex, runIndex, elementIndex)->Draw();
 
-                cout << "crash 2" << endl;
                 singleIntegralCanvases->GetACanvas(cycleIndex, runIndex, elementIndex)->cd();
                 singleIntegralHisto->GetAHisto(cycleIndex, runIndex, elementIndex)->Draw();
-                cout << "crash 3" << endl;
             }
         }
     }
