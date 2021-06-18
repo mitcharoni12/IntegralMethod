@@ -61,26 +61,6 @@ void fitMultiple()
     integralFitFunctions[1] = BADecaybyActivityIntegral;
     integralFitFunctions[2] = LADecaybyActivityIntegral;
 
-    /*
-    TCanvas** testCanArr = new TCanvas* [2];
-    TCanvas *TotalResultCanvas = new TCanvas("TotalResultCanvas", "TotalResultCanvas", 500, 500);
-    TCanvas *TotalIntegralResultCanvas = new TCanvas("TotalIntegralResultCanvas", "TotalIntegralResultCanvas", 500, 500);
-    testCanArr[0] = TotalResultCanvas;
-    testCanArr[1] = TotalIntegralResultCanvas;
-    TCanvas *CSCycleResultCanvas = new TCanvas("CSCycleResultCanvas", "CSCycleResultCanvas", 500, 500);
-    TCanvas *BACycleResultCanvas = new TCanvas("BACycleResultCanvas", "BACycleResultCanvas", 500, 500);
-    TCanvas *LACycleResultCanvas = new TCanvas("LACycleResultCanvas", "LACycleResultCanvas", 500, 500);
-    TCanvas *CSCycleResultCanvasInt = new TCanvas("CSCycleResultCanvasInt", "CSCycleResultCanvasInt", 500, 500);
-    TCanvas *BACycleResultCanvasInt = new TCanvas("BACycleResultCanvasInt", "BACycleResultCanvasInt", 500, 500);
-    TCanvas *LACycleResultCanvasInt = new TCanvas("LACycleResultCanvasInt", "LACycleResultCanvasInt", 500, 500);
-    testCanArr[0] = CSCycleResultCanvas;
-    testCanArr[1] = BACycleResultCanvas;
-    testCanArr[2] = LACycleResultCanvas;
-    testCanArr[3] = CSCycleResultCanvasInt;
-    testCanArr[4] = BACycleResultCanvasInt;
-    testCanArr[5] = LACycleResultCanvasInt;
-    */
-
     //open first option file
     inFile.open("elementInput.txt");
     inFile.ignore(256,':');
@@ -436,7 +416,7 @@ void fitMultiple()
                             {
                                 cycle->runSeperateSingleGen();
                                 cycle->genSingleMeanDifference();
-                                cycleResultGraphs = cycle->genMeanDifferenceGraphs(cycleDifferenceResultData);
+                                cycle->genMeanDifferenceGraphs();
                                 canvasArr = new TCanvas* [numElements];
                                 for(int i = 0; i < numElements; i++)
                                 {
@@ -444,18 +424,7 @@ void fitMultiple()
                                     canvasArr[i]->Divide(2,1,.02,.02);
                                 }
                                 TCanvas* sacraficeCanvas = new TCanvas("SacraficeCanvas", "SacraficeCanvas", 500, 500);
-                                cycle->displayMeanDifferenceGraphs(canvasArr, cycleResultGraphs);
-                                for(int i = 0; i < 8; i++)
-                                {
-                                    delete cycleSeperateResultData[i];
-                                }
-                                delete [] cycleSeperateResultData;
-                                for(int i = 0; i < 4; i++)
-                                {
-                                    delete cycleDifferenceResultData[i];
-                                }
-                                delete cycleDifferenceResultData;
-                                delete [] cycleResultGraphs;
+                                cycle->displayMeanDifferenceGraphs(canvasArr);
                                 delete [] canvasArr;
                             //seperate mean
                             }else{
@@ -479,9 +448,8 @@ void fitMultiple()
                             //mean difference
                             if(cycleMeanChoice == 1)
                             {
-                        /*
-                                cycleResultData = cycle->runDifferenceMean();
-                                cycleResultGraphs = cycle->genMeanDifferenceGraphs(cycleResultData);
+                                cycle->runDifferenceMean();
+                                cycle->genMeanDifferenceGraphs();
                                 canvasArr = new TCanvas* [numElements];
                                 for(int i = 0; i < numElements; i++)
                                 {
@@ -490,16 +458,9 @@ void fitMultiple()
                                 }
                                 TCanvas* sacraficeCanvas = new TCanvas("SacraficeCanvas", "SacraficeCanvas", 500, 500);
 
-                                cycle->displayMeanDifferenceGraphs(canvasArr, cycleResultGraphs);
+                                cycle->displayMeanDifferenceGraphs(canvasArr);
 
-                                for(int i = 0; i < 4; i++)
-                                {
-                                    delete cycleResultData[i];
-                                }
-                                delete [] cycleResultData;
-                                delete [] cycleResultGraphs;
                                 delete [] canvasArr;
-                                */
                             //seperate mean
                             }else if(cycleMeanChoice == 2)
                             {

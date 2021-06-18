@@ -38,6 +38,10 @@ CycleHistoHolder::CycleHistoHolder(Int_t numCycles, Int_t numRuns, string histoN
 
 CycleHistoHolder::~CycleHistoHolder()
 {
+    for(int i = 0; i < numCycles; i++)
+    {
+        delete histoArr[i];
+    }
     delete [] histoArr;
 }
 

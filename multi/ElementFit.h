@@ -260,17 +260,17 @@ void ElementFit::displayParameters()
         cout << elementNames[i] << ": " << "\tHalfLife: " << totalRegularFitParameters->GetAnHalfLife(i) << "s" << endl << 
         "\tError: " << totalRegularFitParameters->GetAnHalfLifeError(i) << "s" << endl;
         cout << "\tN0: " << totalRegularFitParameters->GetAnN0(i) << "" << endl << 
-        "\tError: " << totalRegularFitParameters->GetAnN0Error(i) << "" << endl;
+        "\tError: " << totalRegularFitParameters->GetAnN0Error(i) << "" << endl << endl;
     }
-    cout << endl << "INTEGRAL FIT PARAMETERS/ERRORS" << endl;
+    cout << "INTEGRAL FIT PARAMETERS/ERRORS" << endl;
     for(int i = 0; i < numElements; i++)
     {
         cout << elementNames[i] << ": " << "\tHalfLife: " << totalIntegralFitParameters->GetAnHalfLife(i) << "s" << endl << 
         "\tError: " << totalIntegralFitParameters->GetAnHalfLifeError(i) << "s" << endl;
         cout << "\tN0: " << totalIntegralFitParameters->GetAnN0(i) << "" << endl << 
-        "\tError: " << totalIntegralFitParameters->GetAnN0Error(i) << "" << endl;
+        "\tError: " << totalIntegralFitParameters->GetAnN0Error(i) << "" << endl << endl;
     }
-    cout << endl << "REGULAR SINGLE FIT PARAMETERS/ERRORS" << endl << endl;
+    cout << "REGULAR SINGLE FIT PARAMETERS/ERRORS" << endl << endl;
     for(int i = 0; i < numElements; i++)
     {
         cout << elementNames[i] << " Single Fit Values" << endl;

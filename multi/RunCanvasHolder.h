@@ -9,7 +9,7 @@ using namespace std;
 class RunCanvasHolder{
 private:
     TCanvas** canvasArr;
-    Int_t lowerRunIndex;
+    Int_t lowerRunIndex, numRuns;
 public:
     RunCanvasHolder(Int_t lowerRunIndex, Int_t upperRunIndex, Int_t cycleIndex, string name);
     ~RunCanvasHolder();
@@ -21,6 +21,7 @@ RunCanvasHolder::RunCanvasHolder(Int_t lowerRunIndex, Int_t upperRunIndex, Int_t
     string totalHistoName;
     Int_t numRuns;
 
+    this->numRuns = numRuns;
     this->lowerRunIndex = lowerRunIndex;
 
     //need the plus one becuase if we want run 0 to 0, for our loops and num runs we need the plus one to accuratly calculate

@@ -5,6 +5,7 @@
 #include "TGraphErrors.h"
 #include "TGraph.h"
 #include "TCanvas.h"
+#include "TMath.h"
 #include "Run.h"
 #include "ElementFit.h"
 #include "RunFitValues.h"
@@ -31,12 +32,12 @@ class Cycle{
     public:
         Cycle(Int_t cycles, Run* decayChainRun, ElementFit* element, Double_t x_start, Double_t x_stop, Double_t x_inc, Int_t incChoice);
         ~Cycle();
-        void displayMeanDifferenceGraphs(TCanvas** canvasArr, TGraphErrors** cycleMeanDifferenceGraphs);
+        void displayMeanDifferenceGraphs(TCanvas** canvasArr);
         void displayMeanSeperateGraphs(TCanvas** canvasArr);
         void genMeanDifferenceGraphs();
         void genSeperateMeanGraphs();
         void genSingleMeanDifference();
-        //resultStorage<Double_t>** runDifferenceMean();
+        void runDifferenceMean();
         void runSeperateMean();
         void runSeperateSingleGen();
 };
@@ -95,19 +96,17 @@ Cycle::~Cycle()
     delete singleMeanDifferenceValues;
 }
 
-/*
 //displays the graphs for the mean difference
-void Cycle::displayMeanDifferenceGraphs(TCanvas** canvasArr, TGraphErrors** cycleMeanDifferenceGraphs)
+void Cycle::displayMeanDifferenceGraphs(TCanvas** canvasArr)
 {
     for(int i = 0; i < numElements; i++)
     {
         canvasArr[i]->cd(1);
-        cycleMeanDifferenceGraphs[i*2]->Draw();
+        fitDifferenceGraphs[i]->Draw();
         canvasArr[i]->cd(2);
-        cycleMeanDifferenceGraphs[(i*2)+1]->Draw();
+        singleFitDifferenceGraphs[i]->Draw();
     }
 }
-*/
 
 //displays the graphs for the seperate mean
 void Cycle::displayMeanSeperateGraphs(TCanvas** canvasArr)
@@ -136,15 +135,15 @@ void Cycle::genMeanDifferenceGraphs()
 
     for(int i = 0; i < numElements; i++)
     {
-        fitDifferenceGraphs[(i*2)] = new TGraphErrors(cycles, timeArr, (cycleMeanDifference[0]->getDoubleArrStorage())[i], zero, (cycleMeanDifference[2]->getDoubleArrStorage())[i]);
-        fitDifferenceGraphs[(i*2)]->GetXaxis()->SetTitle("Time");
-        fitDifferenceGraphs[(i*2)]->GetYaxis()->SetTitle("IntegralFit - RegularFit");
-        fitDifferenceGraphs[(i*2)]->SetTitle((elementStrNames[i] + " Regular Histo Mean Difference").c_str());
+        fitDifferenceGraphs[i] = new TGraphErrors(cycles, timeArr, meanDifferenceValues->GetHalfLifeArr(i), zero, meanDifferenceValues->GetHalfLifeErrorArr(i));
+        fitDifferenceGraphs[i]->GetXaxis()->SetTitle("Time");
+        fitDifferenceGraphs[i]->GetYaxis()->SetTitle("Regular Fit - Integral Fit");
+        fitDifferenceGraphs[i]->SetTitle((elementStrNames[i] + " Regular Histo Mean Difference").c_str());
 
-        singleFitDifferenceGraphs[(i*2)+1] = new TGraphErrors(cycles, timeArr, (cycleMeanDifference[1]->getDoubleArrStorage())[i], zero, (cycleMeanDifference[3]->getDoubleArrStorage())[i]);
-        singleFitDifferenceGraphs[(i*2)+1]->GetXaxis()->SetTitle("Time");
-        singleFitDifferenceGraphs[(i*2)+1]->GetYaxis()->SetTitle("IntegralFit - RegularFit");
-        singleFitDifferenceGraphs[(i*2)+1]->SetTitle((elementStrNames[i] + " Single Histo Mean Difference").c_str());
+        singleFitDifferenceGraphs[i] = new TGraphErrors(cycles, timeArr, singleMeanDifferenceValues->GetHalfLifeArr(i, i), zero, singleMeanDifferenceValues->GetHalfLifeErrorArr(i, i));
+        singleFitDifferenceGraphs[i]->GetXaxis()->SetTitle("Time");
+        singleFitDifferenceGraphs[i]->GetYaxis()->SetTitle("Regular Fit - Integral Fit");
+        singleFitDifferenceGraphs[i]->SetTitle((elementStrNames[i] + " Single Histo Mean Difference").c_str());
     }
     delete [] zero;
 }
@@ -164,9 +163,9 @@ void Cycle::genSingleMeanDifference()
             differenceHalfLife = singleRegularFitValues->GetAnHalfLife(k, i, i) - singleIntegralFitValues->GetAnHalfLife(k, i, i);
             singleMeanDifferenceValues->SetAnHalfLife(k, i, i, differenceHalfLife);
 
-            differenceHalfLifeError = sqrt(pow((regularFitValues->GetAnHalfLife(k, i),2) + pow((integralFitValues->GetAnHalfLife(k, i),2));
-            meanDifferenceValues->SetAnHalfLifeError(k, i, i, differenceHalfLifeError);
-            differenceHalfLifeError = sqrt(pow((singleRegularFitValues->GetAnHalfLife(k, i),2) + pow((singleIntegralFitValues->GetAnHalfLife(k, i),2));
+            differenceHalfLifeError = sqrt(TMath::Power(regularFitValues->GetAnHalfLifeError(k, i),2) + TMath::Power(integralFitValues->GetAnHalfLifeError(k, i),2));
+            meanDifferenceValues->SetAnHalfLifeError(k, i, differenceHalfLifeError);
+            differenceHalfLifeError = sqrt(TMath::Power(singleRegularFitValues->GetAnHalfLifeError(k, i, i),2) + TMath::Power(singleIntegralFitValues->GetAnHalfLifeError(k, i, i),2));
             singleMeanDifferenceValues->SetAnHalfLifeError(k, i, i, differenceHalfLifeError);
         }
     }
@@ -211,45 +210,46 @@ void Cycle::genSeperateMeanGraphs()
         singleIntegralFitMeanGraphs[i]->GetXaxis()->SetTitle("Time");
         singleIntegralFitMeanGraphs[i]->GetYaxis()->SetTitle("Fit Value");
         singleIntegralFitMeanGraphs[i]->SetTitle((elementStrNames[i] + " Single Integral Graph Mean").c_str());
-
     }
 
     delete [] zero;
 }
 
-    /*
 //runs the cycles, gets the mean for integral and regular histograms and takes difference (dynamic)
-resultStorage<Double_t>** Cycle::runDifferenceMean()
+void Cycle::runDifferenceMean()
 {
+    Double_t differenceHalfLife, differenceHalfLifeError;
+
     //setting inital values for time, 1= start const end moving, 2= end const start moving
     element->setTimeRunStart(x_start);
     element->setTimeRunEnd(x_stop);
-
-    resultStorage<Double_t>** meanDifferenceData = new resultStorage<Double_t>* [4];
-    meanDifferenceData[0] = new resultStorage<Double_t>(2, cycles, numElements);//Total Mean Difference
-    meanDifferenceData[1] = new resultStorage<Double_t>(2, cycles, numElements);//Single Mean Difference
-    meanDifferenceData[2] = new resultStorage<Double_t>(2, cycles, numElements);//Total Mean Difference Error
-    meanDifferenceData[3] = new resultStorage<Double_t>(2, cycles, numElements);//Single Mean Difference Error
 
     TH1D** multiRunHisto = decayChainRun->createRunResultHistos();
     TH1D** multiRunSingleHistos = decayChainRun->createRunResultHistosSingleElements();
     
     //elements in array stored in order, regular, single
-    // 0 = total mean difference 1 = single mean difference 2 = total mean difference error 3 = single mean difference error
     for(int i = 0; i < cycles; i++)
     {
         //runs (numRuns) runs and generates run result histos
-        decayChainRun->runNoChange();
+        decayChainRun->runNoChange(i);
         multiRunHisto = decayChainRun->fillRunResultHistos(multiRunHisto);
         multiRunSingleHistos = decayChainRun->fillRunResultHistosSingleElement(multiRunSingleHistos);
+
         //does mean difference calculation for each element in decay chain
         for(int k = 0; k < numElements; k++)
         {
-            (meanDifferenceData[0]->getDoubleArrStorage())[k][i] = multiRunHisto[(k*2)+1]->GetMean() - multiRunHisto[(k*2)]->GetMean();
-            (meanDifferenceData[1]->getDoubleArrStorage())[k][i] = multiRunSingleHistos[(k*2)+1]->GetMean() - multiRunSingleHistos[(k*2)]->GetMean();
-            (meanDifferenceData[2]->getDoubleArrStorage())[k][i] = sqrt(pow(multiRunHisto[(k*2)+1]->GetMeanError(),2) - pow(multiRunHisto[(k*2)]->GetMeanError(),2));
-            (meanDifferenceData[3]->getDoubleArrStorage())[k][i] = sqrt(pow(multiRunSingleHistos[(k*2)+1]->GetMeanError(),2) - pow(multiRunSingleHistos[(k*2)]->GetMeanError(),2));
+            differenceHalfLife = multiRunHisto[(k*2)]->GetMean() - multiRunHisto[(k*2)+1]->GetMean();
+            meanDifferenceValues->SetAnHalfLife(i, k, differenceHalfLife);
+            cout << "mean difference: " << differenceHalfLife << endl;
+            differenceHalfLife = multiRunSingleHistos[(k*2)]->GetMean() - multiRunSingleHistos[(k*2)+1]->GetMean();
+            singleMeanDifferenceValues->SetAnHalfLife(i, k, k, differenceHalfLife);
+
+            differenceHalfLifeError = sqrt(pow(multiRunHisto[(k*2)+1]->GetMeanError(),2) + pow(multiRunHisto[(k*2)]->GetMeanError(),2));
+            meanDifferenceValues->SetAnHalfLifeError(i, k, differenceHalfLifeError);
+            differenceHalfLifeError = sqrt(pow(multiRunSingleHistos[(k*2)+1]->GetMeanError(),2) + pow(multiRunSingleHistos[(k*2)]->GetMeanError(),2));
+            singleMeanDifferenceValues->SetAnHalfLifeError(i, k, k, differenceHalfLifeError);
         }
+
         //sets next range for time and sets current time in array, 1= start const end moving, 2= end const start moving
         if(incChoice == 1)
         {
@@ -262,10 +262,14 @@ resultStorage<Double_t>** Cycle::runDifferenceMean()
         }
     }
 
-    return meanDifferenceData;
-    return nullptr;
+    for(int i = 0; i < numElements*2; i++)
+    {
+        delete multiRunHisto[i];
+        delete multiRunSingleHistos[i];
+    }
+    delete [] multiRunHisto;
+    delete [] multiRunSingleHistos;
 }
-    */
 
 //runs the cycles and puts the data of the integral method mean and the regular method mean into their respective arrays (dynamic)
 void Cycle::runSeperateMean()
@@ -320,6 +324,12 @@ void Cycle::runSeperateMean()
             timeArr[i] = ((i*x_inc) + x_start);
         }
     }
+
+    for(int i = 0; i < numElements*2; i++)
+    {
+        delete multiRunHisto[i];
+        delete multiRunHistoSingle[i];
+    }
     delete [] multiRunHisto;
     delete [] multiRunHistoSingle;
 }
@@ -362,7 +372,7 @@ void Cycle::runSeperateSingleGen()
             regularFitValues->SetAnHalfLifeError(i, k, halfLifeError);
         }
         //gets integral fit data from fit
-        tempVals = decayChainRun->getRegularFitValues();
+        tempVals = decayChainRun->getIntegralFitValues();
 
         //move total integral parameters in to respective class
         for(int k = 0; k < numElements; k++)

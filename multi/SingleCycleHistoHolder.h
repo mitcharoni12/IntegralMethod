@@ -45,6 +45,10 @@ SingleCycleHistoHolder::SingleCycleHistoHolder(Int_t numCycles, Int_t numElement
 
 SingleCycleHistoHolder::~SingleCycleHistoHolder()
 {
+    for(int i = 0; i < numElements; i++)
+    {
+        delete histoArr[i];
+    }
     delete [] histoArr;
 }
 
