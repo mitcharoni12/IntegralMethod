@@ -11,18 +11,19 @@ using namespace std;
 class RunHistoHolder{
 private:
     TH1D** histoArr;
-    Int_t cycleNum, numRuns, numBins, timeRunEnd;
+    Int_t cycleNum, numRuns, numBins, timeRunEnd, individualFitChoice;
     string histoName;
 public:
-    RunHistoHolder(Int_t cycleNum, Int_t numRuns, string histoName, Int_t numBins, Int_t timeRunEnd);
+    RunHistoHolder(Int_t cycleNum, Int_t numRuns, string histoName, Int_t numBins, Int_t timeRunEnd, Int_t individualFitChoice);
     ~RunHistoHolder();
     TH1D* GetAHisto(Int_t histoIndex);
     void SetAHisto(Int_t runIndex, TH1D* histo);
 };
 
-RunHistoHolder::RunHistoHolder(Int_t cycleNum, Int_t numRuns, string histoName, Int_t numBins, Int_t timeRunEnd)
+RunHistoHolder::RunHistoHolder(Int_t cycleNum, Int_t numRuns, string histoName, Int_t numBins, Int_t timeRunEnd, Int_t individualFitChoice)
 {
     string tempHistoName;
+    this->individualFitChoice = individualFitChoice;
     this->cycleNum = cycleNum;
     this->numRuns = numRuns;
     this->numBins = numBins;
@@ -39,6 +40,13 @@ RunHistoHolder::RunHistoHolder(Int_t cycleNum, Int_t numRuns, string histoName, 
 
 RunHistoHolder::~RunHistoHolder()
 {
+    if(individualFitChoice != 1)
+    {
+        for(int i = 0; i < numRuns; i++)
+        {
+            delete histoArr [i];
+        }
+    }
     delete [] histoArr;
 }
 

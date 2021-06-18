@@ -15,13 +15,13 @@ private:
     string histoName;
     RunHistoHolder** histoArr;
 public:
-    CycleHistoHolder(Int_t numCycles, Int_t numRuns, string histoName, Int_t numBins, Int_t timeRunEnd);
+    CycleHistoHolder(Int_t numCycles, Int_t numRuns, string histoName, Int_t numBins, Int_t timeRunEnd, Int_t individualFitChoice);
     ~CycleHistoHolder();
     TH1D* GetAHisto(Int_t cycleIndex, Int_t runIndex);
     void SetAHisto(Int_t cycleIndex, Int_t runIndex, TH1D* histo);
 };
 
-CycleHistoHolder::CycleHistoHolder(Int_t numCycles, Int_t numRuns, string histoName, Int_t numBins, Int_t timeRunEnd)
+CycleHistoHolder::CycleHistoHolder(Int_t numCycles, Int_t numRuns, string histoName, Int_t numBins, Int_t timeRunEnd, Int_t individualFitChoice)
 {
     this->numCycles = numCycles;
     this->numRuns = numRuns;
@@ -32,7 +32,7 @@ CycleHistoHolder::CycleHistoHolder(Int_t numCycles, Int_t numRuns, string histoN
     histoArr = new RunHistoHolder* [numCycles];
     for(int i = 0; i < numCycles; i++)
     {
-        histoArr[i] = new RunHistoHolder(i, numRuns, histoName, numBins, timeRunEnd);
+        histoArr[i] = new RunHistoHolder(i, numRuns, histoName, numBins, timeRunEnd, individualFitChoice);
     }
 }
 

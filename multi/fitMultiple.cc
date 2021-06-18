@@ -175,7 +175,8 @@ void fitMultiple()
                 //single run of histogam
                 case 1:
                 {
-                    element = new ElementFit(events, 1, 1, RegularDecaybyActivity, IntegralDecaybyActivity, fitFunctions, numElements, timeRun, numBins, elementNames, paraVals, 2);
+                    displayIndividualFitsChoice = 2;
+                    element = new ElementFit(events, 1, 1, RegularDecaybyActivity, IntegralDecaybyActivity, fitFunctions, numElements, timeRun, numBins, elementNames, paraVals, 2, displayIndividualFitsChoice);
                     inFile.open("simulated_single_run.txt");
                     element->genAndFillHistos();
                     element->fitHistos(0, 0);
@@ -232,7 +233,7 @@ void fitMultiple()
                     inFile.ignore(256, ':');
                     inFile >> upperRunHistoIndex;
                     
-                    element = new ElementFit(events, runs, 1, RegularDecaybyActivity, IntegralDecaybyActivity, fitFunctions, numElements, timeRun, numBins, elementNames, paraVals, 2);
+                    element = new ElementFit(events, runs, 1, RegularDecaybyActivity, IntegralDecaybyActivity, fitFunctions, numElements, timeRun, numBins, elementNames, paraVals, 2, displayIndividualFitsChoice);
                     Run* elementRun = new Run(runs, eventDecrement, element, elementNames); 
                     
                     elementRun->runNoChange(0);
@@ -399,7 +400,7 @@ void fitMultiple()
                     inFile.ignore(256,':');
                     inFile >> upperCycleHistoIndex;
 
-                    element = new ElementFit(events, numRuns, numCycles, RegularDecaybyActivity, IntegralDecaybyActivity, fitFunctions, numElements, timeRun, numBins, elementNames, paraVals, singleSourceHistoChoice);
+                    element = new ElementFit(events, numRuns, numCycles, RegularDecaybyActivity, IntegralDecaybyActivity, fitFunctions, numElements, timeRun, numBins, elementNames, paraVals, singleSourceHistoChoice, displayIndividualFitsChoice);
                     Run* elementRunsCycle = new Run(numRuns, eventDecrement, element, elementNames);
                     Cycle* cycle = new Cycle(numCycles, elementRunsCycle, element, x_start, x_stop, x_inc, cycleChangeChoice);
 
@@ -575,7 +576,6 @@ void fitMultiple()
             }
         }
         */
-       gDirectory->Close();
     }
     //delete dyanmically allocated data
     for(int i = 0; i < numElements; i++)
