@@ -28,7 +28,6 @@ decayFunction* regularFitFunctions;
 decayFunction* integralFitFunctions;
 int numElements;
 
-
 //RUN(N)- process that happens N times in which histograms of the decay is generated and the fit parameters are extracted and put into a histogram
 //CYCLE(M)- process that happens M time in which the mean values for the histograms of the RUN process are in some way compared and then graphed
 void fitMultiple()

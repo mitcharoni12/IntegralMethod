@@ -145,8 +145,8 @@ ElementFit::ElementFit(Int_t events, Int_t numRuns, Int_t numCycles, Double_t (*
     //generates all the histo objects and 
     genAndFillHistos();
     //removes restrictions on fitting function calls and itterations
-    ROOT::Math::MinimizerOptions::SetDefaultMaxIterations(100000000);
-    ROOT::Math::MinimizerOptions::SetDefaultMaxFunctionCalls(100000000);
+    //ROOT::Math::MinimizerOptions::SetDefaultMaxIterations(100000000);
+    //ROOT::Math::MinimizerOptions::SetDefaultMaxFunctionCalls(100000000);
 }
 
 
