@@ -37,8 +37,10 @@ class Cycle{
         void genMeanDifferenceGraphs();
         void genSeperateMeanGraphs();
         void genSingleMeanDifference();
-        void runDifferenceMean();
-        void runSeperateMean();
+        void runDifferenceMeanRebin();
+        void runDifferenceMeanTimeDifference();
+        void runSeperateMeanRebin()
+        void runSeperateMeanTimeDifference();
         void runSeperateSingleGen();
 };
 
@@ -215,8 +217,48 @@ void Cycle::genSeperateMeanGraphs()
     delete [] zero;
 }
 
+//runs the cycles, gets the mean for integral and regular histograms and takes difference for the rebin function
+void Cycle::runDifferenceMeanRebin()
+{
+    Double_t differenceHalfLife, differenceHalfLifeError;
+
+    TH1D** multiRunHisto = decayChainRun->createRunResultHistos();
+    TH1D** multiRunSingleHistos = decayChainRun->createRunResultHistosSingleElements();
+    
+    //elements in array stored in order, regular, single
+    for(int i = 0; i < cycles; i++)
+    {
+        //runs (numRuns) runs and generates run result histos
+        decayChainRun->runNoChange(i);
+        multiRunHisto = decayChainRun->fillRunResultHistos(multiRunHisto);
+        multiRunSingleHistos = decayChainRun->fillRunResultHistosSingleElement(multiRunSingleHistos);
+
+        //does mean difference calculation for each element in decay chain
+        for(int k = 0; k < numElements; k++)
+        {
+            differenceHalfLife = multiRunHisto[(k*2)]->GetMean() - multiRunHisto[(k*2)+1]->GetMean();
+            meanDifferenceValues->SetAnHalfLife(i, k, differenceHalfLife);
+            differenceHalfLife = multiRunSingleHistos[(k*2)]->GetMean() - multiRunSingleHistos[(k*2)+1]->GetMean();
+            singleMeanDifferenceValues->SetAnHalfLife(i, k, k, differenceHalfLife);
+
+            differenceHalfLifeError = sqrt(pow(multiRunHisto[(k*2)+1]->GetMeanError(),2) + pow(multiRunHisto[(k*2)]->GetMeanError(),2));
+            meanDifferenceValues->SetAnHalfLifeError(i, k, differenceHalfLifeError);
+            differenceHalfLifeError = sqrt(pow(multiRunSingleHistos[(k*2)+1]->GetMeanError(),2) + pow(multiRunSingleHistos[(k*2)]->GetMeanError(),2));
+            singleMeanDifferenceValues->SetAnHalfLifeError(i, k, k, differenceHalfLifeError);
+        }
+    }
+
+    for(int i = 0; i < numElements*2; i++)
+    {
+        delete multiRunHisto[i];
+        delete multiRunSingleHistos[i];
+    }
+    delete [] multiRunHisto;
+    delete [] multiRunSingleHistos;
+}
+
 //runs the cycles, gets the mean for integral and regular histograms and takes difference (dynamic)
-void Cycle::runDifferenceMean()
+void Cycle::runDifferenceMeanTimeDifference()
 {
     Double_t differenceHalfLife, differenceHalfLifeError;
 
@@ -240,7 +282,6 @@ void Cycle::runDifferenceMean()
         {
             differenceHalfLife = multiRunHisto[(k*2)]->GetMean() - multiRunHisto[(k*2)+1]->GetMean();
             meanDifferenceValues->SetAnHalfLife(i, k, differenceHalfLife);
-            cout << "mean difference: " << differenceHalfLife << endl;
             differenceHalfLife = multiRunSingleHistos[(k*2)]->GetMean() - multiRunSingleHistos[(k*2)+1]->GetMean();
             singleMeanDifferenceValues->SetAnHalfLife(i, k, k, differenceHalfLife);
 
@@ -272,7 +313,56 @@ void Cycle::runDifferenceMean()
 }
 
 //runs the cycles and puts the data of the integral method mean and the regular method mean into their respective arrays (dynamic)
-void Cycle::runSeperateMean()
+void Cycle::runSeperateMeanRebin()
+{
+    Double_t tempMeanVal;
+    Double_t tempErrorVal;
+
+    TH1D** multiRunHisto = decayChainRun->createRunResultHistos();
+    TH1D** multiRunHistoSingle = decayChainRun->createRunResultHistosSingleElements();
+
+    //running the cycle and putting histograms means in respective arrays
+    for(int i = 0; i < cycles; i++)
+    {
+        decayChainRun->runNoChange(i);
+        //fills histograms with results from multiple runs in order to extract means
+        multiRunHisto = decayChainRun->fillRunResultHistos(multiRunHisto);
+        multiRunHistoSingle = decayChainRun->fillRunResultHistosSingleElement(multiRunHistoSingle);
+
+        //moves histo means into respective data storages
+        for(int k = 0; k < numElements; k++)
+        {
+            tempMeanVal = multiRunHisto[(k*2)]->GetMean();
+            regularFitValues->SetAnHalfLife(i, k, tempMeanVal);
+            tempErrorVal = multiRunHisto[(k*2)]->GetMeanError();
+            regularFitValues->SetAnHalfLifeError(i, k, tempErrorVal);
+            tempMeanVal = multiRunHisto[(k*2)+1]->GetMean();
+            integralFitValues->SetAnHalfLife(i, k, tempMeanVal);
+            tempErrorVal = multiRunHisto[(k*2)+1]->GetMeanError();
+            integralFitValues->SetAnHalfLifeError(i, k, tempErrorVal);
+
+            tempMeanVal = multiRunHistoSingle[(k*2)]->GetMean();
+            singleRegularFitValues->SetAnHalfLife(i, k, k, tempMeanVal);
+            tempErrorVal = multiRunHistoSingle[(k*2)]->GetMean();
+            singleRegularFitValues->SetAnHalfLifeError(i, k, k, tempErrorVal);
+            tempMeanVal = multiRunHistoSingle[(k*2)+1]->GetMean();
+            singleIntegralFitValues->SetAnHalfLife(i, k, k, tempMeanVal);
+            tempErrorVal = multiRunHistoSingle[(k*2)+1]->GetMean();
+            singleIntegralFitValues->SetAnHalfLifeError(i, k, k, tempErrorVal);
+        }
+    }
+
+    for(int i = 0; i < numElements*2; i++)
+    {
+        delete multiRunHisto[i];
+        delete multiRunHistoSingle[i];
+    }
+    delete [] multiRunHisto;
+    delete [] multiRunHistoSingle;
+}
+
+//runs the cycles and puts the data of the integral method mean and the regular method mean into their respective arrays (dynamic)
+void Cycle::runSeperateMeanTimeDifference()
 {
     //setting inital values for time, 1= start const end moving, 2= end const start moving
     element->setTimeRunStart(x_start);
@@ -333,6 +423,7 @@ void Cycle::runSeperateMean()
     delete [] multiRunHisto;
     delete [] multiRunHistoSingle;
 }
+
 
 //does runs cycle for the single histogram (dynamic)
 void Cycle::runSeperateSingleGen()

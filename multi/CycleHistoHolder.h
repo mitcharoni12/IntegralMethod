@@ -11,28 +11,29 @@ using namespace std;
 
 class CycleHistoHolder{
 private:
-    Int_t numCycles, numRuns, numBins, timeRunEnd;
+    Int_t numCycles, numRuns, timeRunEnd;
+    Int_t* binArr
     string histoName;
     RunHistoHolder** histoArr;
 public:
-    CycleHistoHolder(Int_t numCycles, Int_t numRuns, string histoName, Int_t numBins, Int_t timeRunEnd, Int_t individualFitChoice);
+    CycleHistoHolder(Int_t numCycles, Int_t numRuns, string histoName, Int_t* binArr, Int_t timeRunEnd, Int_t individualFitChoice);
     ~CycleHistoHolder();
     TH1D* GetAHisto(Int_t cycleIndex, Int_t runIndex);
     void SetAHisto(Int_t cycleIndex, Int_t runIndex, TH1D* histo);
 };
 
-CycleHistoHolder::CycleHistoHolder(Int_t numCycles, Int_t numRuns, string histoName, Int_t numBins, Int_t timeRunEnd, Int_t individualFitChoice)
+CycleHistoHolder::CycleHistoHolder(Int_t numCycles, Int_t numRuns, string histoName, Int_t* binArr, Int_t timeRunEnd, Int_t individualFitChoice)
 {
     this->numCycles = numCycles;
     this->numRuns = numRuns;
-    this->numBins = numBins;
+    this->binArr = binArr;
     this->timeRunEnd = timeRunEnd;
     this->histoName = histoName;
 
     histoArr = new RunHistoHolder* [numCycles];
     for(int i = 0; i < numCycles; i++)
     {
-        histoArr[i] = new RunHistoHolder(i, numRuns, histoName, numBins, timeRunEnd, individualFitChoice);
+        histoArr[i] = new RunHistoHolder(i, numRuns, histoName, binArr[i], timeRunEnd, individualFitChoice);
     }
 }
 

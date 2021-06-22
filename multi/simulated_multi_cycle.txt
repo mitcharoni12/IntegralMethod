@@ -14,3 +14,5 @@ lower run histo index(0 based):0
 upper run histo index(0 based):0
 lower cycle histo index(0 based):0
 upper cycle histo index(0 based):0
+rebin(1) don't rebin(2):1
+number bin difference(add x bins):20
