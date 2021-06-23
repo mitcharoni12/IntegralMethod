@@ -12,7 +12,7 @@ using namespace std;
 class CycleHistoHolder{
 private:
     Int_t numCycles, numRuns, timeRunEnd;
-    Int_t* binArr
+    Int_t* binArr;
     string histoName;
     RunHistoHolder** histoArr;
 public:
@@ -33,6 +33,7 @@ CycleHistoHolder::CycleHistoHolder(Int_t numCycles, Int_t numRuns, string histoN
     histoArr = new RunHistoHolder* [numCycles];
     for(int i = 0; i < numCycles; i++)
     {
+        cout << "Bin num: " << binArr[i] << endl;
         histoArr[i] = new RunHistoHolder(i, numRuns, histoName, binArr[i], timeRunEnd, individualFitChoice);
     }
 }

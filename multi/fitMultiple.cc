@@ -175,9 +175,8 @@ void fitMultiple()
                 case 1:
                 {
                     displayIndividualFitsChoice = 2;
-                    element = new ElementFit(events, 1, 1, RegularDecaybyActivity, IntegralDecaybyActivity, fitFunctions, numElements, timeRun, numBins, elementNames, paraVals, 2, displayIndividualFitsChoice, 0, 0);
+                    element = new ElementFit(events, 1, 1, RegularDecaybyActivity, IntegralDecaybyActivity, fitFunctions, numElements, timeRun, numBins, elementNames, paraVals, 2, displayIndividualFitsChoice, 2, 0);
                     inFile.open("simulated_single_run.txt");
-                    element->genAndFillHistos();
                     element->fitHistos(0, 0);
                     element->displayParameters();
                     //gets write file choice
@@ -232,7 +231,7 @@ void fitMultiple()
                     inFile.ignore(256, ':');
                     inFile >> upperRunHistoIndex;
                     
-                    element = new ElementFit(events, runs, 1, RegularDecaybyActivity, IntegralDecaybyActivity, fitFunctions, numElements, timeRun, numBins, elementNames, paraVals, 2, displayIndividualFitsChoice, 0, 0);
+                    element = new ElementFit(events, runs, 1, RegularDecaybyActivity, IntegralDecaybyActivity, fitFunctions, numElements, timeRun, numBins, elementNames, paraVals, 2, displayIndividualFitsChoice, 2, 0);
                     Run* elementRun = new Run(runs, eventDecrement, element, elementNames); 
                     
                     elementRun->runNoChange(0);
@@ -418,7 +417,7 @@ void fitMultiple()
                         {
                             cycle->runSeperateSingleGen();
                             cycle->genSingleMeanDifference();
-                            cycle->genMeanDifferenceGraphs();
+                            cycle->genMeanDifferenceGraphsTimeDifference();
                             canvasArr = new TCanvas* [numElements];
                             for(int i = 0; i < numElements; i++)
                             {
@@ -431,7 +430,7 @@ void fitMultiple()
                         //seperate mean
                         }else{
                             cycle->runSeperateSingleGen();
-                            cycle->genSeperateMeanGraphs();
+                            cycle->genSeperateMeanGraphsTimeDifference();
                             canvasArr = new TCanvas* [numElements];
                             for(int i = 0; i < numElements; i++)
                             {
@@ -449,7 +448,7 @@ void fitMultiple()
                         if(cycleMeanChoice == 1)
                         {
                             cycle->runDifferenceMeanTimeDifference();
-                            cycle->genMeanDifferenceGraphs();
+                            cycle->genMeanDifferenceGraphsTimeDifference();
                             canvasArr = new TCanvas* [numElements];
                             for(int i = 0; i < numElements; i++)
                             {
@@ -463,7 +462,7 @@ void fitMultiple()
                         }else if(cycleMeanChoice == 2)
                         {
                             cycle->runSeperateMeanTimeDifference();
-                            cycle->genSeperateMeanGraphs();
+                            cycle->genSeperateMeanGraphsTimeDifference();
                             canvasArr = new TCanvas* [numElements];
                             for(int i = 0; i < numElements; i++)
                             {
@@ -480,12 +479,32 @@ void fitMultiple()
                         //mean difference
                         if(cycleMeanChoice == 1)
                         {
-                        
+                            cycle->runDifferenceMeanRebin();
+                            cycle->genSeperateMeanGraphsRebin();
+                            canvasArr = new TCanvas* [numElements];
+                            for(int i = 0; i < numElements; i++)
+                            {
+                                canvasArr[i] = new TCanvas((elementNames[i] + " Rebin Difference Mean").c_str(), (elementNames[i] + " Rebin Difference Mean").c_str(), 1100, 500);
+                                canvasArr[i]->Divide(2,1,.02,.02);
+                            }
+                            TCanvas* sacraficeCanvas = new TCanvas("SacraficeCanvas", "SacraficeCanvas", 500, 500);
+                            cycle->displayMeanDifferenceGraphs(canvasArr);
+                            delete [] canvasArr;
                         //seperate mean
                         }else if(cycleMeanChoice == 2)
                         {
-                            cycle->runSeperateMean();
-                            cycle->genSeperateMeanGraphs();
+                            cycle->runSeperateMeanRebin();
+                            cycle->genSeperateMeanGraphsRebin();
+                            canvasArr = new TCanvas* [numElements];
+                            for(int i = 0; i < numElements; i++)
+                            {
+                                canvasArr[i] = new TCanvas((elementNames[i] + " Rebin Seperate Mean").c_str(), (elementNames[i] + " Rebin Seperate Mean").c_str(), 1100, 500);
+                                canvasArr[i]->Divide(2,1,.02,.02);
+                            }
+                            TCanvas* sacraficeCanvas = new TCanvas("SacraficeCanvas", "SacraficeCanvas", 500, 500);
+                            cycle->displayMeanSeperateGraphs(canvasArr);
+
+                            delete [] canvasArr;
                         }
                     }
 

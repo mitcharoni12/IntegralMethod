@@ -17,6 +17,7 @@ using namespace std;
 class Cycle{
     private:
         Int_t cycles, numElements, incChoice;
+        Int_t* binSizeArr;
         Double_t x_inc, x_start, x_stop;
         Double_t* timeArr;
         Run* decayChainRun;
@@ -34,12 +35,14 @@ class Cycle{
         ~Cycle();
         void displayMeanDifferenceGraphs(TCanvas** canvasArr);
         void displayMeanSeperateGraphs(TCanvas** canvasArr);
-        void genMeanDifferenceGraphs();
-        void genSeperateMeanGraphs();
+        void genMeanDifferenceGraphsRebin();
+        void genMeanDifferenceGraphsTimeDifference();
+        void genSeperateMeanGraphsRebin();
+        void genSeperateMeanGraphsTimeDifference();
         void genSingleMeanDifference();
         void runDifferenceMeanRebin();
         void runDifferenceMeanTimeDifference();
-        void runSeperateMeanRebin()
+        void runSeperateMeanRebin();
         void runSeperateMeanTimeDifference();
         void runSeperateSingleGen();
 };
@@ -55,6 +58,7 @@ Cycle::Cycle(Int_t cycles, Run* decayChainRun, ElementFit* element, Double_t x_s
     this->x_stop = x_stop;
     this->x_inc = x_inc;
     this->incChoice = incChoice;
+    binSizeArr = element->getBinArr();
     element->setNumRuns(decayChainRun->getNumRuns());
     element->setNumCycles(cycles);
     elementStrNames = decayChainRun->getElementStringNames();
@@ -110,7 +114,7 @@ void Cycle::displayMeanDifferenceGraphs(TCanvas** canvasArr)
     }
 }
 
-//displays the graphs for the seperate mean
+//displays the graphs for the seperate mean for time difference
 void Cycle::displayMeanSeperateGraphs(TCanvas** canvasArr)
 {
     for(int i = 0; i < numElements; i++)
@@ -126,8 +130,38 @@ void Cycle::displayMeanSeperateGraphs(TCanvas** canvasArr)
     }
 }
 
-//creates and fills graphs for the difference in mean results (dynamic)
-void Cycle::genMeanDifferenceGraphs()
+//creates and fills graphs for the difference in mean results for rebin
+void Cycle::genMeanDifferenceGraphsRebin()
+{
+    Double_t* zero = new Double_t[cycles];
+    Double_t* binSizeArrDoubles = new Double_t [cycles];
+    for(int i = 0; i < cycles; i++)
+    {
+        zero[i] = 0.0f;
+    }
+    for(int i = 0; i < cycles; i++)
+    {
+        binSizeArrDoubles[i] = (Double_t) binSizeArr[i];
+    }
+
+    for(int i = 0; i < numElements; i++)
+    {
+        fitDifferenceGraphs[i] = new TGraphErrors(cycles, binSizeArrDoubles, meanDifferenceValues->GetHalfLifeArr(i), zero, meanDifferenceValues->GetHalfLifeErrorArr(i));
+        fitDifferenceGraphs[i]->GetXaxis()->SetTitle("Number Bins");
+        fitDifferenceGraphs[i]->GetYaxis()->SetTitle("Regular Fit - Integral Fit");
+        fitDifferenceGraphs[i]->SetTitle((elementStrNames[i] + " Regular Histo Mean Difference").c_str());
+
+        singleFitDifferenceGraphs[i] = new TGraphErrors(cycles, binSizeArrDoubles, singleMeanDifferenceValues->GetHalfLifeArr(i, i), zero, singleMeanDifferenceValues->GetHalfLifeErrorArr(i, i));
+        singleFitDifferenceGraphs[i]->GetXaxis()->SetTitle("Number Bins");
+        singleFitDifferenceGraphs[i]->GetYaxis()->SetTitle("Regular Fit - Integral Fit");
+        singleFitDifferenceGraphs[i]->SetTitle((elementStrNames[i] + " Single Histo Mean Difference").c_str());
+    }
+    delete [] zero;
+    delete [] binSizeArrDoubles;
+}
+
+//creates and fills graphs for the difference in mean results for time difference
+void Cycle::genMeanDifferenceGraphsTimeDifference()
 {
     Double_t* zero = new Double_t[cycles];
     for(int i = 0; i < cycles; i++)
@@ -173,8 +207,60 @@ void Cycle::genSingleMeanDifference()
     }
 }
 
+//creates and fills the graphs for the seperate mean results for different bins
+void Cycle::genSeperateMeanGraphsRebin()
+{
+    Double_t* tempFitVals, *tempFitErrors;
+    Double_t* zero = new Double_t[cycles];
+    Double_t* binSizeArrDoubles = new Double_t [cycles];
+
+    for(int i = 0; i < cycles; i++)
+    {
+        zero[i] = 0.0f;
+    }
+    for(int i = 0; i < cycles; i++)
+    {
+        binSizeArrDoubles[i] = (Double_t) binSizeArr[i];
+    }
+
+    TGraphErrors** meanSeperateGraphs = new TGraphErrors* [numElements];
+    for(int i = 0; i < numElements; i++)
+    {
+        tempFitVals = regularFitValues->GetHalfLifeArr(i);
+        tempFitErrors = regularFitValues->GetHalfLifeErrorArr(i);
+        regularFitMeanGraphs[i] = new TGraphErrors(cycles, binSizeArrDoubles, tempFitVals, zero, tempFitErrors);
+        regularFitMeanGraphs[i]->GetXaxis()->SetTitle("Bin Number");
+        regularFitMeanGraphs[i]->GetYaxis()->SetTitle("Fit Value");
+        regularFitMeanGraphs[i]->SetTitle((elementStrNames[i] + " Regular Graph Mean").c_str());
+
+        tempFitVals = singleRegularFitValues->GetHalfLifeArr(i, i);
+        tempFitErrors = singleRegularFitValues->GetHalfLifeErrorArr(i, i);
+        singleRegularFitMeanGraphs[i] = new TGraphErrors(cycles, binSizeArrDoubles, tempFitVals, zero, tempFitErrors);
+        singleRegularFitMeanGraphs[i]->GetXaxis()->SetTitle("Bin Number");
+        singleRegularFitMeanGraphs[i]->GetYaxis()->SetTitle("Fit Value");
+        singleRegularFitMeanGraphs[i]->SetTitle((elementStrNames[i] + " Single Regular Graph Mean").c_str());
+
+        tempFitVals = integralFitValues->GetHalfLifeArr(i);
+        tempFitErrors = integralFitValues->GetHalfLifeErrorArr(i);
+        integralFitMeanGraphs[i] = new TGraphErrors(cycles, binSizeArrDoubles, tempFitVals, zero, tempFitErrors);
+        integralFitMeanGraphs[i]->GetXaxis()->SetTitle("TiBin Numberme");
+        integralFitMeanGraphs[i]->GetYaxis()->SetTitle("Fit Value");
+        integralFitMeanGraphs[i]->SetTitle((elementStrNames[i] + " Integral Graph Mean").c_str());
+
+        tempFitVals = singleIntegralFitValues->GetHalfLifeArr(i, i);
+        tempFitErrors = singleIntegralFitValues->GetHalfLifeErrorArr(i, i);
+        singleIntegralFitMeanGraphs[i] = new TGraphErrors(cycles, binSizeArrDoubles, tempFitVals, zero, tempFitErrors);
+        singleIntegralFitMeanGraphs[i]->GetXaxis()->SetTitle("Bin Number");
+        singleIntegralFitMeanGraphs[i]->GetYaxis()->SetTitle("Fit Value");
+        singleIntegralFitMeanGraphs[i]->SetTitle((elementStrNames[i] + " Single Integral Graph Mean").c_str());
+    }
+
+    delete [] zero;
+    delete [] binSizeArrDoubles;
+}
+
 //creates and fills the graphs for the seperate mean results (dynamic)
-void Cycle::genSeperateMeanGraphs()
+void Cycle::genSeperateMeanGraphsTimeDifference()
 {
     Double_t* tempFitVals, *tempFitErrors;
     Double_t* zero = new Double_t[cycles];

@@ -12,7 +12,7 @@ using namespace std;
 class SingleCycleHistoHolder{
 private:
     Int_t numCycles, numRuns, timeRunEnd, numElements;
-    Int_t* binArr
+    Int_t* binArr;
     CycleHistoHolder** histoArr;
     string histoName;
     string* elementNames;

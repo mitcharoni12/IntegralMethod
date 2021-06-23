@@ -36,7 +36,7 @@ class ElementFit{
         Double_t getElementParameters(int i){return paraVals[i]->getValueDecayConst();}
         Int_t getNumEvents(){return events;}
         Int_t getNumElements(){return numElements;}
-        Int_t getNumBins(){return numBins;}
+        Int_t* getBinArr(){return binSizeArr;}
         Int_t getTimeRunEnd(){return timeRunEnd;}
         ChainFitValues* getRegularFitParameters(){return totalRegularFitParameters;}
         ChainFitValues* getIntegralFitParameters(){return totalIntegralFitParameters;}
@@ -94,7 +94,7 @@ class ElementFit{
         void setFunctionParametersTotal();
         void setFunctionParamersSingle();
         void setParaLimits();
-        //TCanvas* test = new TCanvas("test", "test", 500, 500);
+        TCanvas* test = new TCanvas("test", "test", 500, 500);
         clock_t Tclock;
 };  
 
@@ -212,13 +212,13 @@ void ElementFit::createHistoHolders()
 {
     string histoName;
     histoName = "Total Regular Histo";
-    regularHisto = new CycleHistoHolder(numCycles, numRuns, histoName, numBins, timeRunEnd, individualFitChoice);
+    regularHisto = new CycleHistoHolder(numCycles, numRuns, histoName, binSizeArr, timeRunEnd, individualFitChoice);
     histoName = "Total Integral Histo";
-    integralHisto = new CycleHistoHolder(numCycles, numRuns, histoName, numBins, timeRunEnd, individualFitChoice);
+    integralHisto = new CycleHistoHolder(numCycles, numRuns, histoName, binSizeArr, timeRunEnd, individualFitChoice);
     histoName = "Single Regular Histo";
-    singleRegularHisto = new SingleCycleHistoHolder(numCycles, numElements, numRuns, histoName, numBins, timeRunEnd, individualFitChoice, elementNames);
+    singleRegularHisto = new SingleCycleHistoHolder(numCycles, numElements, numRuns, histoName, binSizeArr, timeRunEnd, individualFitChoice, elementNames);
     histoName = "Single Integral Histo";
-    singleIntegralHisto = new SingleCycleHistoHolder(numCycles, numElements, numRuns, histoName, numBins, timeRunEnd, individualFitChoice, elementNames);
+    singleIntegralHisto = new SingleCycleHistoHolder(numCycles, numElements, numRuns, histoName, binSizeArr, timeRunEnd, individualFitChoice, elementNames);
 }
 
 //dynamically allocates the total fit functions
@@ -388,6 +388,12 @@ void ElementFit::fitRegularHisto(Int_t cycleIndex, Int_t runIndex)
     TH1D* tempHisto;
 
     tempHisto = regularHisto->GetAHisto(cycleIndex, runIndex);
+    for(int i = 0; i < numBins; i++)
+    {
+        cout << tempHisto->GetBinContent(i) << endl;
+    }
+    test->cd();
+    tempHisto->Draw();
     tempHisto->Fit(this->regularFunction, "L", "", timeRunStart, timeRunEnd);
     for(int i = 0; i < numElements; i++)
     {   
