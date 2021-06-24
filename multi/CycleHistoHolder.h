@@ -16,13 +16,13 @@ private:
     string histoName;
     RunHistoHolder** histoArr;
 public:
-    CycleHistoHolder(Int_t numCycles, Int_t numRuns, string histoName, Int_t* binArr, Int_t timeRunEnd, Int_t individualFitChoice);
+    CycleHistoHolder(Int_t numCycles, Int_t numRuns, string histoName, Int_t* binArr, Int_t timeRunEnd);
     ~CycleHistoHolder();
     TH1D* GetAHisto(Int_t cycleIndex, Int_t runIndex);
     void SetAHisto(Int_t cycleIndex, Int_t runIndex, TH1D* histo);
 };
 
-CycleHistoHolder::CycleHistoHolder(Int_t numCycles, Int_t numRuns, string histoName, Int_t* binArr, Int_t timeRunEnd, Int_t individualFitChoice)
+CycleHistoHolder::CycleHistoHolder(Int_t numCycles, Int_t numRuns, string histoName, Int_t* binArr, Int_t timeRunEnd)
 {
     this->numCycles = numCycles;
     this->numRuns = numRuns;
@@ -33,8 +33,7 @@ CycleHistoHolder::CycleHistoHolder(Int_t numCycles, Int_t numRuns, string histoN
     histoArr = new RunHistoHolder* [numCycles];
     for(int i = 0; i < numCycles; i++)
     {
-        cout << "Bin num: " << binArr[i] << endl;
-        histoArr[i] = new RunHistoHolder(i, numRuns, histoName, binArr[i], timeRunEnd, individualFitChoice);
+        histoArr[i] = new RunHistoHolder(i, numRuns, histoName, binArr[i], timeRunEnd);
     }
 }
 

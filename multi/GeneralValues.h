@@ -28,7 +28,7 @@ GeneralValues::GeneralValues(Int_t numRuns)
 
 GeneralValues::~GeneralValues()
 {
-    delete fitValues;
+    delete [] fitValues;
 }
 
 //sets values in array fitValues

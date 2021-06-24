@@ -30,7 +30,7 @@ typedef Double_t (*decayFunction)(Double_t *x, Double_t *par);
 class ElementFit{
     public:
         ElementFit(Int_t events, Int_t numRuns, Int_t numCycles, Double_t (*regularFunc)(Double_t*, Double_t*), Double_t (*integralFunc)(Double_t*, Double_t*), Double_t (**fitFunctions)(Double_t*, Double_t*),
-                   Int_t numElements, Double_t timeRunEnd, Int_t numBins, string* elementNames,  ParameterValue** paraVals, Int_t singleHistoChoice, Int_t individualFitChoice, Int_t rebinChoice, Int_t rebinDifference);
+                   Int_t numElements, Double_t timeRunEnd, Int_t numBins, string* elementNames,  ParameterValue** paraVals, Int_t singleHistoChoice, Int_t rebinChoice, Int_t rebinDifference);
         ~ElementFit();
         //getter function
         Double_t getElementParameters(int i){return paraVals[i]->getValueDecayConst();}
@@ -67,7 +67,7 @@ class ElementFit{
     private:
         //private variables
         string* elementNames;
-        Int_t events, numElements, numBins, numParameters, numRuns, numCycles, singleHistoChoice, individualFitChoice, rebinChoice, rebinDifference;
+        Int_t events, numElements, numBins, numParameters, numRuns, numCycles, singleHistoChoice, rebinChoice, rebinDifference;
         Int_t* binSizeArr;
         TF1* integralFunction, *regularFunction;
         TF1** singleFitFunctions;
@@ -79,10 +79,8 @@ class ElementFit{
         TRandom3 rand;
         Double_t timeRunStart, timeRunEnd;
         Double_t* randArr;
-        ChainFitValues* totalRegularFitParameters;
-        ChainFitValues* totalIntegralFitParameters;
-        SingleElementFitValues* singleRegularFitParameters;
-        SingleElementFitValues* singleIntegralFitParameters;
+        ChainFitValues* totalRegularFitParameters, *totalIntegralFitParameters;
+        SingleElementFitValues* singleRegularFitParameters, *singleIntegralFitParameters;
         ParameterValue** paraVals;
         Int_t globalSeedChanger = 0;
         //helper functions
@@ -94,14 +92,14 @@ class ElementFit{
         void setFunctionParametersTotal();
         void setFunctionParamersSingle();
         void setParaLimits();
-        TCanvas* test = new TCanvas("test", "test", 500, 500);
+        //TCanvas* test = new TCanvas("test", "test", 500, 500);
         clock_t Tclock;
 };  
 
 
 //constructor for generating a histogram
 ElementFit::ElementFit(Int_t events, Int_t numRuns, Int_t numCycles, Double_t (*regularFunc)(Double_t*, Double_t*), Double_t (*integralFunc)(Double_t*, Double_t*), Double_t (**fitFunctions)(Double_t*, Double_t*),
-                       Int_t numElements, Double_t timeRunEnd, Int_t numBins, string* elementNames,  ParameterValue** paraVals, Int_t singleHistoChoice, Int_t individualFitChoice, Int_t rebinChoice, Int_t rebinDifference)
+                       Int_t numElements, Double_t timeRunEnd, Int_t numBins, string* elementNames,  ParameterValue** paraVals, Int_t singleHistoChoice, Int_t rebinChoice, Int_t rebinDifference)
 {
     //setting variables
     this->events = events;
@@ -117,7 +115,6 @@ ElementFit::ElementFit(Int_t events, Int_t numRuns, Int_t numCycles, Double_t (*
     this->timeRunEnd = timeRunEnd;
     this->paraVals = paraVals;
     this->singleHistoChoice = singleHistoChoice;
-    this->individualFitChoice = individualFitChoice;
     this->rebinChoice = rebinChoice;
     this->rebinDifference = rebinDifference;
 
@@ -212,13 +209,13 @@ void ElementFit::createHistoHolders()
 {
     string histoName;
     histoName = "Total Regular Histo";
-    regularHisto = new CycleHistoHolder(numCycles, numRuns, histoName, binSizeArr, timeRunEnd, individualFitChoice);
+    regularHisto = new CycleHistoHolder(numCycles, numRuns, histoName, binSizeArr, timeRunEnd);
     histoName = "Total Integral Histo";
-    integralHisto = new CycleHistoHolder(numCycles, numRuns, histoName, binSizeArr, timeRunEnd, individualFitChoice);
+    integralHisto = new CycleHistoHolder(numCycles, numRuns, histoName, binSizeArr, timeRunEnd);
     histoName = "Single Regular Histo";
-    singleRegularHisto = new SingleCycleHistoHolder(numCycles, numElements, numRuns, histoName, binSizeArr, timeRunEnd, individualFitChoice, elementNames);
+    singleRegularHisto = new SingleCycleHistoHolder(numCycles, numElements, numRuns, histoName, binSizeArr, timeRunEnd, elementNames);
     histoName = "Single Integral Histo";
-    singleIntegralHisto = new SingleCycleHistoHolder(numCycles, numElements, numRuns, histoName, binSizeArr, timeRunEnd, individualFitChoice, elementNames);
+    singleIntegralHisto = new SingleCycleHistoHolder(numCycles, numElements, numRuns, histoName, binSizeArr, timeRunEnd, elementNames);
 }
 
 //dynamically allocates the total fit functions
@@ -388,12 +385,6 @@ void ElementFit::fitRegularHisto(Int_t cycleIndex, Int_t runIndex)
     TH1D* tempHisto;
 
     tempHisto = regularHisto->GetAHisto(cycleIndex, runIndex);
-    for(int i = 0; i < numBins; i++)
-    {
-        cout << tempHisto->GetBinContent(i) << endl;
-    }
-    test->cd();
-    tempHisto->Draw();
     tempHisto->Fit(this->regularFunction, "L", "", timeRunStart, timeRunEnd);
     for(int i = 0; i < numElements; i++)
     {   
@@ -531,6 +522,7 @@ void ElementFit::genRandomAlternate()
     //case for generating single histogram
     if(singleHistoChoice == 1 && rebinChoice == 2)
     {   //generate the single histogram
+    cout << "case 1" << endl << endl;
         TH1D* originalHisto;
         TH1D** originalSingleHisto;
         originalSingleHisto = new TH1D* [numElements];
@@ -580,6 +572,7 @@ void ElementFit::genRandomAlternate()
     //case for multiple histogram generation
     }else if(singleHistoChoice == 2 && rebinChoice == 2)
     {
+        cout << "case 2" << endl << endl;
         for(int cycleIndex = 0; cycleIndex < numCycles; cycleIndex++)
         {
             for(int runIndex = 0; runIndex < numRuns; runIndex++)
@@ -611,6 +604,7 @@ void ElementFit::genRandomAlternate()
     //case for generating data with rebinning
     }else if(rebinChoice == 1)
     {
+        cout << "case 3" << endl << endl;
         //numbers generated same but data fed in differently. We want all the events in each cycle to be identical so we can see the effects of rebinning, therefore data generated in run index 0 of cycle 1 must be identical to run index 0 of cycle 2
         for(int runIndex = 0; runIndex < numRuns; runIndex++)
         {
@@ -628,7 +622,7 @@ void ElementFit::genRandomAlternate()
                 {
                     stack += randArr[k];
                     //must itterate over cycles because and fill
-                    for(int cycleIndex = 0; cycleIndex < numCycles; i++)
+                    for(int cycleIndex = 0; cycleIndex < numCycles; cycleIndex++)
                     {
                         tempHisto = regularHisto->GetAHisto(cycleIndex, runIndex);
                         singleTempHisto[k] = singleRegularHisto->GetAHisto(cycleIndex, runIndex, k);

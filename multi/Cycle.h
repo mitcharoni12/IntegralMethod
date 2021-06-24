@@ -223,7 +223,6 @@ void Cycle::genSeperateMeanGraphsRebin()
         binSizeArrDoubles[i] = (Double_t) binSizeArr[i];
     }
 
-    TGraphErrors** meanSeperateGraphs = new TGraphErrors* [numElements];
     for(int i = 0; i < numElements; i++)
     {
         tempFitVals = regularFitValues->GetHalfLifeArr(i);
@@ -268,7 +267,7 @@ void Cycle::genSeperateMeanGraphsTimeDifference()
     {
         zero[i] = 0.0f;
     }
-    TGraphErrors** meanSeperateGraphs = new TGraphErrors* [numElements];
+
     for(int i = 0; i < numElements; i++)
     {
         tempFitVals = regularFitValues->GetHalfLifeArr(i);

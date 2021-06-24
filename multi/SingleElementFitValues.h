@@ -92,6 +92,6 @@ SingleElementFitValues::~SingleElementFitValues()
     {
         delete singleFitValues[i];
     }
-    delete singleFitValues;
+    delete [] singleFitValues;
 }
 #endif

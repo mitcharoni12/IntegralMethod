@@ -28,18 +28,30 @@ decayFunction* regularFitFunctions;
 decayFunction* integralFitFunctions;
 int numElements;
 
+void fitMultiple();
+
+int main()
+{
+    fitMultiple();
+    return 0;
+}
+
 //RUN(N)- process that happens N times in which histograms of the decay is generated and the fit parameters are extracted and put into a histogram
 //CYCLE(M)- process that happens M time in which the mean values for the histograms of the RUN process are in some way compared and then graphed
 void fitMultiple()
 {
     Int_t eventDecrement, numBins, rebinDifference;
     Double_t timeRun;
-    bool rangeOption;
     Double_t valueHolder;
     int histoSimulateChoice, rangeValueChoice, displayIndividualFitsChoice, rebinChoice;
     ElementFit* element;
     ifstream inFile;
     
+    //open first option file
+    inFile.open("elementInput.txt");
+    inFile.ignore(256,':');
+    inFile >> numElements;
+
     //fitFunctions array passed in and used in element object
     Int_t numFitFunction = numElements*2;
     decayFunction* fitFunctions = new decayFunction[numFitFunction];
@@ -59,11 +71,6 @@ void fitMultiple()
     integralFitFunctions[0] = CSDecaybyActivityIntegral;
     integralFitFunctions[1] = BADecaybyActivityIntegral;
     integralFitFunctions[2] = LADecaybyActivityIntegral;
-
-    //open first option file
-    inFile.open("elementInput.txt");
-    inFile.ignore(256,':');
-    inFile >> numElements;
 
     //create storage for the read in parameter values
     ParameterValue** paraVals = new ParameterValue* [numElements];
@@ -174,8 +181,7 @@ void fitMultiple()
                 //single run of histogam
                 case 1:
                 {
-                    displayIndividualFitsChoice = 2;
-                    element = new ElementFit(events, 1, 1, RegularDecaybyActivity, IntegralDecaybyActivity, fitFunctions, numElements, timeRun, numBins, elementNames, paraVals, 2, displayIndividualFitsChoice, 2, 0);
+                    element = new ElementFit(events, 1, 1, RegularDecaybyActivity, IntegralDecaybyActivity, fitFunctions, numElements, timeRun, numBins, elementNames, paraVals, 2, 2, 0);
                     inFile.open("simulated_single_run.txt");
                     element->fitHistos(0, 0);
                     element->displayParameters();
@@ -199,7 +205,6 @@ void fitMultiple()
                         }
                         TCanvas* regularTotalCanvas = new TCanvas("Total Regular Histo", "Total Regular Histo", 500, 500);
                         TCanvas* integralTotalCanvas = new TCanvas("Total Integral Histo", "Total Integral Histo", 500, 500);
-                        TCanvas* sacraficeCanvas = new TCanvas("SacraficeCanvas", "SacraficeCanvas", 500, 500);
                         element->displaySingleHistos(singleCanvas);
                         element->displayRegularHisto(regularTotalCanvas);
                         element->displayIntegralHisto(integralTotalCanvas);
@@ -231,7 +236,7 @@ void fitMultiple()
                     inFile.ignore(256, ':');
                     inFile >> upperRunHistoIndex;
                     
-                    element = new ElementFit(events, runs, 1, RegularDecaybyActivity, IntegralDecaybyActivity, fitFunctions, numElements, timeRun, numBins, elementNames, paraVals, 2, displayIndividualFitsChoice, 2, 0);
+                    element = new ElementFit(events, runs, 1, RegularDecaybyActivity, IntegralDecaybyActivity, fitFunctions, numElements, timeRun, numBins, elementNames, paraVals, 2, 2, 0);
                     Run* elementRun = new Run(runs, eventDecrement, element, elementNames); 
                     
                     elementRun->runNoChange(0);
@@ -267,10 +272,7 @@ void fitMultiple()
                         }
 
                         elementRun->displayMultiRunResultHistos(totalRunResultCanvases, totalResultHisto);
-                        for(int i = 0; i < numElements; i++)
-                        {
-                            totalRunResultCanvases[i];
-                        }
+
                         delete [] totalRunResultCanvases;
                         delete [] totalResultHisto;
 
@@ -284,9 +286,9 @@ void fitMultiple()
                 
                 
                         //extracts the fit value graphs from the array of graphs runResultGraphs and runResultSingleElementGraphs
-                        /*(I wanted to put the graphs of single element fit value and total element fit value into one array, but
-                        the graph array runResultGraphs and runResultSingleElementGraphs both had 18 graphs in them with a lot of extra data
-                        so I had to extract the graphs in this really weird way)*/
+                        //(I wanted to put the graphs of single element fit value and total element fit value into one array, but
+                        //the graph array runResultGraphs and runResultSingleElementGraphs both had 18 graphs in them with a lot of extra data
+                        //so I had to extract the graphs in this really weird way)
                         for(int i = 0; i < numElements; i++)
                         { 
                             totalRunResults[(i*4)] = runResultGraphs[(i*6)+2];
@@ -326,7 +328,6 @@ void fitMultiple()
                                 runResultErrorCanvases[i] = new TCanvas((elementNames[i] + "ResultGraphErrors").c_str(), (elementNames[i] + "ResultGraphErrors").c_str(), 1100, 1100);
                                 runResultErrorCanvases[i]->Divide(2,2,.02,.02);
                             }
-                            TCanvas* sacraficeCanvas = new TCanvas("SacraficeCanvas", "SacraficeCanvas", 500, 500);
                             elementRun->displayMultiRunResultGraphs(runResultCanvases,totalRunResults);
                             elementRun->displayMultiRunResultGraphs(runResultErrorCanvases, totalRunResultErrors);
 
@@ -362,7 +363,7 @@ void fitMultiple()
                 //multiple runs of histogram
                 case 3:
                 {
-                    Int_t numRuns, numCycles, writeToFileChoice, singleSourceHistoChoice, seperateMeanChoice, cycleChangeChoice,
+                    Int_t numRuns, numCycles, writeToFileChoice, singleSourceHistoChoice, cycleChangeChoice,
                           lowerRunHistoIndex, upperRunHistoIndex, lowerCycleHistoIndex, upperCycleHistoIndex;
                     Double_t x_start, x_stop, x_inc, cycleMeanChoice;
 
@@ -402,11 +403,10 @@ void fitMultiple()
                     inFile.ignore(256,':');
                     inFile >> rebinDifference;
 
-                    element = new ElementFit(events, numRuns, numCycles, RegularDecaybyActivity, IntegralDecaybyActivity, fitFunctions, numElements, timeRun, numBins, elementNames, paraVals, singleSourceHistoChoice, displayIndividualFitsChoice, rebinChoice, rebinDifference);
+                    element = new ElementFit(events, numRuns, numCycles, RegularDecaybyActivity, IntegralDecaybyActivity, fitFunctions, numElements, timeRun, numBins, elementNames, paraVals, singleSourceHistoChoice, rebinChoice, rebinDifference);
                     Run* elementRunsCycle = new Run(numRuns, eventDecrement, element, elementNames);
                     Cycle* cycle = new Cycle(numCycles, elementRunsCycle, element, x_start, x_stop, x_inc, cycleChangeChoice);
 
-                    TGraphErrors** cycleResultGraphs;
                     TCanvas** canvasArr;
 
                     //single histo source
@@ -424,7 +424,6 @@ void fitMultiple()
                                 canvasArr[i] = new TCanvas((elementNames[i] + " Single Source Mean Difference").c_str(), (elementNames[i] + " Single Source Mean Difference").c_str(), 1100, 500);
                                 canvasArr[i]->Divide(2,1,.02,.02);
                             }
-                            TCanvas* sacraficeCanvas = new TCanvas("SacraficeCanvas", "SacraficeCanvas", 500, 500);
                             cycle->displayMeanDifferenceGraphs(canvasArr);
                             delete [] canvasArr;
                         //seperate mean
@@ -437,7 +436,6 @@ void fitMultiple()
                                 canvasArr[i] = new TCanvas((elementNames[i] + " Single Source Seperate Mean").c_str(), (elementNames[i] + " Single Source Seperate Mean").c_str(), 1100, 1100);
                                 canvasArr[i]->Divide(2,2,.02,.02);
                             }
-                            TCanvas* sacraficeCanvas = new TCanvas("SacraficeCanvas", "SacraficeCanvas", 500, 500);
                             cycle->displayMeanSeperateGraphs(canvasArr);
                             delete [] canvasArr;
                         }
@@ -455,7 +453,6 @@ void fitMultiple()
                                 canvasArr[i] = new TCanvas((elementNames[i] + " Multi Source Mean Difference").c_str(), (elementNames[i] + " Multi Source Mean Difference").c_str(), 1100, 500);
                                 canvasArr[i]->Divide(2,1,.02,.02);
                             }
-                            TCanvas* sacraficeCanvas = new TCanvas("SacraficeCanvas", "SacraficeCanvas", 500, 500);
                             cycle->displayMeanDifferenceGraphs(canvasArr);
                             delete [] canvasArr;
                         //seperate mean
@@ -469,7 +466,6 @@ void fitMultiple()
                                 canvasArr[i] = new TCanvas((elementNames[i] + " Multi Source Seperate Mean").c_str(), (elementNames[i] + " Multi Source Seperate Mean").c_str(), 1100, 1100);
                                 canvasArr[i]->Divide(2,2,.02,.02);
                             }
-                            TCanvas* sacraficeCanvas = new TCanvas("SacraficeCanvas", "SacraficeCanvas", 500, 500);
                             
                             cycle->displayMeanSeperateGraphs(canvasArr);
                             delete [] canvasArr;
@@ -487,7 +483,6 @@ void fitMultiple()
                                 canvasArr[i] = new TCanvas((elementNames[i] + " Rebin Difference Mean").c_str(), (elementNames[i] + " Rebin Difference Mean").c_str(), 1100, 500);
                                 canvasArr[i]->Divide(2,1,.02,.02);
                             }
-                            TCanvas* sacraficeCanvas = new TCanvas("SacraficeCanvas", "SacraficeCanvas", 500, 500);
                             cycle->displayMeanDifferenceGraphs(canvasArr);
                             delete [] canvasArr;
                         //seperate mean
@@ -501,7 +496,6 @@ void fitMultiple()
                                 canvasArr[i] = new TCanvas((elementNames[i] + " Rebin Seperate Mean").c_str(), (elementNames[i] + " Rebin Seperate Mean").c_str(), 1100, 500);
                                 canvasArr[i]->Divide(2,1,.02,.02);
                             }
-                            TCanvas* sacraficeCanvas = new TCanvas("SacraficeCanvas", "SacraficeCanvas", 500, 500);
                             cycle->displayMeanSeperateGraphs(canvasArr);
 
                             delete [] canvasArr;

@@ -1,5 +1,0 @@
-number of runs:25
-event decrement:1
-write to file(1) display data(2):2
-show data via histogram(1) or graph(2):1
-write file name;outputFile.root

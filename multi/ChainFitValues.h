@@ -101,7 +101,7 @@ ChainFitValues::~ChainFitValues()
     {
         delete chainFitVals[i];
     }
-    delete chainFitVals;
+    delete [] chainFitVals;
 }
 
 #endif

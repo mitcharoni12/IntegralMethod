@@ -1,8 +1,8 @@
-number of runs:10
+number of runs:5
 event decrement:1
 write to file(1) display data(2):2
 show data via histogram(1) or graph(2):1
-display individual fits(1) dont display individual fits(2):2
+display individual fits(1) dont display individual fits(2):1
 lower run histo index(0 based):1
 upper run histo index(0 based):4
 write file name;outputFile.root
