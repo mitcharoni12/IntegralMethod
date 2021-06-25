@@ -87,6 +87,8 @@ class ElementFit{
         void changeSeed();
         TF1** createFitFunctions();
         void createTotalFunctions();
+        void DisplayParameterLimits();
+        void DisplayTotalFunctionParameters();
         void fitSingleHistos(Int_t cycleIndex, Int_t run);
         void genIntegralHistoSimulated();
         void setFunctionParametersTotal();
@@ -154,8 +156,8 @@ ElementFit::ElementFit(Int_t events, Int_t numRuns, Int_t numCycles, Double_t (*
     //generates all the histo objects and 
     genAndFillHistos();
     //removes restrictions on fitting function calls and itterations
-    //ROOT::Math::MinimizerOptions::SetDefaultMaxIterations(100000000);
-    //ROOT::Math::MinimizerOptions::SetDefaultMaxFunctionCalls(100000000);
+    ROOT::Math::MinimizerOptions::SetDefaultMaxIterations(100000000);
+    ROOT::Math::MinimizerOptions::SetDefaultMaxFunctionCalls(100000000);
 }
 
 ElementFit::~ElementFit()
@@ -354,6 +356,7 @@ void ElementFit::fitIntegralHisto(Int_t cycleIndex, Int_t runIndex)
     Double_t errorHalfLife;
     TH1D* tempHisto;
 
+    cout << "FITTING TOTAL INTEGRAL CYCLE: " << cycleIndex << " RUN: " << runIndex << endl;;
     tempHisto = integralHisto->GetAHisto(cycleIndex, runIndex);
     tempHisto->Fit(integralFunction, "L", "", timeRunStart, timeRunEnd);
     for(int i = 0; i < numElements; i++)
@@ -384,6 +387,7 @@ void ElementFit::fitRegularHisto(Int_t cycleIndex, Int_t runIndex)
     Double_t errorHalfLife;
     TH1D* tempHisto;
 
+    cout << "FITTING TOTAL REGULAR CYCLE: " << cycleIndex << " RUN: " << runIndex << endl;
     tempHisto = regularHisto->GetAHisto(cycleIndex, runIndex);
     tempHisto->Fit(this->regularFunction, "L", "", timeRunStart, timeRunEnd);
     for(int i = 0; i < numElements; i++)
@@ -419,7 +423,9 @@ void ElementFit::fitSingleHistos(Int_t cycleIndex, Int_t runIndex)
         tempSingleRegularHisto = singleRegularHisto->GetAHisto(cycleIndex, runIndex, i);
         tempSingleIntegralHisto = singleIntegralHisto->GetAHisto(cycleIndex, runIndex, i);
 
+        cout << "FITTING SINGLE REGULAR " << elementNames[i] << " CYCLE: " << cycleIndex << " RUN: " << runIndex << endl;
         tempSingleRegularHisto->Fit(singleFitFunctions[(i*2)], "L", "", timeRunStart, timeRunEnd);
+        cout << "FITTING SINGLE INTEGRAL " << elementNames[i] << " CYCLE: " << cycleIndex << " RUN: " << runIndex << endl;
         tempSingleIntegralHisto->Fit(singleFitFunctions[(i*2)+1], "L", "", timeRunStart, timeRunEnd);
         //loop for extracting the error and value for each element(you might need to draw out the array structure to understand what is happening)
         for(int k = 0; k < (i+1); k++)
@@ -641,6 +647,7 @@ void ElementFit::genRandomAlternate()
 //set parameters for base values for the total fit functions
 void ElementFit::setFunctionParametersTotal()
 {
+    DisplayTotalFunctionParameters();
     for(int i = 0; i < numElements; i++)
     {
         //have to have the if statments to account for the fact that the value could be a range
@@ -661,6 +668,19 @@ void ElementFit::setFunctionParametersTotal()
             regularFunction->SetParameter((i*2)+1, paraVals[i]->getRangeAverageDecayConst());
         }
     }
+}
+
+//displays initial parameters set for fit functions
+void ElementFit::DisplayTotalFunctionParameters()
+{
+    cout << "INITIAL FIT FUNCTION PARAMETERS" << endl;
+    for(int i = 0; i < numElements; i++)
+    {
+        cout << elementNames[i] << ":\tInit value: " << paraVals[i]->getInitValue();
+        cout << "\tDecay constant: " << paraVals[i]->getValueDecayConst();
+        cout << endl;
+    }
+    cout << endl;
 }
 
 //set parameters to base values
@@ -694,6 +714,7 @@ void ElementFit::setFunctionParamersSingle()
 //sets parameter limits so fitting knows about where to fit
 void ElementFit::setParaLimits()
 {
+    DisplayParameterLimits();
     //sets limits for N0 of the total function
     for(int i = 0; i < numElements; i++)
     {
@@ -748,6 +769,20 @@ void ElementFit::setParaLimits()
                 (singleFitFunctions[(i*2)+1])->SetParLimits((k*2)+1, (paraVals[i]->getLowerRangeDecayConst()), (paraVals[i]->getUpperRangeDecayConst()));
             }
         }
+    }
+}
+
+void ElementFit::DisplayParameterLimits()
+{
+    cout << "PARAMETER FIT RANGE" << endl;
+    for(int i = 0; i < numElements; i++)
+    {
+        cout << elementNames[i] << ":" << endl;
+        cout << "\tInitial Lower Range: 0" << endl;
+        cout << "\tInitial Lower Range: " << events * 2 << endl;
+        cout << "\tDecay Constant Lower Range: " << paraVals[i]->getValueDecayConst() * .001 << endl;
+        cout << "\tDecay Constant Upper Range: " << paraVals[i]->getValueDecayConst() * 100. << endl;
+        cout << endl;
     }
 }
 

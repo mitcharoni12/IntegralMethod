@@ -494,7 +494,7 @@ void fitMultiple()
                             for(int i = 0; i < numElements; i++)
                             {
                                 canvasArr[i] = new TCanvas((elementNames[i] + " Rebin Seperate Mean").c_str(), (elementNames[i] + " Rebin Seperate Mean").c_str(), 1100, 500);
-                                canvasArr[i]->Divide(2,1,.02,.02);
+                                canvasArr[i]->Divide(2,2,.02,.02);
                             }
                             cycle->displayMeanSeperateGraphs(canvasArr);
 
