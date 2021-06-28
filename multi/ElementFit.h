@@ -85,7 +85,7 @@ class ElementFit{
         Int_t globalSeedChanger = 0;
         //helper functions
         void changeSeed();
-        TF1** createFitFunctions();
+        void createFitFunctions();
         void createTotalFunctions();
         void DisplayParameterLimits();
         void DisplayTotalFunctionParameters();
@@ -128,6 +128,7 @@ ElementFit::ElementFit(Int_t events, Int_t numRuns, Int_t numCycles, Double_t (*
     totalIntegralFitParameters = new ChainFitValues(numElements);
     binSizeArr = new Int_t [numCycles];
     int rebinSize = numBins;
+    singleFitFunctions = new TF1* [numElements*2];
     if(rebinChoice == 1)
     {
         for(int i = 0; i < numCycles; i++)
@@ -145,7 +146,7 @@ ElementFit::ElementFit(Int_t events, Int_t numRuns, Int_t numCycles, Double_t (*
     timeRunStart = 0;
     Tclock = clock();
     //dynamically allocates the fit functions for the single histograms
-    singleFitFunctions = createFitFunctions();
+    createFitFunctions();
     //dynamically allocates histograms for the single histograms
     createTotalFunctions();
     //setting base parameters for ALL fit functions
@@ -195,15 +196,13 @@ void ElementFit::changeSeed()
 }
 
 //dynamically allocates the functions for the single elements
-TF1** ElementFit::createFitFunctions()
+void ElementFit::createFitFunctions()
 {
-    TF1** tempFunctionHolder = new TF1* [numElements*2];
     for(int i = 0; i < numElements; i++)
     {
-        tempFunctionHolder[(i*2)] = new TF1((elementNames[i] + "RegSingFunc").c_str(), fitFunctions[(i*2)], 0., timeRunEnd, (i+1)*2);
-        tempFunctionHolder[(i*2)+1] = new TF1((elementNames[i] + "InteSingFunc").c_str(), fitFunctions[(i*2)+1], 0., timeRunEnd, (i+1)*2);
+        singleFitFunctions[(i*2)] = new TF1((elementNames[i] + "RegSingFunc").c_str(), fitFunctions[(i*2)], 0., timeRunEnd, (i+1)*2);
+        singleFitFunctions[(i*2)+1] = new TF1((elementNames[i] + "InteSingFunc").c_str(), fitFunctions[(i*2)+1], 0., timeRunEnd, (i+1)*2);
     }
-    return tempFunctionHolder;
 }
 
 //creates the holding objects for the histograms
@@ -356,7 +355,14 @@ void ElementFit::fitIntegralHisto(Int_t cycleIndex, Int_t runIndex)
     Double_t errorHalfLife;
     TH1D* tempHisto;
 
-    cout << "FITTING TOTAL INTEGRAL CYCLE: " << cycleIndex << " RUN: " << runIndex << endl;;
+    cout << "FITTING TOTAL INTEGRAL CYCLE: " << cycleIndex << " RUN: " << runIndex << endl;
+
+    createFitFunctions();
+    createTotalFunctions();
+    setFunctionParametersTotal();
+    setFunctionParamersSingle();
+    setParaLimits();
+
     tempHisto = integralHisto->GetAHisto(cycleIndex, runIndex);
     tempHisto->Fit(integralFunction, "L", "", timeRunStart, timeRunEnd);
     for(int i = 0; i < numElements; i++)
@@ -388,6 +394,13 @@ void ElementFit::fitRegularHisto(Int_t cycleIndex, Int_t runIndex)
     TH1D* tempHisto;
 
     cout << "FITTING TOTAL REGULAR CYCLE: " << cycleIndex << " RUN: " << runIndex << endl;
+
+    createFitFunctions();
+    createTotalFunctions();
+    setFunctionParametersTotal();
+    setFunctionParamersSingle();
+    setParaLimits();
+
     tempHisto = regularHisto->GetAHisto(cycleIndex, runIndex);
     tempHisto->Fit(this->regularFunction, "L", "", timeRunStart, timeRunEnd);
     for(int i = 0; i < numElements; i++)
@@ -417,6 +430,11 @@ void ElementFit::fitSingleHistos(Int_t cycleIndex, Int_t runIndex)
     Double_t errorHalfLife;
     TH1D* tempSingleRegularHisto, *tempSingleIntegralHisto;
     
+    createFitFunctions();
+    createTotalFunctions();
+    setFunctionParametersTotal();
+    setFunctionParamersSingle();
+    setParaLimits();
     //loop for fitting and storing value for elements
     for(int i = 0; i < numElements; i++)
     {
@@ -647,7 +665,7 @@ void ElementFit::genRandomAlternate()
 //set parameters for base values for the total fit functions
 void ElementFit::setFunctionParametersTotal()
 {
-    DisplayTotalFunctionParameters();
+    //DisplayTotalFunctionParameters();
     for(int i = 0; i < numElements; i++)
     {
         //have to have the if statments to account for the fact that the value could be a range
@@ -714,7 +732,7 @@ void ElementFit::setFunctionParamersSingle()
 //sets parameter limits so fitting knows about where to fit
 void ElementFit::setParaLimits()
 {
-    DisplayParameterLimits();
+    //DisplayParameterLimits();
     //sets limits for N0 of the total function
     for(int i = 0; i < numElements; i++)
     {

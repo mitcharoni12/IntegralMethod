@@ -1,5 +1,5 @@
 number of runs:5
-number of cycles:5
+number of cycles:8
 event decement:1
 write to file(1) display data(2):2
 x axis range start const end moves (1) x axis range start moves stop const(2):1
@@ -15,4 +15,4 @@ upper run histo index(0 based):0
 lower cycle histo index(0 based):0
 upper cycle histo index(0 based):4
 rebin(1) don't rebin(2):1
-number bin difference(add x bins):50
+number bin difference(add x bins):200
