@@ -428,11 +428,11 @@ void Cycle::runSeperateMeanRebin()
 
             tempMeanVal = multiRunHistoSingle[(k*2)]->GetMean();
             singleRegularFitValues->SetAnHalfLife(i, k, k, tempMeanVal);
-            tempErrorVal = multiRunHistoSingle[(k*2)]->GetMean();
+            tempErrorVal = multiRunHistoSingle[(k*2)]->GetMeanError();
             singleRegularFitValues->SetAnHalfLifeError(i, k, k, tempErrorVal);
             tempMeanVal = multiRunHistoSingle[(k*2)+1]->GetMean();
             singleIntegralFitValues->SetAnHalfLife(i, k, k, tempMeanVal);
-            tempErrorVal = multiRunHistoSingle[(k*2)+1]->GetMean();
+            tempErrorVal = multiRunHistoSingle[(k*2)+1]->GetMeanError();
             singleIntegralFitValues->SetAnHalfLifeError(i, k, k, tempErrorVal);
         }
     }
@@ -480,11 +480,11 @@ void Cycle::runSeperateMeanTimeDifference()
 
             tempMeanVal = multiRunHistoSingle[(k*2)]->GetMean();
             singleRegularFitValues->SetAnHalfLife(i, k, k, tempMeanVal);
-            tempErrorVal = multiRunHistoSingle[(k*2)]->GetMean();
+            tempErrorVal = multiRunHistoSingle[(k*2)]->GetMeanError();
             singleRegularFitValues->SetAnHalfLifeError(i, k, k, tempErrorVal);
             tempMeanVal = multiRunHistoSingle[(k*2)+1]->GetMean();
             singleIntegralFitValues->SetAnHalfLife(i, k, k, tempMeanVal);
-            tempErrorVal = multiRunHistoSingle[(k*2)+1]->GetMean();
+            tempErrorVal = multiRunHistoSingle[(k*2)+1]->GetMeanError();
             singleIntegralFitValues->SetAnHalfLifeError(i, k, k, tempErrorVal);
         }
 

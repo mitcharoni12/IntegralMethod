@@ -41,8 +41,7 @@ int main()
 void fitMultiple()
 {
     Int_t eventDecrement, numBins, rebinDifference;
-    Double_t timeRun;
-    Double_t valueHolder;
+    Double_t timeRun, valueHolder, leaveOutStartBinNumber, leaveOutEndBinNumber;
     int histoSimulateChoice, rangeValueChoice, displayIndividualFitsChoice, rebinChoice;
     ElementFit* element;
     ifstream inFile;
@@ -174,6 +173,10 @@ void fitMultiple()
             //gets the fit generation choice
             inFile.ignore(256,':');
             inFile >> fitGenerationChoice;
+            inFile.ignore(256,':');
+            inFile >> leaveOutStartBinNumber;
+            inFile.ignore(256,':');
+            inFile >> leaveOutEndBinNumber;
             inFile.close();
 
             switch(fitGenerationChoice)
@@ -181,7 +184,7 @@ void fitMultiple()
                 //single run of histogam
                 case 1:
                 {
-                    element = new ElementFit(events, 1, 1, RegularDecaybyActivity, IntegralDecaybyActivity, fitFunctions, numElements, timeRun, numBins, elementNames, paraVals, 2, 2, 0);
+                    element = new ElementFit(events, 1, 1, RegularDecaybyActivity, IntegralDecaybyActivity, fitFunctions, numElements, timeRun, numBins, elementNames, paraVals, 2, 2, 0, leaveOutStartBinNumber, leaveOutEndBinNumber);
                     inFile.open("simulated_single_run.txt");
                     element->fitHistos(0, 0);
                     element->displayParameters();
@@ -236,7 +239,7 @@ void fitMultiple()
                     inFile.ignore(256, ':');
                     inFile >> upperRunHistoIndex;
                     
-                    element = new ElementFit(events, runs, 1, RegularDecaybyActivity, IntegralDecaybyActivity, fitFunctions, numElements, timeRun, numBins, elementNames, paraVals, 2, 2, 0);
+                    element = new ElementFit(events, runs, 1, RegularDecaybyActivity, IntegralDecaybyActivity, fitFunctions, numElements, timeRun, numBins, elementNames, paraVals, 2, 2, 0, leaveOutStartBinNumber, leaveOutEndBinNumber);
                     Run* elementRun = new Run(runs, eventDecrement, element, elementNames); 
                     
                     elementRun->runNoChange(0);
@@ -403,7 +406,7 @@ void fitMultiple()
                     inFile.ignore(256,':');
                     inFile >> rebinDifference;
 
-                    element = new ElementFit(events, numRuns, numCycles, RegularDecaybyActivity, IntegralDecaybyActivity, fitFunctions, numElements, timeRun, numBins, elementNames, paraVals, singleSourceHistoChoice, rebinChoice, rebinDifference);
+                    element = new ElementFit(events, numRuns, numCycles, RegularDecaybyActivity, IntegralDecaybyActivity, fitFunctions, numElements, timeRun, numBins, elementNames, paraVals, singleSourceHistoChoice, rebinChoice, rebinDifference, leaveOutStartBinNumber, leaveOutEndBinNumber);
                     Run* elementRunsCycle = new Run(numRuns, eventDecrement, element, elementNames);
                     Cycle* cycle = new Cycle(numCycles, elementRunsCycle, element, x_start, x_stop, x_inc, cycleChangeChoice);
 

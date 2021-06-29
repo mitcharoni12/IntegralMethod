@@ -55,15 +55,15 @@ class ElementFit{
         void displaySingleHistos(TCanvas** can);
         void displayParameters();
         void DrawIndividualHistos(CycleCanvasHolder* regularTotalCanvases, CycleCanvasHolder* integralTotalCanvases, SingleCycleCanvasHolder* singleRegularCanvases, SingleCycleCanvasHolder* singleIntegralCanvases, Int_t lowerRunIndex, Int_t upperRunIndex, Int_t lowerCycleIndex, Int_t upperCycleIndex);
-        void fitHistos(Int_t cycleIndex, Int_t runIndex);
-        void fitSingleHisto(Int_t cycleIndex, Int_t runIndex, Int_t elementIndex);
         void fitDataGenOnce(Int_t cycleIndex, Int_t runIndex);
+        void fitHistos(Int_t cycleIndex, Int_t runIndex);
+        void fitIntegralHisto(Int_t cycleIndex, Int_t runIndex, Double_t leaveOutStartBinNumber, Double_t leaveOutEndBinNumber);
+        void fitRegularHisto(Int_t cycleIndex, Int_t runIndex, Double_t leaveOutStartBinNumber, Double_t leaveOutEndBinNumber);
+        void fitSingleHistos(Int_t cycleIndex, Int_t runIndex, Double_t leaveOutStartBinNumber, Double_t leaveOutEndBinNumber);
         void genIntegralHisto();
         void genIntegralSingleHistos();
         void genRandomAlternate();
         void genAndFillHistos();
-        void fitRegularHisto(Int_t cycleIndex, Int_t runIndex);
-        void fitIntegralHisto(Int_t cycleIndex, Int_t runIndex);
     private:
         //private variables
         string* elementNames;
@@ -77,7 +77,7 @@ class ElementFit{
         decayFunction* fitFunctions;
         decayFunction passedRegularFunction, passedIntegralFunction;
         TRandom3 rand;
-        Double_t timeRunStart, timeRunEnd;
+        Double_t timeRunStart, timeRunEnd, leaveOutStartBinNumber, leaveOutEndBinNumber;
         Double_t* randArr;
         ChainFitValues* totalRegularFitParameters, *totalIntegralFitParameters;
         SingleElementFitValues* singleRegularFitParameters, *singleIntegralFitParameters;
@@ -85,11 +85,10 @@ class ElementFit{
         Int_t globalSeedChanger = 0;
         //helper functions
         void changeSeed();
-        void createFitFunctions();
-        void createTotalFunctions();
+        void createSingleFitFunctions();
+        void createTotalFitFunctions();
         void DisplayParameterLimits();
         void DisplayTotalFunctionParameters();
-        void fitSingleHistos(Int_t cycleIndex, Int_t run);
         void genIntegralHistoSimulated();
         void setFunctionParametersTotal();
         void setFunctionParamersSingle();
@@ -100,8 +99,8 @@ class ElementFit{
 
 
 //constructor for generating a histogram
-ElementFit::ElementFit(Int_t events, Int_t numRuns, Int_t numCycles, Double_t (*regularFunc)(Double_t*, Double_t*), Double_t (*integralFunc)(Double_t*, Double_t*), Double_t (**fitFunctions)(Double_t*, Double_t*),
-                       Int_t numElements, Double_t timeRunEnd, Int_t numBins, string* elementNames,  ParameterValue** paraVals, Int_t singleHistoChoice, Int_t rebinChoice, Int_t rebinDifference)
+ElementFit::ElementFit(Int_t events, Int_t numRuns, Int_t numCycles, Double_t (*regularFunc)(Double_t*, Double_t*), Double_t (*integralFunc)(Double_t*, Double_t*), Double_t (**fitFunctions)(Double_t*, Double_t*), Int_t numElements,
+                       Double_t timeRunEnd, Int_t numBins, string* elementNames,  ParameterValue** paraVals, Int_t singleHistoChoice, Int_t rebinChoice, Int_t rebinDifference, Double_t leaveOutStartBinNumber, Double_t leaveOutEndBinNumber)
 {
     //setting variables
     this->events = events;
@@ -119,6 +118,8 @@ ElementFit::ElementFit(Int_t events, Int_t numRuns, Int_t numCycles, Double_t (*
     this->singleHistoChoice = singleHistoChoice;
     this->rebinChoice = rebinChoice;
     this->rebinDifference = rebinDifference;
+    this->leaveOutStartBinNumber = leaveOutStartBinNumber;
+    this->leaveOutEndBinNumber = leaveOutEndBinNumber;
 
     //dynamically allocating needed variables and arrays
     //dynamic array
@@ -145,15 +146,6 @@ ElementFit::ElementFit(Int_t events, Int_t numRuns, Int_t numCycles, Double_t (*
     randArr = new Double_t [numElements];
     timeRunStart = 0;
     Tclock = clock();
-    //dynamically allocates the fit functions for the single histograms
-    createFitFunctions();
-    //dynamically allocates histograms for the single histograms
-    createTotalFunctions();
-    //setting base parameters for ALL fit functions
-    setFunctionParametersTotal();
-    setFunctionParamersSingle();
-    //parameter limits so we get reasonable values
-    setParaLimits();
     //generates all the histo objects and 
     genAndFillHistos();
     //removes restrictions on fitting function calls and itterations
@@ -196,7 +188,7 @@ void ElementFit::changeSeed()
 }
 
 //dynamically allocates the functions for the single elements
-void ElementFit::createFitFunctions()
+void ElementFit::createSingleFitFunctions(Double_t startFitTime, Double_t endFitTime)
 {
     for(int i = 0; i < numElements; i++)
     {
@@ -220,7 +212,7 @@ void ElementFit::createHistoHolders()
 }
 
 //dynamically allocates the total fit functions
-void ElementFit::createTotalFunctions()
+void ElementFit::createTotalFitFunctions(Double_t startFitTime, Double_t endFitTime)
 {
     regularFunction = new TF1("TotalregularFunction", passedRegularFunction, 0., timeRunEnd, numParameters);
     integralFunction = new TF1("TotalIntegralFunction", passedIntegralFunction, 0., timeRunEnd, numParameters);
@@ -331,21 +323,33 @@ void ElementFit::DrawIndividualHistos(CycleCanvasHolder* regularTotalCanvases, C
 //fits all histos
 void ElementFit::fitHistos(Int_t cycleIndex, Int_t runIndex)
 {
-    fitRegularHisto(cycleIndex, runIndex);
-    fitIntegralHisto(cycleIndex, runIndex);
-    fitSingleHistos(cycleIndex, runIndex);
+    createSingleFitFunctions();
+    createTotalFitFunctions();
+    setFunctionParametersTotal();
+    setFunctionParamersSingle();
+    setParaLimits();
+
+    fitRegularHisto(cycleIndex, runIndex, leaveOutStartBinNumber, leaveOutEndBinNumber);
+    fitIntegralHisto(cycleIndex, runIndex, leaveOutStartBinNumber, leaveOutEndBinNumber);
+    fitSingleHistos(cycleIndex, runIndex, leaveOutStartBinNumber, leaveOutEndBinNumber);
 }
 
 //fits data of the one histogram generated
 void ElementFit::fitDataGenOnce(Int_t cycleIndex, Int_t runIndex)
 {
-    fitRegularHisto(cycleIndex, runIndex);
-    fitIntegralHisto(cycleIndex, runIndex);
-    fitSingleHistos(cycleIndex, runIndex);
+    createSingleFitFunctions();
+    createTotalFitFunctions();
+    setFunctionParametersTotal();
+    setFunctionParamersSingle();
+    setParaLimits();
+
+    fitRegularHisto(cycleIndex, runIndex, leaveOutStartBinNumber, leaveOutEndBinNumber);
+    fitIntegralHisto(cycleIndex, runIndex, leaveOutStartBinNumber, leaveOutEndBinNumber);
+    fitSingleHistos(cycleIndex, runIndex, leaveOutStartBinNumber, leaveOutEndBinNumber);
 }
 
 //fits integral histogram with log likelihood method, stores fitted value in their respective arrays
-void ElementFit::fitIntegralHisto(Int_t cycleIndex, Int_t runIndex)
+void ElementFit::fitIntegralHisto(Int_t cycleIndex, Int_t runIndex, Double_t leaveOutStartBinNumber, Double_t leaveOutEndBinNumber)
 {
     Double_t valueN0;
     Double_t errorN0;
@@ -353,15 +357,12 @@ void ElementFit::fitIntegralHisto(Int_t cycleIndex, Int_t runIndex)
     Double_t errorDecayConst;
     Double_t valueHalfLife;
     Double_t errorHalfLife;
+    Double_t startFit;
+    Double_t endFit;
+    Doublt_t binWidth = ;
     TH1D* tempHisto;
 
     cout << "FITTING TOTAL INTEGRAL CYCLE: " << cycleIndex << " RUN: " << runIndex << endl;
-
-    createFitFunctions();
-    createTotalFunctions();
-    setFunctionParametersTotal();
-    setFunctionParamersSingle();
-    setParaLimits();
 
     tempHisto = integralHisto->GetAHisto(cycleIndex, runIndex);
     tempHisto->Fit(integralFunction, "L", "", timeRunStart, timeRunEnd);
@@ -382,7 +383,7 @@ void ElementFit::fitIntegralHisto(Int_t cycleIndex, Int_t runIndex)
 }
 
 //fits Regular histogram with log likelihood method, stores values in their respective arrays
-void ElementFit::fitRegularHisto(Int_t cycleIndex, Int_t runIndex)
+void ElementFit::fitRegularHisto(Int_t cycleIndex, Int_t runIndex, Double_t leaveOutStartBinNumber, Double_t leaveOutEndBinNumber)
 {
     //dynamic array
     Double_t valueN0;
@@ -394,12 +395,6 @@ void ElementFit::fitRegularHisto(Int_t cycleIndex, Int_t runIndex)
     TH1D* tempHisto;
 
     cout << "FITTING TOTAL REGULAR CYCLE: " << cycleIndex << " RUN: " << runIndex << endl;
-
-    createFitFunctions();
-    createTotalFunctions();
-    setFunctionParametersTotal();
-    setFunctionParamersSingle();
-    setParaLimits();
 
     tempHisto = regularHisto->GetAHisto(cycleIndex, runIndex);
     tempHisto->Fit(this->regularFunction, "L", "", timeRunStart, timeRunEnd);
@@ -420,7 +415,7 @@ void ElementFit::fitRegularHisto(Int_t cycleIndex, Int_t runIndex)
 }
 
 //fits all the single element histos and stores them
-void ElementFit::fitSingleHistos(Int_t cycleIndex, Int_t runIndex)
+void ElementFit::fitSingleHistos(Int_t cycleIndex, Int_t runIndex, Double_t leaveOutStartBinNumber, Double_t leaveOutEndBinNumber)
 {
     Double_t valueN0;
     Double_t errorN0;
@@ -429,12 +424,7 @@ void ElementFit::fitSingleHistos(Int_t cycleIndex, Int_t runIndex)
     Double_t valueHalfLife;
     Double_t errorHalfLife;
     TH1D* tempSingleRegularHisto, *tempSingleIntegralHisto;
-    
-    createFitFunctions();
-    createTotalFunctions();
-    setFunctionParametersTotal();
-    setFunctionParamersSingle();
-    setParaLimits();
+
     //loop for fitting and storing value for elements
     for(int i = 0; i < numElements; i++)
     {
@@ -489,15 +479,18 @@ void ElementFit::genIntegralHisto()
 {
     //resets histogram so it can be used between runs
     TH1D* tempIntegralHisto, *tempRegularHisto;
+    Int_t tempNumBins;
+
     for(int cycleIndex = 0; cycleIndex < numCycles; cycleIndex++)
     {
+        tempNumBins = binSizeArr[cycleIndex];
         for(int runIndex = 0; runIndex < numRuns; runIndex++)
         {
             tempIntegralHisto = integralHisto->GetAHisto(cycleIndex, runIndex);
             tempRegularHisto = regularHisto->GetAHisto(cycleIndex, runIndex);
 
             tempIntegralHisto->SetBinContent(1, tempRegularHisto->GetBinContent(1));
-            for(int i = 2; i<= numBins; i++)
+            for(int i = 2; i<= tempNumBins; i++)
             {
                 tempIntegralHisto->SetBinContent(i, tempRegularHisto->GetBinContent(i) + tempIntegralHisto->GetBinContent(i-1));
             }
@@ -516,8 +509,11 @@ void ElementFit::genIntegralHistoSimulated()
 void ElementFit::genIntegralSingleHistos()
 {
     TH1D* tempIntegralHisto, *tempRegularHisto;
+    Int_t tempNumBins;
+
     for(int cycleIndex = 0; cycleIndex < numCycles; cycleIndex++)
     {
+        tempNumBins = binSizeArr[cycleIndex];
         for(int runIndex = 0; runIndex < numRuns; runIndex++)
         {
             for(int i = 0; i < numElements; i++)
@@ -526,7 +522,7 @@ void ElementFit::genIntegralSingleHistos()
                 tempRegularHisto = singleRegularHisto->GetAHisto(cycleIndex, runIndex, i);
 
                 tempIntegralHisto->SetBinContent(1, tempRegularHisto->GetBinContent(1));
-                for(int k = 2; k <= events; k++)
+                for(int k = 2; k <= tempNumBins; k++)
                 {
                     tempIntegralHisto->SetBinContent(k, tempIntegralHisto->GetBinContent(k-1) + tempRegularHisto->GetBinContent(k));
                 }
