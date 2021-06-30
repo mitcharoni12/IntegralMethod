@@ -1,18 +1,18 @@
-number of runs:5
-number of cycles:16
+number of runs:2
+number of cycles:8
 event decement:1
 write to file(1) display data(2):2
 x axis range start const end moves (1) x axis range start moves stop const(2):1
 x start value init:0
-x stop value init:400
+x stop value init:10
 x inc per cycle:20
 single source histo (1) or mutli source histo (2):2
 mean difference(1) or seperate mean(2):2
-display individual fits(1) dont display individual fits(2):1
+display individual fits(1) dont display individual fits(2):2
 NOTE; if single source histo keep run index from 0 to 0
 lower run histo index(0 based):0
 upper run histo index(0 based):0
 lower cycle histo index(0 based):0
-upper cycle histo index(0 based):3
-rebin(1) don't rebin(2):1
-number bin difference(add x bins):200
+upper cycle histo index(0 based):4
+rebin(1) don't rebin(2):2
+number bin difference(add x bins):400
