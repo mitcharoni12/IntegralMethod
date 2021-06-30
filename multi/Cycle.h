@@ -148,12 +148,12 @@ void Cycle::genMeanDifferenceGraphsRebin()
     {
         fitDifferenceGraphs[i] = new TGraphErrors(cycles, binSizeArrDoubles, meanDifferenceValues->GetHalfLifeArr(i), zero, meanDifferenceValues->GetHalfLifeErrorArr(i));
         fitDifferenceGraphs[i]->GetXaxis()->SetTitle("Number Bins");
-        fitDifferenceGraphs[i]->GetYaxis()->SetTitle("Regular Fit - Integral Fit");
+        fitDifferenceGraphs[i]->GetYaxis()->SetTitle("Regular Fit - Integral Fit(s)");
         fitDifferenceGraphs[i]->SetTitle((elementStrNames[i] + " Regular Histo Mean Difference").c_str());
 
         singleFitDifferenceGraphs[i] = new TGraphErrors(cycles, binSizeArrDoubles, singleMeanDifferenceValues->GetHalfLifeArr(i, i), zero, singleMeanDifferenceValues->GetHalfLifeErrorArr(i, i));
         singleFitDifferenceGraphs[i]->GetXaxis()->SetTitle("Number Bins");
-        singleFitDifferenceGraphs[i]->GetYaxis()->SetTitle("Regular Fit - Integral Fit");
+        singleFitDifferenceGraphs[i]->GetYaxis()->SetTitle("Regular Fit - Integral Fit(s)");
         singleFitDifferenceGraphs[i]->SetTitle((elementStrNames[i] + " Single Histo Mean Difference").c_str());
     }
     delete [] zero;
@@ -172,14 +172,14 @@ void Cycle::genMeanDifferenceGraphsTimeDifference()
     for(int i = 0; i < numElements; i++)
     {
         fitDifferenceGraphs[i] = new TGraphErrors(cycles, timeArr, meanDifferenceValues->GetHalfLifeArr(i), zero, meanDifferenceValues->GetHalfLifeErrorArr(i));
-        fitDifferenceGraphs[i]->GetXaxis()->SetTitle("Time");
-        fitDifferenceGraphs[i]->GetYaxis()->SetTitle("Regular Fit - Integral Fit");
+        fitDifferenceGraphs[i]->GetXaxis()->SetTitle("Time(s)");
+        fitDifferenceGraphs[i]->GetYaxis()->SetTitle("Regular Fit - Integral Fit(s)");
         fitDifferenceGraphs[i]->SetTitle((elementStrNames[i] + " Regular Histo Mean Difference").c_str());
 
         singleFitDifferenceGraphs[i] = new TGraphErrors(cycles, timeArr, singleMeanDifferenceValues->GetHalfLifeArr(i, i), zero, singleMeanDifferenceValues->GetHalfLifeErrorArr(i, i));
-        singleFitDifferenceGraphs[i]->GetXaxis()->SetTitle("Time");
+        singleFitDifferenceGraphs[i]->GetXaxis()->SetTitle("Time(s)");
         singleFitDifferenceGraphs[i]->GetYaxis()->SetTitle("Regular Fit - Integral Fit");
-        singleFitDifferenceGraphs[i]->SetTitle((elementStrNames[i] + " Single Histo Mean Difference").c_str());
+        singleFitDifferenceGraphs[i]->SetTitle((elementStrNames[i] + " Single Histo Mean Difference(s)").c_str());
     }
     delete [] zero;
 }
@@ -229,28 +229,28 @@ void Cycle::genSeperateMeanGraphsRebin()
         tempFitErrors = regularFitValues->GetHalfLifeErrorArr(i);
         regularFitMeanGraphs[i] = new TGraphErrors(cycles, binSizeArrDoubles, tempFitVals, zero, tempFitErrors);
         regularFitMeanGraphs[i]->GetXaxis()->SetTitle("Bin Number");
-        regularFitMeanGraphs[i]->GetYaxis()->SetTitle("Fit Value");
+        regularFitMeanGraphs[i]->GetYaxis()->SetTitle("Fit Value(s)");
         regularFitMeanGraphs[i]->SetTitle((elementStrNames[i] + " Regular Graph Mean").c_str());
 
         tempFitVals = singleRegularFitValues->GetHalfLifeArr(i, i);
         tempFitErrors = singleRegularFitValues->GetHalfLifeErrorArr(i, i);
         singleRegularFitMeanGraphs[i] = new TGraphErrors(cycles, binSizeArrDoubles, tempFitVals, zero, tempFitErrors);
         singleRegularFitMeanGraphs[i]->GetXaxis()->SetTitle("Bin Number");
-        singleRegularFitMeanGraphs[i]->GetYaxis()->SetTitle("Fit Value");
+        singleRegularFitMeanGraphs[i]->GetYaxis()->SetTitle("Fit Value(s)");
         singleRegularFitMeanGraphs[i]->SetTitle((elementStrNames[i] + " Single Regular Graph Mean").c_str());
 
         tempFitVals = integralFitValues->GetHalfLifeArr(i);
         tempFitErrors = integralFitValues->GetHalfLifeErrorArr(i);
         integralFitMeanGraphs[i] = new TGraphErrors(cycles, binSizeArrDoubles, tempFitVals, zero, tempFitErrors);
-        integralFitMeanGraphs[i]->GetXaxis()->SetTitle("TiBin Numberme");
-        integralFitMeanGraphs[i]->GetYaxis()->SetTitle("Fit Value");
+        integralFitMeanGraphs[i]->GetXaxis()->SetTitle("Bin Number");
+        integralFitMeanGraphs[i]->GetYaxis()->SetTitle("Fit Value(s)");
         integralFitMeanGraphs[i]->SetTitle((elementStrNames[i] + " Integral Graph Mean").c_str());
 
         tempFitVals = singleIntegralFitValues->GetHalfLifeArr(i, i);
         tempFitErrors = singleIntegralFitValues->GetHalfLifeErrorArr(i, i);
         singleIntegralFitMeanGraphs[i] = new TGraphErrors(cycles, binSizeArrDoubles, tempFitVals, zero, tempFitErrors);
         singleIntegralFitMeanGraphs[i]->GetXaxis()->SetTitle("Bin Number");
-        singleIntegralFitMeanGraphs[i]->GetYaxis()->SetTitle("Fit Value");
+        singleIntegralFitMeanGraphs[i]->GetYaxis()->SetTitle("Fit Value(S)");
         singleIntegralFitMeanGraphs[i]->SetTitle((elementStrNames[i] + " Single Integral Graph Mean").c_str());
     }
 
@@ -273,29 +273,29 @@ void Cycle::genSeperateMeanGraphsTimeDifference()
         tempFitVals = regularFitValues->GetHalfLifeArr(i);
         tempFitErrors = regularFitValues->GetHalfLifeErrorArr(i);
         regularFitMeanGraphs[i] = new TGraphErrors(cycles, timeArr, tempFitVals, zero, tempFitErrors);
-        regularFitMeanGraphs[i]->GetXaxis()->SetTitle("Time");
-        regularFitMeanGraphs[i]->GetYaxis()->SetTitle("Fit Value");
+        regularFitMeanGraphs[i]->GetXaxis()->SetTitle("Time(s)");
+        regularFitMeanGraphs[i]->GetYaxis()->SetTitle("Fit Value(s)");
         regularFitMeanGraphs[i]->SetTitle((elementStrNames[i] + " Regular Graph Mean").c_str());
 
         tempFitVals = singleRegularFitValues->GetHalfLifeArr(i, i);
         tempFitErrors = singleRegularFitValues->GetHalfLifeErrorArr(i, i);
         singleRegularFitMeanGraphs[i] = new TGraphErrors(cycles, timeArr, tempFitVals, zero, tempFitErrors);
-        singleRegularFitMeanGraphs[i]->GetXaxis()->SetTitle("Time");
-        singleRegularFitMeanGraphs[i]->GetYaxis()->SetTitle("Fit Value");
+        singleRegularFitMeanGraphs[i]->GetXaxis()->SetTitle("Time(s)");
+        singleRegularFitMeanGraphs[i]->GetYaxis()->SetTitle("Fit Value(s)");
         singleRegularFitMeanGraphs[i]->SetTitle((elementStrNames[i] + " Single Regular Graph Mean").c_str());
 
         tempFitVals = integralFitValues->GetHalfLifeArr(i);
         tempFitErrors = integralFitValues->GetHalfLifeErrorArr(i);
         integralFitMeanGraphs[i] = new TGraphErrors(cycles, timeArr, tempFitVals, zero, tempFitErrors);
-        integralFitMeanGraphs[i]->GetXaxis()->SetTitle("Time");
-        integralFitMeanGraphs[i]->GetYaxis()->SetTitle("Fit Value");
+        integralFitMeanGraphs[i]->GetXaxis()->SetTitle("Time(s)");
+        integralFitMeanGraphs[i]->GetYaxis()->SetTitle("Fit Value(s)");
         integralFitMeanGraphs[i]->SetTitle((elementStrNames[i] + " Integral Graph Mean").c_str());
 
         tempFitVals = singleIntegralFitValues->GetHalfLifeArr(i, i);
         tempFitErrors = singleIntegralFitValues->GetHalfLifeErrorArr(i, i);
         singleIntegralFitMeanGraphs[i] = new TGraphErrors(cycles, timeArr, tempFitVals, zero, tempFitErrors);
-        singleIntegralFitMeanGraphs[i]->GetXaxis()->SetTitle("Time");
-        singleIntegralFitMeanGraphs[i]->GetYaxis()->SetTitle("Fit Value");
+        singleIntegralFitMeanGraphs[i]->GetXaxis()->SetTitle("Time(s)");
+        singleIntegralFitMeanGraphs[i]->GetYaxis()->SetTitle("Fit Value(s)");
         singleIntegralFitMeanGraphs[i]->SetTitle((elementStrNames[i] + " Single Integral Graph Mean").c_str());
     }
 
