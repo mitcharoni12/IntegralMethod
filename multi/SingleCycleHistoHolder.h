@@ -12,25 +12,24 @@ using namespace std;
 class SingleCycleHistoHolder{
 private:
     Int_t numCycles, numRuns, timeRunEnd, numElements;
-    Int_t* binArr;
+    Int_t* binArr, *timeEndArr;
     CycleHistoHolder** histoArr;
     string histoName;
     string* elementNames;
 public:
-    SingleCycleHistoHolder(Int_t numCycles, Int_t numElements, Int_t numRuns, string histoName, Int_t* binArr, Int_t timeRunEnd, string* elementNames);
+    SingleCycleHistoHolder(Int_t numCycles, Int_t numElements, Int_t numRuns, string histoName, Int_t* binArr, Int_t* timeEndArr, string* elementNames);
     ~SingleCycleHistoHolder();
     TH1D* GetAHisto(Int_t cycleIndex, Int_t runIndex, Int_t elementIndex);
     void SetAHisto(Int_t cycleIndex, Int_t runIndex, Int_t elementIndex, TH1D* histo);
 };
 
-SingleCycleHistoHolder::SingleCycleHistoHolder(Int_t numCycles, Int_t numElements, Int_t numRuns, string histoName, Int_t* binArr, Int_t timeRunEnd, string* elementNames)
+SingleCycleHistoHolder::SingleCycleHistoHolder(Int_t numCycles, Int_t numElements, Int_t numRuns, string histoName, Int_t* binArr, Int_t* timeEndArr, string* elementNames)
 {
     this->numCycles = numCycles;
     this->numElements = numElements;
     this->numRuns = numRuns;
     this->histoName = histoName;
     this->binArr = binArr;
-    this->timeRunEnd = timeRunEnd;
     this->elementNames = elementNames;
     string histoParameter = histoName;
     
@@ -38,7 +37,7 @@ SingleCycleHistoHolder::SingleCycleHistoHolder(Int_t numCycles, Int_t numElement
     for(int i = 0; i < numElements; i++)
     {
         histoName = elementNames[i] + " " + histoName;
-        histoArr[i] = new CycleHistoHolder(numCycles, numRuns, histoName, binArr, timeRunEnd);
+        histoArr[i] = new CycleHistoHolder(numCycles, numRuns, histoName, binArr, timeEndArr);
         histoName = histoParameter;
 
     }

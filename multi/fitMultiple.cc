@@ -184,7 +184,7 @@ void fitMultiple()
                 //single run of histogam
                 case 1:
                 {
-                    element = new ElementFit(events, 1, 1, RegularDecaybyActivity, IntegralDecaybyActivity, fitFunctions, numElements, timeRun, numBins, elementNames, paraVals, 2, 2, 0, leaveOutStartBinNumber, leaveOutEndBinNumber);
+                    element = new ElementFit(events, 1, 1, RegularDecaybyActivity, IntegralDecaybyActivity, fitFunctions, numElements, timeRun, numBins, elementNames, paraVals, 2, 2, 0, leaveOutStartBinNumber, leaveOutEndBinNumber, 0);
                     inFile.open("simulated_single_run.txt");
                     element->fitHistos(0, 0);
                     element->displayParameters();
@@ -239,7 +239,7 @@ void fitMultiple()
                     inFile.ignore(256, ':');
                     inFile >> upperRunHistoIndex;
                     
-                    element = new ElementFit(events, runs, 1, RegularDecaybyActivity, IntegralDecaybyActivity, fitFunctions, numElements, timeRun, numBins, elementNames, paraVals, 2, 2, 0, leaveOutStartBinNumber, leaveOutEndBinNumber);
+                    element = new ElementFit(events, runs, 1, RegularDecaybyActivity, IntegralDecaybyActivity, fitFunctions, numElements, timeRun, numBins, elementNames, paraVals, 2, 2, 0, leaveOutStartBinNumber, leaveOutEndBinNumber, 0);
                     Run* elementRun = new Run(runs, eventDecrement, element, elementNames); 
                     
                     elementRun->runNoChange(0);
@@ -370,7 +370,7 @@ void fitMultiple()
                     inFile.ignore(256,':');
                     inFile >> rebinDifference;
 
-                    element = new ElementFit(events, numRuns, numCycles, RegularDecaybyActivity, IntegralDecaybyActivity, fitFunctions, numElements, timeRun, numBins, elementNames, paraVals, singleSourceHistoChoice, rebinChoice, rebinDifference, leaveOutStartBinNumber, leaveOutEndBinNumber);
+                    element = new ElementFit(events, numRuns, numCycles, RegularDecaybyActivity, IntegralDecaybyActivity, fitFunctions, numElements, timeRun, numBins, elementNames, paraVals, singleSourceHistoChoice, rebinChoice, rebinDifference, leaveOutStartBinNumber, leaveOutEndBinNumber, x_inc);
                     Run* elementRunsCycle = new Run(numRuns, eventDecrement, element, elementNames);
                     Cycle* cycle = new Cycle(numCycles, elementRunsCycle, element, x_start, x_stop, x_inc, cycleChangeChoice);
 
