@@ -14,7 +14,7 @@
 #include "TH1D.h"
 #include "TH3D.h"
 #include "TH3.h"
-#include "TGraph.h"
+#include "TGraphErrors.h"
 #include "TCanvas.h"
 #include "TMath.h"
 #include "ChainFitValues.h"
@@ -30,10 +30,11 @@ class Run{
         ElementFit* element;
         ChainRunFitValues* regularFitValues, *integralFitValues;
         SingleChainRunFitValues* singleRegularFitValues, *singleIntegralFitValues;
-        Double_t* eventsXAxis, *runsXAxis;
+        Double_t* eventsXAxis, *runsXAxis, *zero;
         string* elementNameStrs;
         TH3D* correlationHisto;
         TH1D** multiRunResultHistograms;
+        TGraphErrors** totalRegularGraphs, **totalIntegralGraphs, **singleRegularGraphs, **singleIntegralGraphs;
         TCanvas* testCan;
         TCanvas** multiRunResultCanvas;
         //helper functions
@@ -48,14 +49,14 @@ class Run{
         Run(Int_t runs, Int_t eventDecrement, ElementFit* element, string* elementNameStrs);
         ~Run();
         void runNoChangeGenOnce(Int_t cycleIndex, Int_t runIndex);
-        TGraph** genGraphsEventChange();
-        TGraph** genGraphsNoChange();
-        TGraph** genGraphsNoChangeSingleElement();
+        void genGraphsEventChange();
+        void genGraphsNoChange();
+        void genGraphsNoChangeSingleElement();
         TH1D** createRunResultHistos();
         TH1D** createRunResultHistosSingleElements();
         TH1D** fillRunResultHistos(TH1D** multiRunResultHistograms);
         TH1D** fillRunResultHistosSingleElement(TH1D** multiRunResultHistogramsSingleElement);
-        void displayMultiRunResultGraphs(TCanvas** canvasArray, TGraph** multiRunResultGraph);
+        void displayMultiRunResultGraphs(TCanvas** canvasArray);
         void displayCorrelationHisto(TCanvas* canvas);
         void displayMultiRunResultHistos(TCanvas** canvasArray, TH1D** multiRunResultHistograms);
         void runNoChange(Int_t cycleIndex);
@@ -85,10 +86,19 @@ Run::Run(Int_t runs, Int_t eventDecrement, ElementFit* element, string* elementN
     //dynamic array
     eventsXAxis = new Double_t [runs];
     runsXAxis = new Double_t [runs];
+    zero = new Double_t [runs];
+    for(int i = 0; i < runs; i++)
+    {
+        zero[i] = 0.0f;
+    }
     regularFitValues = new ChainRunFitValues(numElements, runs);
     integralFitValues = new ChainRunFitValues(numElements, runs);
     singleRegularFitValues = new SingleChainRunFitValues(numElements, runs);
     singleIntegralFitValues = new SingleChainRunFitValues(numElements, runs);
+    totalRegularGraphs = new TGraphErrors* [numElements];
+    totalIntegralGraphs = new TGraphErrors* [numElements];
+    singleRegularGraphs = new TGraphErrors* [numElements];
+    singleIntegralGraphs = new TGraphErrors* [numElements];
     //testCan = new TCanvas("testCan", "testCan", 500, 500);
     for(int i = 0; i < runs; i++)
     {
@@ -104,6 +114,10 @@ Run::~Run()
     delete singleIntegralFitValues;
     delete [] eventsXAxis;
     delete [] runsXAxis;
+    delete [] totalRegularGraphs;
+    delete [] totalIntegralGraphs;
+    delete [] singleRegularGraphs;
+    delete [] singleIntegralGraphs;
 }
 
 /*
@@ -194,18 +208,18 @@ void Run::displayCorrelationHisto(TCanvas* canvas)
 }
 
 //displays the graphs for the multiple runs
-void Run::displayMultiRunResultGraphs(TCanvas** canvasArray, TGraph** multiRunResultGraph)
+void Run::displayMultiRunResultGraphs(TCanvas** canvasArray)
 {
     for(int i = 0; i < numElements; i++)
     {
         canvasArray[i]->cd(1);
-        multiRunResultGraph[(i*4)]->Draw();
+        totalRegularGraphs[i]->Draw();
         canvasArray[i]->cd(2);
-        multiRunResultGraph[(i*4)+1]->Draw();
+        totalIntegralGraphs[i]->Draw();
         canvasArray[i]->cd(3);
-        multiRunResultGraph[(i*4)+2]->Draw();
+        singleRegularGraphs[i]->Draw();
         canvasArray[i]->cd(4);
-        multiRunResultGraph[(i*4)+3]->Draw();
+        singleIntegralGraphs[i]->Draw();
     }
 }
 
@@ -260,141 +274,60 @@ TH1D** Run::fillRunResultHistosSingleElement(TH1D** multiRunResultHistogramsSing
 }
 
 //fill graphs for the result of the multiple runs, used for events changing between runs (dynamic)
-TGraph** Run::genGraphsEventChange()
+void Run::genGraphsEventChange()
 {
-    TGraph** multiRunResultGraph = new TGraph* [numElements*6];
-
     for(int j = 0; j < numElements; j++)
     {
-        multiRunResultGraph[j*6] = new TGraph(runs, eventsXAxis, regularFitValues->GetHalfLifeErrorArr(j));
-        multiRunResultGraph[j*6]->GetXaxis()->SetTitle("Events");
-        multiRunResultGraph[j*6]->GetYaxis()->SetTitle("Regular Fit Error(S)");
-        multiRunResultGraph[j*6]->SetTitle((elementNameStrs[j] + " Regular Fit Error(S)").c_str());
-        multiRunResultGraph[j*6]->SetName((elementNameStrs[j] + " Regular_Fit_Error(S)").c_str());
+        totalRegularGraphs[j]= new TGraphErrors(runs, eventsXAxis, regularFitValues->GetHalfLifeArr(j), zero, regularFitValues->GetHalfLifeErrorArr(j));
+        totalRegularGraphs[j]->GetXaxis()->SetTitle("Events");
+        totalRegularGraphs[j]->GetYaxis()->SetTitle("Regular Fit(S)");
+        totalRegularGraphs[j]->SetTitle((elementNameStrs[j] + " Regular Fit(S)").c_str());
+        totalRegularGraphs[j]->SetName((elementNameStrs[j] + " Regular_Fit(S)").c_str());
 
-        multiRunResultGraph[(j*6)+1] = new TGraph(runs, eventsXAxis, integralFitValues->GetHalfLifeErrorArr(j));
-        multiRunResultGraph[(j*6)+1]->GetXaxis()->SetTitle("Events");
-        multiRunResultGraph[(j*6)+1]->GetYaxis()->SetTitle("Integral Fit Error(S)");
-        multiRunResultGraph[(j*6)+1]->SetTitle((elementNameStrs[j] + " Integral Fit Error(S)").c_str());
-        multiRunResultGraph[(j*6)+1]->SetName((elementNameStrs[j] + " Integral_Fit_Error(S)").c_str());
-
-        multiRunResultGraph[(j*6)+2] = new TGraph(runs, eventsXAxis, regularFitValues->GetHalfLifeArr(j));
-        multiRunResultGraph[(j*6)+2]->GetXaxis()->SetTitle("Events");
-        multiRunResultGraph[(j*6)+2]->GetYaxis()->SetTitle("Regular Fit Value(S)");
-        multiRunResultGraph[(j*6)+2]->SetTitle((elementNameStrs[j] + " Regular Fit Value(S)").c_str());
-        multiRunResultGraph[(j*6)+2]->SetName((elementNameStrs[j] + " Regular_Fit_Value(S)").c_str());
-
-        multiRunResultGraph[(j*6)+3] = new TGraph(runs, eventsXAxis, integralFitValues->GetHalfLifeArr(j));
-        multiRunResultGraph[(j*6)+3]->GetXaxis()->SetTitle("Events");
-        multiRunResultGraph[(j*6)+3]->GetYaxis()->SetTitle("Integral Fit Value(S)");
-        multiRunResultGraph[(j*6)+3]->SetTitle((elementNameStrs[j] + " Integral Fit Value(S)").c_str());
-        multiRunResultGraph[(j*6)+3]->SetName((elementNameStrs[j] + " Integral_Fit_Value(S)").c_str());
-
-        multiRunResultGraph[(j*6)+4] = new TGraph(runs, eventsXAxis, regularFitValues->GetN0Arr(j));
-        multiRunResultGraph[(j*6)+4]->GetXaxis()->SetTitle("Events");
-        multiRunResultGraph[(j*6)+4]->GetYaxis()->SetTitle("Init Regular Value");
-        multiRunResultGraph[(j*6)+4]->SetTitle((elementNameStrs[j] + " Init Regular value").c_str());
-        multiRunResultGraph[(j*6)+4]->SetName((elementNameStrs[j] + " Init_Regular_value").c_str());
-
-        multiRunResultGraph[(j*6)+5] = new TGraph(runs, eventsXAxis, integralFitValues->GetN0Arr(j));
-        multiRunResultGraph[(j*6)+5]->GetXaxis()->SetTitle("Events");
-        multiRunResultGraph[(j*6)+5]->GetYaxis()->SetTitle("Init Integral Value");
-        multiRunResultGraph[(j*6)+5]->SetTitle((elementNameStrs[j] + " Init Integral value").c_str());
-        multiRunResultGraph[(j*6)+5]->SetName((elementNameStrs[j] + " Init_Integral_value").c_str());
+        totalIntegralGraphs[j] = new TGraphErrors(runs, eventsXAxis, integralFitValues->GetHalfLifeArr(j), zero, integralFitValues->GetHalfLifeErrorArr(j));
+        totalIntegralGraphs[j]->GetXaxis()->SetTitle("Events");
+        totalIntegralGraphs[j]->GetYaxis()->SetTitle("Integral Fit(S)");
+        totalIntegralGraphs[j]->SetTitle((elementNameStrs[j] + " Integral Fit(S)").c_str());
+        totalIntegralGraphs[j]->SetName((elementNameStrs[j] + " Integral_Fit(S)").c_str());
     }
-    return multiRunResultGraph;
 }
 
 //fill graphs for the result of the multiple runs, used for no change between runs (dynamic)
-TGraph** Run::genGraphsNoChange() 
+void Run::genGraphsNoChange() 
 {
-    TGraph** multiRunResultGraph = new TGraph* [numElements*6];
-
     for(int j = 0; j < numElements; j++)
     {
-        multiRunResultGraph[j*6] = new TGraph(runs, runsXAxis, regularFitValues->GetHalfLifeErrorArr(j));
-        multiRunResultGraph[j*6]->GetXaxis()->SetTitle("Runs");
-        multiRunResultGraph[j*6]->GetYaxis()->SetTitle("Regular Fit Error(S)");
-        multiRunResultGraph[j*6]->SetTitle((elementNameStrs[j] + " Regular Fit Error(S)").c_str());
-        multiRunResultGraph[j*6]->SetName((elementNameStrs[j] + " Regular_Fit_Error(S)").c_str());
+        totalRegularGraphs[j]= new TGraphErrors(runs, runsXAxis, regularFitValues->GetHalfLifeArr(j), zero, regularFitValues->GetHalfLifeErrorArr(j));
+        totalRegularGraphs[j]->GetXaxis()->SetTitle("Runs");
+        totalRegularGraphs[j]->GetYaxis()->SetTitle("Regular Fit(S)");
+        totalRegularGraphs[j]->SetTitle((elementNameStrs[j] + " Regular Fit(S)").c_str());
+        totalRegularGraphs[j]->SetName((elementNameStrs[j] + " Regular_Fit(S)").c_str());
 
-        multiRunResultGraph[(j*6)+1] = new TGraph(runs, runsXAxis, integralFitValues->GetHalfLifeErrorArr(j));
-        multiRunResultGraph[(j*6)+1]->GetXaxis()->SetTitle("Runs");
-        multiRunResultGraph[(j*6)+1]->GetYaxis()->SetTitle("Integral Fit Error(S)");
-        multiRunResultGraph[(j*6)+1]->SetTitle((elementNameStrs[j] + " Integral Fit Error(S)").c_str());
-        multiRunResultGraph[(j*6)+1]->SetName((elementNameStrs[j] + " Integral_Fit_Error(S)").c_str());
-
-        multiRunResultGraph[(j*6)+2] = new TGraph(runs, runsXAxis, regularFitValues->GetHalfLifeArr(j));
-        multiRunResultGraph[(j*6)+2]->GetXaxis()->SetTitle("Runs");
-        multiRunResultGraph[(j*6)+2]->GetYaxis()->SetTitle("Regular Fit Value(S)");
-        multiRunResultGraph[(j*6)+2]->SetTitle((elementNameStrs[j] + " Regular Fit Value(S)").c_str());
-        multiRunResultGraph[(j*6)+2]->SetName((elementNameStrs[j] + " Regular_Fit_Value(S)").c_str());
-
-        multiRunResultGraph[(j*6)+3] = new TGraph(runs, runsXAxis, integralFitValues->GetHalfLifeArr(j));
-        multiRunResultGraph[(j*6)+3]->GetXaxis()->SetTitle("Runs");
-        multiRunResultGraph[(j*6)+3]->GetYaxis()->SetTitle("Integral Fit Value(S)");
-        multiRunResultGraph[(j*6)+3]->SetTitle((elementNameStrs[j] + " Integral Fit Value(S)").c_str());
-        multiRunResultGraph[(j*6)+3]->SetName((elementNameStrs[j] + " Integral_Fit_Value(S)").c_str());
-
-        multiRunResultGraph[(j*6)+4] = new TGraph(runs, runsXAxis, regularFitValues->GetN0Arr(j));
-        multiRunResultGraph[(j*6)+4]->GetXaxis()->SetTitle("Runs");
-        multiRunResultGraph[(j*6)+4]->GetYaxis()->SetTitle("Init Regular Value");
-        multiRunResultGraph[(j*6)+4]->SetTitle((elementNameStrs[j] + " Init Regular value").c_str());
-        multiRunResultGraph[(j*6)+4]->SetName((elementNameStrs[j] + " Init_Regular_value").c_str());
-
-        multiRunResultGraph[(j*6)+5] = new TGraph(runs, runsXAxis, integralFitValues->GetN0Arr(j));
-        multiRunResultGraph[(j*6)+5]->GetXaxis()->SetTitle("Runs");
-        multiRunResultGraph[(j*6)+5]->GetYaxis()->SetTitle("Init Integral Value");
-        multiRunResultGraph[(j*6)+5]->SetTitle((elementNameStrs[j] + " Init Integral value").c_str());
-        multiRunResultGraph[(j*6)+5]->SetName((elementNameStrs[j] + " Init_Integral_value").c_str());
+        totalIntegralGraphs[j] = new TGraphErrors(runs, runsXAxis, integralFitValues->GetHalfLifeArr(j), zero, integralFitValues->GetHalfLifeErrorArr(j));
+        totalIntegralGraphs[j]->GetXaxis()->SetTitle("Runs");
+        totalIntegralGraphs[j]->GetYaxis()->SetTitle("Integral Fit(S)");
+        totalIntegralGraphs[j]->SetTitle((elementNameStrs[j] + " Integral Fit(S)").c_str());
+        totalIntegralGraphs[j]->SetName((elementNameStrs[j] + " Integral_Fit(S)").c_str());
     }
-    return multiRunResultGraph;
 }
 
 //newB generates the graphs for the single fit function data (dynamic)
-TGraph** Run::genGraphsNoChangeSingleElement()
+void Run::genGraphsNoChangeSingleElement()
 {
-    TGraph** multiRunResultGraphsSingleElement = new TGraph* [numElements*6];
-
     for(int j = 0; j < numElements; j++)
     {
-        multiRunResultGraphsSingleElement[j*6] = new TGraph(runs, runsXAxis, singleRegularFitValues->GetHalfLifeErrorArr(j, j));
-        multiRunResultGraphsSingleElement[j*6]->GetXaxis()->SetTitle("Runs");
-        multiRunResultGraphsSingleElement[j*6]->GetYaxis()->SetTitle("Regular Fit Error(S)");
-        multiRunResultGraphsSingleElement[j*6]->SetTitle((elementNameStrs[j] + " Regular Fit Error Single Element(S)").c_str());
-        multiRunResultGraphsSingleElement[j*6]->SetName((elementNameStrs[j] + " Regular_Fit_Error(S)_Single_Element(S)").c_str());
+        singleRegularGraphs[j]= new TGraphErrors(runs, runsXAxis, singleRegularFitValues->GetHalfLifeArr(j, j), zero, singleRegularFitValues->GetHalfLifeErrorArr(j, j));
+        singleRegularGraphs[j]->GetXaxis()->SetTitle("Runs");
+        singleRegularGraphs[j]->GetYaxis()->SetTitle("Regular Fit(S)");
+        singleRegularGraphs[j]->SetTitle((elementNameStrs[j] + " Regular Fit Single Element(S)").c_str());
+        singleRegularGraphs[j]->SetName((elementNameStrs[j] + " Regular_Fit_Single_Element(S)").c_str());
 
-        multiRunResultGraphsSingleElement[(j*6)+1] = new TGraph(runs, runsXAxis, singleIntegralFitValues->GetHalfLifeErrorArr(j, j));
-        multiRunResultGraphsSingleElement[(j*6)+1]->GetXaxis()->SetTitle("Runs");
-        multiRunResultGraphsSingleElement[(j*6)+1]->GetYaxis()->SetTitle("Integral Fit Error(S)");
-        multiRunResultGraphsSingleElement[(j*6)+1]->SetTitle((elementNameStrs[j] + " Integral Fit Error Single Element(S)").c_str());
-        multiRunResultGraphsSingleElement[(j*6)+1]->SetName((elementNameStrs[j] + " Integral_Fit_Error_Single_Element(S)").c_str());
-
-        multiRunResultGraphsSingleElement[(j*6)+2] = new TGraph(runs, runsXAxis, singleRegularFitValues->GetHalfLifeArr(j, j));
-        multiRunResultGraphsSingleElement[(j*6)+2]->GetXaxis()->SetTitle("Runs");
-        multiRunResultGraphsSingleElement[(j*6)+2]->GetYaxis()->SetTitle("Regular Fit Value(S)");
-        multiRunResultGraphsSingleElement[(j*6)+2]->SetTitle((elementNameStrs[j] + " Regular Fit Value Single Element(S)").c_str());
-        multiRunResultGraphsSingleElement[(j*6)+2]->SetName((elementNameStrs[j] + " Regular_Fit_Value_Single_Element(S)").c_str());
-
-        multiRunResultGraphsSingleElement[(j*6)+3] = new TGraph(runs, runsXAxis, singleIntegralFitValues->GetHalfLifeArr(j, j));
-        multiRunResultGraphsSingleElement[(j*6)+3]->GetXaxis()->SetTitle("Runs");
-        multiRunResultGraphsSingleElement[(j*6)+3]->GetYaxis()->SetTitle("Integral Fit Value(S)");
-        multiRunResultGraphsSingleElement[(j*6)+3]->SetTitle((elementNameStrs[j] + " Integral Fit Value Single Element(S)").c_str());
-        multiRunResultGraphsSingleElement[(j*6)+3]->SetName((elementNameStrs[j] + " Integral_Fit_Value_Single_Element(S)").c_str());
-
-        multiRunResultGraphsSingleElement[(j*6)+4] = new TGraph(runs, runsXAxis, singleRegularFitValues->GetN0Arr(j, j));
-        multiRunResultGraphsSingleElement[(j*6)+4]->GetXaxis()->SetTitle("Runs");
-        multiRunResultGraphsSingleElement[(j*6)+4]->GetYaxis()->SetTitle("Init Regular Value");
-        multiRunResultGraphsSingleElement[(j*6)+4]->SetTitle((elementNameStrs[j] + " Init Regular value Single Element").c_str());
-        multiRunResultGraphsSingleElement[(j*6)+4]->SetName((elementNameStrs[j] + " Init_Regular_value_Single_Element").c_str());
-
-        multiRunResultGraphsSingleElement[(j*6)+5] = new TGraph(runs, runsXAxis, singleIntegralFitValues->GetN0Arr(j, j));
-        multiRunResultGraphsSingleElement[(j*6)+5]->GetXaxis()->SetTitle("Runs");
-        multiRunResultGraphsSingleElement[(j*6)+5]->GetYaxis()->SetTitle("Init Integral Value");
-        multiRunResultGraphsSingleElement[(j*6)+5]->SetTitle((elementNameStrs[j] + " Init Integral value Single Element").c_str());
-        multiRunResultGraphsSingleElement[(j*6)+5]->SetName((elementNameStrs[j] + " Init_Integral_value_Single_Element").c_str());
+        singleIntegralGraphs[j] = new TGraphErrors(runs, runsXAxis, singleIntegralFitValues->GetHalfLifeArr(j, j), zero, singleIntegralFitValues->GetHalfLifeErrorArr(j, j));
+        singleIntegralGraphs[j]->GetXaxis()->SetTitle("Runs");
+        singleIntegralGraphs[j]->GetYaxis()->SetTitle("Integral Fit Single Element(S)");
+        singleIntegralGraphs[j]->SetTitle((elementNameStrs[j] + " Integral Fit Single Element(S)").c_str());
+        singleIntegralGraphs[j]->SetName((elementNameStrs[j] + " Integral_Fit_Single_Element(S)").c_str());
     }
-    return multiRunResultGraphsSingleElement;
 }
 
 //returns maximum value in array

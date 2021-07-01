@@ -753,14 +753,12 @@ void ElementFit::setParaLimits()
 {
     DisplayParameterLimits();
     //sets limits for N0 of the total function
-    Double_t tempDecayConst;
     for(int i = 0; i < numElements; i++)
     {
-        tempDecayConst = paraVals[i]->getValueDecayConst();
         if(paraVals[i]->getIsValueInitValue())
         {
-            regularFunction->SetParLimits((i*2), 0., tempDecayConst*events*2);
-            integralFunction->SetParLimits((i*2), 0., tempDecayConst*events*2);
+            regularFunction->SetParLimits((i*2), 0., events*300000);
+            integralFunction->SetParLimits((i*2), 0., events*300000);
         }else{
             regularFunction->SetParLimits((i*2), paraVals[i]->getLowerRangeInitValue(), paraVals[i]->getUpperRangeInitValue());
             integralFunction->SetParLimits((i*2), paraVals[i]->getLowerRangeInitValue(), paraVals[i]->getUpperRangeInitValue());
@@ -771,8 +769,8 @@ void ElementFit::setParaLimits()
     {
         if(paraVals[i]->getIsValueDecayConst())
         {
-            regularFunction->SetParLimits((i*2)+1, (paraVals[i]->getValueDecayConst() * .001), (paraVals[i]->getValueDecayConst() * 100.));
-            integralFunction->SetParLimits((i*2)+1, (paraVals[i]->getValueDecayConst() * .001), (paraVals[i]->getValueDecayConst() * 100.));
+            regularFunction->SetParLimits((i*2)+1, (paraVals[i]->getValueDecayConst() * .01), (paraVals[i]->getValueDecayConst() * 100.));
+            integralFunction->SetParLimits((i*2)+1, (paraVals[i]->getValueDecayConst() * .01), (paraVals[i]->getValueDecayConst() * 100.));
         }else{
             regularFunction->SetParLimits((i*2)+1, (paraVals[i]->getLowerRangeDecayConst()), (paraVals[i]->getUpperRangeDecayConst()));
             integralFunction->SetParLimits((i*2)+1, (paraVals[i]->getLowerRangeDecayConst()), (paraVals[i]->getUpperRangeDecayConst()));
@@ -784,11 +782,10 @@ void ElementFit::setParaLimits()
     {
         for(int k = 0; k < i+1; k++)
         {
-            tempDecayConst = paraVals[k]->getValueDecayConst();
             if(paraVals[i]->getIsValueInitValue())
             {
-                (singleFitFunctions[(i*2)])->SetParLimits((k*2), 0., tempDecayConst*events*2);
-                (singleFitFunctions[(i*2)+1])->SetParLimits((k*2), 0., tempDecayConst*events*2);
+                (singleFitFunctions[(i*2)])->SetParLimits((k*2), 0., events*300000);
+                (singleFitFunctions[(i*2)+1])->SetParLimits((k*2), 0., events*300000);
             }else{
                 (singleFitFunctions[(i*2)])->SetParLimits((k*2), paraVals[i]->getLowerRangeInitValue(), paraVals[i]->getUpperRangeInitValue());
                 (singleFitFunctions[(i*2)+1])->SetParLimits((k*2), paraVals[i]->getLowerRangeInitValue(), paraVals[i]->getUpperRangeInitValue());
@@ -802,8 +799,8 @@ void ElementFit::setParaLimits()
         {
             if(paraVals[i]->getIsValueDecayConst())
             {
-                (singleFitFunctions[(i*2)])->SetParLimits((k*2)+1, (paraVals[k]->getValueDecayConst() * .001), (paraVals[k]->getValueDecayConst() * 100.));
-                (singleFitFunctions[(i*2)+1])->SetParLimits((k*2)+1, (paraVals[k]->getValueDecayConst() * .001), (paraVals[k]->getValueDecayConst() * 100.));
+                (singleFitFunctions[(i*2)])->SetParLimits((k*2)+1, (paraVals[k]->getValueDecayConst() * .01), (paraVals[k]->getValueDecayConst() * 100.));
+                (singleFitFunctions[(i*2)+1])->SetParLimits((k*2)+1, (paraVals[k]->getValueDecayConst() * .01), (paraVals[k]->getValueDecayConst() * 100.));
             }else{
                 (singleFitFunctions[(i*2)])->SetParLimits((k*2)+1, (paraVals[i]->getLowerRangeDecayConst()), (paraVals[i]->getUpperRangeDecayConst()));
                 (singleFitFunctions[(i*2)+1])->SetParLimits((k*2)+1, (paraVals[i]->getLowerRangeDecayConst()), (paraVals[i]->getUpperRangeDecayConst()));
@@ -819,8 +816,8 @@ void ElementFit::DisplayParameterLimits()
     {
         cout << elementNames[i] << ":" << endl;
         cout << "\tInitial Lower Range: 0" << endl;
-        cout << "\tInitial Lower Range: " << events * paraVals[i]->getValueDecayConst() * 2 << endl;
-        cout << "\tDecay Constant Lower Range: " << paraVals[i]->getValueDecayConst() * .001 << endl;
+        cout << "\tInitial Lower Range: " << events*300000 << endl;
+        cout << "\tDecay Constant Lower Range: " << paraVals[i]->getValueDecayConst() * .01 << endl;
         cout << "\tDecay Constant Upper Range: " << paraVals[i]->getValueDecayConst() * 100. << endl;
         cout << endl;
     }

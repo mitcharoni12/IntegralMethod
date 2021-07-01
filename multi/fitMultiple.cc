@@ -281,38 +281,12 @@ void fitMultiple()
 
                     //choice of displaying data via graph
                     }else{
-                        TGraph** runResultGraphs = elementRun->genGraphsNoChange();
-                        TGraph** runResultSingleElementGraphs = elementRun->genGraphsNoChangeSingleElement();
-
-                        TGraph** totalRunResults = new TGraph* [numElements*4];
-                        TGraph** totalRunResultErrors = new TGraph* [numElements*4];
-                
-                
-                        //extracts the fit value graphs from the array of graphs runResultGraphs and runResultSingleElementGraphs
-                        //(I wanted to put the graphs of single element fit value and total element fit value into one array, but
-                        //the graph array runResultGraphs and runResultSingleElementGraphs both had 18 graphs in them with a lot of extra data
-                        //so I had to extract the graphs in this really weird way)
-                        for(int i = 0; i < numElements; i++)
-                        { 
-                            totalRunResults[(i*4)] = runResultGraphs[(i*6)+2];
-                            totalRunResults[(i*4)+1] = runResultSingleElementGraphs[(i*6)+2];
-                            totalRunResults[(i*4)+2] = runResultGraphs[(i*6)+3];
-                            totalRunResults[(i*4)+3] = runResultSingleElementGraphs[(i*6)+3];
-                        }
-                        for(int i = 0; i < numElements; i++)
-                        { 
-                            totalRunResultErrors[(i*4)] = runResultGraphs[(i*6)];
-                            totalRunResultErrors[(i*4)+1] = runResultSingleElementGraphs[(i*6)];
-                            totalRunResultErrors[(i*4)+2] = runResultGraphs[(i*6)+1];
-                            totalRunResultErrors[(i*4)+3] = runResultSingleElementGraphs[(i*6)+1];
-                        }
-                        delete [] runResultGraphs;
-                        delete [] runResultSingleElementGraphs;
+                        elementRun->genGraphsNoChange();
+                        elementRun->genGraphsNoChangeSingleElement();                
 
                         //case for writing to file
                         if(writeToFileChoice == 1)
                         {
-                            
                             string fileName;
                             inFile.ignore(256,';');
                             inFile >> fileName;
@@ -320,25 +294,15 @@ void fitMultiple()
                         //case for displaying results
                         }else{
                             TCanvas** runResultCanvases = new TCanvas* [numElements];
-                            TCanvas** runResultErrorCanvases = new TCanvas* [numElements];
                             for(int i = 0; i < numElements; i++)
                             {
                                 runResultCanvases[i] = new TCanvas((elementNames[i] + "ResultGraph").c_str(), (elementNames[i] + "ResultGraph").c_str(), 1100, 1100);
                                 runResultCanvases[i]->Divide(2,2,.02,.02);
                             }
-                            for(int i = 0; i < numElements; i++)
-                            {
-                                runResultErrorCanvases[i] = new TCanvas((elementNames[i] + "ResultGraphErrors").c_str(), (elementNames[i] + "ResultGraphErrors").c_str(), 1100, 1100);
-                                runResultErrorCanvases[i]->Divide(2,2,.02,.02);
-                            }
-                            elementRun->displayMultiRunResultGraphs(runResultCanvases,totalRunResults);
-                            elementRun->displayMultiRunResultGraphs(runResultErrorCanvases, totalRunResultErrors);
+                            elementRun->displayMultiRunResultGraphs(runResultCanvases);
 
-                            delete [] runResultErrorCanvases;
                             delete [] runResultCanvases;
                         }
-                        delete [] totalRunResults;
-                        delete [] totalRunResultErrors;
                     }
 
                 //case for displaying the individual fits for runs
