@@ -367,6 +367,8 @@ void ElementFit::fitDataGenOnce(Int_t cycleIndex, Int_t runIndex)
     setFunctionParametersTotal();
     setFunctionParamersSingle();
     setParaLimits();
+    cout << "Time end: " << timeEndArr[cycleIndex] << endl;
+    cout << "Bin number: " << binSizeArr[cycleIndex] << endl << endl;
 
     Double_t startFitOffset;
     Double_t startFit;
@@ -765,8 +767,8 @@ void ElementFit::setParaLimits()
     {
         if(paraVals[i]->getIsValueInitValue())
         {
-            regularFunction->SetParLimits((i*2), 0., doubleEvents*30);
-            integralFunction->SetParLimits((i*2), 0., doubleEvents*30);
+            regularFunction->SetParLimits((i*2), 0., doubleEvents*30000);
+            integralFunction->SetParLimits((i*2), 0., doubleEvents*30000);
         }else{
             regularFunction->SetParLimits((i*2), paraVals[i]->getLowerRangeInitValue(), paraVals[i]->getUpperRangeInitValue());
             integralFunction->SetParLimits((i*2), paraVals[i]->getLowerRangeInitValue(), paraVals[i]->getUpperRangeInitValue());
@@ -792,8 +794,8 @@ void ElementFit::setParaLimits()
         {
             if(paraVals[i]->getIsValueInitValue())
             {
-                (singleFitFunctions[(i*2)])->SetParLimits((k*2), 0., doubleEvents*30);
-                (singleFitFunctions[(i*2)+1])->SetParLimits((k*2), 0., doubleEvents*30);
+                (singleFitFunctions[(i*2)])->SetParLimits((k*2), 0., doubleEvents*30000);
+                (singleFitFunctions[(i*2)+1])->SetParLimits((k*2), 0., doubleEvents*30000);
             }else{
                 (singleFitFunctions[(i*2)])->SetParLimits((k*2), paraVals[i]->getLowerRangeInitValue(), paraVals[i]->getUpperRangeInitValue());
                 (singleFitFunctions[(i*2)+1])->SetParLimits((k*2), paraVals[i]->getLowerRangeInitValue(), paraVals[i]->getUpperRangeInitValue());
@@ -824,7 +826,7 @@ void ElementFit::DisplayParameterLimits()
     {
         cout << elementNames[i] << ":" << endl;
         cout << "\tInitial Lower Range: 0" << endl;
-        cout << "\tInitial Lower Range: " << doubleEvents*30 << endl;
+        cout << "\tInitial Lower Range: " << doubleEvents*30000 << endl;
         cout << "\tDecay Constant Lower Range: " << paraVals[i]->getValueHalfLife() * .01 << endl;
         cout << "\tDecay Constant Upper Range: " << paraVals[i]->getValueHalfLife() * 100. << endl;
         cout << endl;
