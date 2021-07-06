@@ -95,6 +95,8 @@ class ElementFit{
         void setParaLimits();
         //TCanvas* test = new TCanvas("test", "test", 500, 500);
         clock_t Tclock;
+
+        TF1* tempRegularCs, *tempIntegralCs;
 };  
 
 
@@ -211,6 +213,8 @@ void ElementFit::createSingleFitFunctions(Int_t timeEnd)
         singleFitFunctions[(i*2)] = new TF1((elementNames[i] + "RegSingFunc").c_str(), fitFunctions[(i*2)], 0., timeEnd, (i+1)*2);
         singleFitFunctions[(i*2)+1] = new TF1((elementNames[i] + "InteSingFunc").c_str(), fitFunctions[(i*2)+1], 0., timeEnd, (i+1)*2);
     }
+    tempRegularCs = new TF1("Cs Regular Single Function", fitFunctions[0], 0., timeEnd, 2);
+    tempIntegralCs = new TF1("Cs Integral Single Function", fitFunctions[1], 0., timeEnd, 2);
 }
 
 //creates the holding objects for the histograms
@@ -302,8 +306,18 @@ void ElementFit::displaySingleHistos(TCanvas** can)
     {
         can[(i*2)]->cd();
         singleRegularHisto->GetAHisto(0, 0, i)->Draw();
+        if(i == 0)
+        {
+            tempRegularCs->SetLineColorAlpha(kBlue, 0.35);
+            tempRegularCs->Draw("SAME");
+        }
         can[(i*2)+1]->cd();
         singleIntegralHisto->GetAHisto(0, 0, i)->Draw();
+        if(i == 0)
+        {
+            tempIntegralCs->SetLineColorAlpha(kBlue, 0.35);
+            tempIntegralCs->Draw("SAME");
+        }
     }
 }
 
@@ -756,6 +770,10 @@ void ElementFit::setFunctionParamersSingle()
             }
         }
     }
+    tempRegularCs->SetParameter(0, paraVals[0]->getInitValue());
+    tempRegularCs->SetParameter(1, paraVals[0]->getValueDecayConst());
+    tempIntegralCs->SetParameter(0, paraVals[0]->getInitValue());
+    tempIntegralCs->SetParameter(1, paraVals[0]->getValueDecayConst());
 }
 
 //sets parameter limits so fitting knows about where to fit
@@ -767,8 +785,8 @@ void ElementFit::setParaLimits()
     {
         if(paraVals[i]->getIsValueInitValue())
         {
-            regularFunction->SetParLimits((i*2), 0., doubleEvents*30000);
-            integralFunction->SetParLimits((i*2), 0., doubleEvents*30000);
+            regularFunction->SetParLimits((i*2), 0., doubleEvents*10);
+            integralFunction->SetParLimits((i*2), 0., doubleEvents*10);
         }else{
             regularFunction->SetParLimits((i*2), paraVals[i]->getLowerRangeInitValue(), paraVals[i]->getUpperRangeInitValue());
             integralFunction->SetParLimits((i*2), paraVals[i]->getLowerRangeInitValue(), paraVals[i]->getUpperRangeInitValue());
@@ -794,8 +812,8 @@ void ElementFit::setParaLimits()
         {
             if(paraVals[i]->getIsValueInitValue())
             {
-                (singleFitFunctions[(i*2)])->SetParLimits((k*2), 0., doubleEvents*30000);
-                (singleFitFunctions[(i*2)+1])->SetParLimits((k*2), 0., doubleEvents*30000);
+                (singleFitFunctions[(i*2)])->SetParLimits((k*2), 0., doubleEvents*10);
+                (singleFitFunctions[(i*2)+1])->SetParLimits((k*2), 0., doubleEvents*10);
             }else{
                 (singleFitFunctions[(i*2)])->SetParLimits((k*2), paraVals[i]->getLowerRangeInitValue(), paraVals[i]->getUpperRangeInitValue());
                 (singleFitFunctions[(i*2)+1])->SetParLimits((k*2), paraVals[i]->getLowerRangeInitValue(), paraVals[i]->getUpperRangeInitValue());
@@ -826,7 +844,7 @@ void ElementFit::DisplayParameterLimits()
     {
         cout << elementNames[i] << ":" << endl;
         cout << "\tInitial Lower Range: 0" << endl;
-        cout << "\tInitial Lower Range: " << doubleEvents*30000 << endl;
+        cout << "\tInitial Lower Range: " << doubleEvents*10 << endl;
         cout << "\tDecay Constant Lower Range: " << paraVals[i]->getValueHalfLife() * .01 << endl;
         cout << "\tDecay Constant Upper Range: " << paraVals[i]->getValueHalfLife() * 100. << endl;
         cout << endl;
