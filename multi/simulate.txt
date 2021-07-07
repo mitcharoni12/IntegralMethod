@@ -1,6 +1,6 @@
 Histo events:10000
 Histo Bins:1000
 Time generate until:400
-single run(1) multi run(2) multiple cycle(3):1
+single run(1) multi run(2) multiple cycle(3):3
 leave out x first bins:0
 leave out x last bins:0

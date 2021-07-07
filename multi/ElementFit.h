@@ -106,7 +106,6 @@ class ElementFit{
         TF1* tempRegularCs, *tempIntegralCs;
 };  
 
-
 //constructor for generating a histogram
 ElementFit::ElementFit(Int_t events, Int_t numRuns, Int_t numCycles, Double_t (*regularFunc)(Double_t*, Double_t*), Double_t (*integralFunc)(Double_t*, Double_t*), Double_t (**fitFunctions)(Double_t*, Double_t*), Int_t numElements,
                        Double_t timeRunEnd, Int_t numBins, string* elementNames,  ParameterValue** paraVals, Int_t singleHistoChoice, Int_t rebinChoice, Int_t rebinDifference, Double_t leaveOutStartBinNumber, Double_t leaveOutEndBinNumber, Int_t timeInc)
@@ -168,7 +167,7 @@ ElementFit::ElementFit(Int_t events, Int_t numRuns, Int_t numCycles, Double_t (*
     Double_t tempTimeRun;
     for(int i = 0; i < numCycles; i++)
     {
-        tempTimeRun = timeRunEnd - timeRunStart;
+        tempTimeRun = timeEndArr[i] - timeRunStart;
         binWidth[i] = tempTimeRun / binSizeArr[i];
     }
     //setting values for randomization
@@ -243,7 +242,7 @@ void ElementFit::createIntegralGraph()
             tempGraph = integralGraph->GetAGraph(cycleIndex, runIndex);
             tempGraph->SetPoint(1, 0.0, 0.0);
 
-            for(int i = 1; i < binSizeArr[i] + 1; i++)
+            for(int i = 1; i < binSizeArr[cycleIndex] + 1; i++)
             {
                 tempTimeValue = i * tempBinWidth;
                 tempBinValue = tempHisto->GetBinContent(i);
@@ -255,7 +254,7 @@ void ElementFit::createIntegralGraph()
                 tempGraph = singleIntegralGraph->GetAGraph(cycleIndex, runIndex, elementIndex);
                 tempGraph->SetPoint(1, 0.0, 0.0);
 
-                for(int i = 1; i < binSizeArr[i] + 1; i++)
+                for(int i = 1; i < binSizeArr[cycleIndex] + 1; i++)
                 {
                     tempTimeValue = i * tempBinWidth;
                     tempBinValue = tempHisto->GetBinContent(i);
@@ -304,7 +303,8 @@ void ElementFit::createTotalFitFunctions(Int_t timeEnd)
 void ElementFit::displayIntegralHisto(TCanvas* can)
 {
     can->cd();
-    integralHisto->GetAHisto(0, 0)->Draw();
+    //integralHisto->GetAHisto(0, 0)->Draw();
+    integralGraph->GetAGraph(0, 0)->Draw();
 }
 
 //USED FOR TROUBLESHOOTING
@@ -374,12 +374,15 @@ void ElementFit::displaySingleHistos(TCanvas** can)
             tempRegularCs->Draw("SAME");
         }
         can[(i*2)+1]->cd();
+        singleIntegralGraph->GetAGraph(0, 0, i)->Draw();
+        /*
         singleIntegralHisto->GetAHisto(0, 0, i)->Draw();
         if(i == 0)
         {
             tempIntegralCs->SetLineColorAlpha(kBlue, 0.35);
             tempIntegralCs->Draw("SAME");
         }
+        */
     }
 }
 
@@ -398,7 +401,8 @@ void ElementFit::DrawIndividualHistos(CycleCanvasHolder* regularTotalCanvases, C
             regularHisto->GetAHisto(cycleIndex, runIndex)->Draw();
 
             integralTotalCanvases->GetACanvas(cycleIndex, runIndex)->cd();
-            integralHisto->GetAHisto(cycleIndex, runIndex)->Draw();
+            //integralHisto->GetAHisto(cycleIndex, runIndex)->Draw();
+            integralGraph->GetAGraph(cycleIndex, runIndex)->Draw();
 
             for(int elementIndex = 0; elementIndex < numElements; elementIndex++)
             {
@@ -406,7 +410,8 @@ void ElementFit::DrawIndividualHistos(CycleCanvasHolder* regularTotalCanvases, C
                 singleRegularHisto->GetAHisto(cycleIndex, runIndex, elementIndex)->Draw();
 
                 singleIntegralCanvases->GetACanvas(cycleIndex, runIndex, elementIndex)->cd();
-                singleIntegralHisto->GetAHisto(cycleIndex, runIndex, elementIndex)->Draw();
+                //singleIntegralHisto->GetAHisto(cycleIndex, runIndex, elementIndex)->Draw();
+                singleIntegralGraph->GetAGraph(cycleIndex, runIndex, elementIndex)->Draw();
             }
         }
     }
@@ -855,8 +860,8 @@ void ElementFit::setParaLimits()
     {
         if(paraVals[i]->getIsValueInitValue())
         {
-            regularFunction->SetParLimits((i*2), 0., doubleEvents*1000);
-            integralFunction->SetParLimits((i*2), 0., doubleEvents*1000);
+            regularFunction->SetParLimits((i*2), 0., doubleEvents*100);
+            integralFunction->SetParLimits((i*2), 0., doubleEvents*100);
         }else{
             regularFunction->SetParLimits((i*2), paraVals[i]->getLowerRangeInitValue(), paraVals[i]->getUpperRangeInitValue());
             integralFunction->SetParLimits((i*2), paraVals[i]->getLowerRangeInitValue(), paraVals[i]->getUpperRangeInitValue());
@@ -867,8 +872,8 @@ void ElementFit::setParaLimits()
     {
         if(paraVals[i]->getIsValueDecayConst())
         {
-            regularFunction->SetParLimits((i*2)+1, (paraVals[i]->getValueDecayConst() * .01), (paraVals[i]->getValueDecayConst() * 10000.));
-            integralFunction->SetParLimits((i*2)+1, (paraVals[i]->getValueDecayConst() * .01), (paraVals[i]->getValueDecayConst() * 10000.));
+            regularFunction->SetParLimits((i*2)+1, (paraVals[i]->getValueDecayConst() * .01), (paraVals[i]->getValueDecayConst() * 100.));
+            integralFunction->SetParLimits((i*2)+1, (paraVals[i]->getValueDecayConst() * .01), (paraVals[i]->getValueDecayConst() * 100.));
         }else{
             regularFunction->SetParLimits((i*2)+1, (paraVals[i]->getLowerRangeDecayConst()), (paraVals[i]->getUpperRangeDecayConst()));
             integralFunction->SetParLimits((i*2)+1, (paraVals[i]->getLowerRangeDecayConst()), (paraVals[i]->getUpperRangeDecayConst()));
@@ -882,8 +887,8 @@ void ElementFit::setParaLimits()
         {
             if(paraVals[i]->getIsValueInitValue())
             {
-                (singleFitFunctions[(i*2)])->SetParLimits((k*2), 0., doubleEvents*1000000);
-                (singleFitFunctions[(i*2)+1])->SetParLimits((k*2), 0., doubleEvents*1000000);
+                (singleFitFunctions[(i*2)])->SetParLimits((k*2), 0., doubleEvents*100);
+                (singleFitFunctions[(i*2)+1])->SetParLimits((k*2), 0., doubleEvents*100);
             }else{
                 (singleFitFunctions[(i*2)])->SetParLimits((k*2), paraVals[i]->getLowerRangeInitValue(), paraVals[i]->getUpperRangeInitValue());
                 (singleFitFunctions[(i*2)+1])->SetParLimits((k*2), paraVals[i]->getLowerRangeInitValue(), paraVals[i]->getUpperRangeInitValue());
@@ -914,7 +919,7 @@ void ElementFit::DisplayParameterLimits()
     {
         cout << elementNames[i] << ":" << endl;
         cout << "\tInitial Lower Range: 0" << endl;
-        cout << "\tInitial Lower Range: " << doubleEvents*10 << endl;
+        cout << "\tInitial Lower Range: " << doubleEvents*100 << endl;
         cout << "\tDecay Constant Lower Range: " << paraVals[i]->getValueHalfLife() * .01 << endl;
         cout << "\tDecay Constant Upper Range: " << paraVals[i]->getValueHalfLife() * 100. << endl;
         cout << endl;
