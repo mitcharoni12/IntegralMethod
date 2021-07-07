@@ -22,6 +22,10 @@
 #include "CycleHistoHolder.h"
 #include "CycleCanvasHolder.h"
 #include "SingleCycleCanvasHolder.h"
+#include "RunGraphHolder.h"
+#include "CycleGraphHolder.h"
+#include "SingleCycleGraphHolder.h"
+#include "TGraph.h"
 
 using namespace std;
 
@@ -73,6 +77,8 @@ class ElementFit{
         TF1** singleFitFunctions;
         CycleHistoHolder* regularHisto, *integralHisto;
         SingleCycleHistoHolder* singleRegularHisto, *singleIntegralHisto;
+        CycleGraphHolder* integralGraph;
+        SingleCycleGraphHolder* singleIntegralGraph;
         //passed fit functions used to make the TF1 for fitting
         decayFunction* fitFunctions;
         decayFunction passedRegularFunction, passedIntegralFunction;
@@ -85,6 +91,7 @@ class ElementFit{
         Int_t globalSeedChanger = 0;
         //helper functions
         void changeSeed();
+        void createIntegralGraph();
         void createSingleFitFunctions(Int_t timeEnd);
         void createTotalFitFunctions(Int_t timeEnd);
         void DisplayParameterLimits();
@@ -125,20 +132,22 @@ ElementFit::ElementFit(Int_t events, Int_t numRuns, Int_t numCycles, Double_t (*
     this->timeInc = timeInc;
     doubleEvents = (Double_t) events;
 
-    //dynamically allocating needed variables and arrays
-    //dynamic array
+    //creating fit parameter holders
     singleRegularFitParameters = new SingleElementFitValues(numElements);
     singleIntegralFitParameters = new SingleElementFitValues(numElements);
     totalRegularFitParameters = new ChainFitValues(numElements);
     totalIntegralFitParameters = new ChainFitValues(numElements);
+    //creating array tracking when the fit time ends between cycles
     timeEndArr = new Int_t [numCycles];
     for(int i = 0; i < numCycles; i++)
     {
         timeEndArr[i] = timeRunEnd + timeInc * i;
     }
+    //creating array containing how many bins will exist in histograms between cycles
     binSizeArr = new Int_t [numCycles];
     int rebinSize = numBins;
     singleFitFunctions = new TF1* [numElements*2];
+    //case if rebining
     if(rebinChoice == 1)
     {
         for(int i = 0; i < numCycles; i++)
@@ -146,12 +155,14 @@ ElementFit::ElementFit(Int_t events, Int_t numRuns, Int_t numCycles, Double_t (*
             binSizeArr[i] = rebinSize;
             rebinSize = rebinSize + rebinDifference;
         }
+    //case if not rebining
     }else{
         for(int i = 0; i < numCycles; i++)
         {
             binSizeArr[i] = rebinSize;
         }
     }
+    //creating array containing the bin widths between cycles
     timeRunStart = 0;
     binWidth = new Double_t [numCycles];
     Double_t tempTimeRun;
@@ -160,6 +171,7 @@ ElementFit::ElementFit(Int_t events, Int_t numRuns, Int_t numCycles, Double_t (*
         tempTimeRun = timeRunEnd - timeRunStart;
         binWidth[i] = tempTimeRun / binSizeArr[i];
     }
+    //setting values for randomization
     randArr = new Double_t [numElements];
     Tclock = clock();
     //generates all the histo objects and 
@@ -190,6 +202,70 @@ ElementFit::~ElementFit()
     delete [] binSizeArr;
     delete [] binWidth;
     delete [] timeEndArr;
+    delete integralGraph;
+    delete singleIntegralGraph;
+}
+
+//creates the holding objects for the histograms
+void ElementFit::createHistoHolders()
+{
+    string histoName;
+    histoName = "Total Regular Histo";
+    regularHisto = new CycleHistoHolder(numCycles, numRuns, histoName, binSizeArr, timeEndArr);
+    histoName = "Total Integral Histo";
+    integralHisto = new CycleHistoHolder(numCycles, numRuns, histoName, binSizeArr, timeEndArr);
+    histoName = "Single Regular Histo";
+    singleRegularHisto = new SingleCycleHistoHolder(numCycles, numElements, numRuns, histoName, binSizeArr, timeEndArr, elementNames);
+    histoName = "Single Integral Histo";
+    singleIntegralHisto = new SingleCycleHistoHolder(numCycles, numElements, numRuns, histoName, binSizeArr, timeEndArr, elementNames);
+}
+
+void ElementFit::createIntegralGraph()
+{
+    TH1D* tempHisto;
+    TGraph* tempGraph;
+    Int_t* pointsArr = new Int_t [numCycles];
+    Double_t tempBinWidth, tempTimeValue, tempBinValue;
+    for(int i = 0; i < numCycles; i++)
+    {
+        pointsArr[i] = binSizeArr[i] + 1;
+    }
+
+    integralGraph = new CycleGraphHolder(numCycles, numRuns, "Total Integral Graph", pointsArr);
+    singleIntegralGraph = new SingleCycleGraphHolder(numCycles, numElements, numRuns, "Single Integral Graph", pointsArr, elementNames);
+
+    for(int cycleIndex = 0; cycleIndex < numCycles; cycleIndex++)
+    {
+        tempBinWidth = binWidth[cycleIndex];
+        for(int runIndex = 0; runIndex < numRuns; runIndex++)
+        {  
+            tempHisto = integralHisto->GetAHisto(cycleIndex, runIndex);
+            tempGraph = integralGraph->GetAGraph(cycleIndex, runIndex);
+            tempGraph->SetPoint(1, 0.0, 0.0);
+
+            for(int i = 1; i < binSizeArr[i] + 1; i++)
+            {
+                tempTimeValue = i * tempBinWidth;
+                tempBinValue = tempHisto->GetBinContent(i);
+                tempGraph->SetPoint(i+1, tempTimeValue, tempBinValue);
+            }
+            for(int elementIndex = 0; elementIndex < numElements; elementIndex++)
+            {
+                tempHisto = singleIntegralHisto->GetAHisto(cycleIndex, runIndex, elementIndex);
+                tempGraph = singleIntegralGraph->GetAGraph(cycleIndex, runIndex, elementIndex);
+                tempGraph->SetPoint(1, 0.0, 0.0);
+
+                for(int i = 1; i < binSizeArr[i] + 1; i++)
+                {
+                    tempTimeValue = i * tempBinWidth;
+                    tempBinValue = tempHisto->GetBinContent(i);
+                    tempGraph->SetPoint(i+1, tempTimeValue, tempBinValue);
+                }
+            }
+        }
+    }
+
+    delete [] pointsArr;
 }
 
 //used for changing seed between runs
@@ -215,20 +291,6 @@ void ElementFit::createSingleFitFunctions(Int_t timeEnd)
     }
     tempRegularCs = new TF1("Cs Regular Single Function", fitFunctions[0], 0., timeEnd, 2);
     tempIntegralCs = new TF1("Cs Integral Single Function", fitFunctions[1], 0., timeEnd, 2);
-}
-
-//creates the holding objects for the histograms
-void ElementFit::createHistoHolders()
-{
-    string histoName;
-    histoName = "Total Regular Histo";
-    regularHisto = new CycleHistoHolder(numCycles, numRuns, histoName, binSizeArr, timeEndArr);
-    histoName = "Total Integral Histo";
-    integralHisto = new CycleHistoHolder(numCycles, numRuns, histoName, binSizeArr, timeEndArr);
-    histoName = "Single Regular Histo";
-    singleRegularHisto = new SingleCycleHistoHolder(numCycles, numElements, numRuns, histoName, binSizeArr, timeEndArr, elementNames);
-    histoName = "Single Integral Histo";
-    singleIntegralHisto = new SingleCycleHistoHolder(numCycles, numElements, numRuns, histoName, binSizeArr, timeEndArr, elementNames);
 }
 
 //dynamically allocates the total fit functions
@@ -408,11 +470,15 @@ void ElementFit::fitIntegralHisto(Int_t cycleIndex, Int_t runIndex, Double_t sta
     Double_t valueHalfLife;
     Double_t errorHalfLife;
     TH1D* tempHisto;
+    TGraph* tempGraph;
 
     cout << "FITTING TOTAL INTEGRAL CYCLE: " << cycleIndex << " RUN: " << runIndex << endl;
 
-    tempHisto = integralHisto->GetAHisto(cycleIndex, runIndex);
-    tempHisto->Fit(integralFunction, "L", "", startFit, endFit);
+    //tempHisto = integralHisto->GetAHisto(cycleIndex, runIndex);
+    //tempHisto->Fit(integralFunction, "", "", startFit, endFit);
+    tempGraph = integralGraph->GetAGraph(cycleIndex, runIndex);
+    tempGraph->Fit(integralFunction, "", "", startFit, endFit);
+
     for(int i = 0; i < numElements; i++)
     {   
         valueN0 = integralFunction->GetParameter((i*2));
@@ -471,17 +537,20 @@ void ElementFit::fitSingleHistos(Int_t cycleIndex, Int_t runIndex, Double_t star
     Double_t valueHalfLife;
     Double_t errorHalfLife;
     TH1D* tempSingleRegularHisto, *tempSingleIntegralHisto;
+    TGraph* tempSingleGraph;
 
     //loop for fitting and storing value for elements
     for(int i = 0; i < numElements; i++)
     {
         tempSingleRegularHisto = singleRegularHisto->GetAHisto(cycleIndex, runIndex, i);
-        tempSingleIntegralHisto = singleIntegralHisto->GetAHisto(cycleIndex, runIndex, i);
+        //tempSingleIntegralHisto = singleIntegralHisto->GetAHisto(cycleIndex, runIndex, i);
+        tempSingleGraph = singleIntegralGraph->GetAGraph(cycleIndex, runIndex, i);
 
         cout << "FITTING SINGLE REGULAR " << elementNames[i] << " CYCLE: " << cycleIndex << " RUN: " << runIndex << endl;
         tempSingleRegularHisto->Fit(singleFitFunctions[(i*2)], "L", "", startFit, endFit);
         cout << "FITTING SINGLE INTEGRAL " << elementNames[i] << " CYCLE: " << cycleIndex << " RUN: " << runIndex << endl;
-        tempSingleIntegralHisto->Fit(singleFitFunctions[(i*2)+1], "L", "", startFit, endFit);
+        //tempSingleIntegralHisto->Fit(singleFitFunctions[(i*2)+1], "L", "", startFit, endFit);
+        tempSingleGraph->Fit(singleFitFunctions[(i*2)+1], "", "", startFit, endFit);
         //loop for extracting the error and value for each element(you might need to draw out the array structure to understand what is happening)
         for(int k = 0; k < (i+1); k++)
         {
@@ -519,6 +588,7 @@ void ElementFit::genAndFillHistos()
     createHistoHolders();
     genRandomAlternate();
     genIntegralHistoSimulated();
+    createIntegralGraph();
 }
 
 //generates the integral histogram from the data in the Regular histogram
@@ -785,8 +855,8 @@ void ElementFit::setParaLimits()
     {
         if(paraVals[i]->getIsValueInitValue())
         {
-            regularFunction->SetParLimits((i*2), 0., doubleEvents*10);
-            integralFunction->SetParLimits((i*2), 0., doubleEvents*10);
+            regularFunction->SetParLimits((i*2), 0., doubleEvents*1000);
+            integralFunction->SetParLimits((i*2), 0., doubleEvents*1000);
         }else{
             regularFunction->SetParLimits((i*2), paraVals[i]->getLowerRangeInitValue(), paraVals[i]->getUpperRangeInitValue());
             integralFunction->SetParLimits((i*2), paraVals[i]->getLowerRangeInitValue(), paraVals[i]->getUpperRangeInitValue());
@@ -797,8 +867,8 @@ void ElementFit::setParaLimits()
     {
         if(paraVals[i]->getIsValueDecayConst())
         {
-            regularFunction->SetParLimits((i*2)+1, (paraVals[i]->getValueDecayConst() * .01), (paraVals[i]->getValueDecayConst() * 100.));
-            integralFunction->SetParLimits((i*2)+1, (paraVals[i]->getValueDecayConst() * .01), (paraVals[i]->getValueDecayConst() * 100.));
+            regularFunction->SetParLimits((i*2)+1, (paraVals[i]->getValueDecayConst() * .01), (paraVals[i]->getValueDecayConst() * 10000.));
+            integralFunction->SetParLimits((i*2)+1, (paraVals[i]->getValueDecayConst() * .01), (paraVals[i]->getValueDecayConst() * 10000.));
         }else{
             regularFunction->SetParLimits((i*2)+1, (paraVals[i]->getLowerRangeDecayConst()), (paraVals[i]->getUpperRangeDecayConst()));
             integralFunction->SetParLimits((i*2)+1, (paraVals[i]->getLowerRangeDecayConst()), (paraVals[i]->getUpperRangeDecayConst()));
@@ -812,8 +882,8 @@ void ElementFit::setParaLimits()
         {
             if(paraVals[i]->getIsValueInitValue())
             {
-                (singleFitFunctions[(i*2)])->SetParLimits((k*2), 0., doubleEvents*10);
-                (singleFitFunctions[(i*2)+1])->SetParLimits((k*2), 0., doubleEvents*10);
+                (singleFitFunctions[(i*2)])->SetParLimits((k*2), 0., doubleEvents*1000000);
+                (singleFitFunctions[(i*2)+1])->SetParLimits((k*2), 0., doubleEvents*1000000);
             }else{
                 (singleFitFunctions[(i*2)])->SetParLimits((k*2), paraVals[i]->getLowerRangeInitValue(), paraVals[i]->getUpperRangeInitValue());
                 (singleFitFunctions[(i*2)+1])->SetParLimits((k*2), paraVals[i]->getLowerRangeInitValue(), paraVals[i]->getUpperRangeInitValue());

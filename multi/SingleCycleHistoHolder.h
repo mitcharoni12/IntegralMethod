@@ -1,8 +1,8 @@
 /*
     PURPOSE: used to store the single element fitted histograms for a cycle
 */
-#ifndef SingleCycleHistoHolder_H
-#define SingleCycleHistoHolder_H
+#ifndef SINGLECYCLEHISTOHOLDER_H
+#define SINGLECYCLEHISTOHOLDER_H
 
 #include "TH1D.h"
 #include "CycleHistoHolder.h"
