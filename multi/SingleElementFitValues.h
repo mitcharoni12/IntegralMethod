@@ -17,14 +17,14 @@ public:
     void SetElementChainFitValues(ChainFitValues** singleFitValues){this->singleFitValues = singleFitValues;}
     ChainFitValues** GetElementChainFitValues(){return singleFitValues;}
     ChainFitValues* GetChainFitValues(Int_t i){return singleFitValues[i];}
-    void SetAnN0(int chainNum, int elementNum, Double_t N0);
-    void SetAnN0Error(int chainNum, int elementNum, Double_t N0Error);
-    void SetAnHalfLife(int chainNum, int elementNum, Double_t halfLife);
-    void SetAnHalfLifeError(int chainNum, int elementNum, Double_t halfLifeError);
-    Double_t GetAnN0(int chainNum, int elementNum);
-    Double_t GetAnN0Error(int chainNum, int elementNum);
-    Double_t GetAnHalfLife(int chainNum, int elementNum);
-    Double_t GetAnHalfLifeError(int chainNum, int elementNum);
+    void SetAnN0(Int_t chainNum, Int_t elementNum, Double_t N0);
+    void SetAnN0Error(Int_t chainNum, Int_t elementNum, Double_t N0Error);
+    void SetAnHalfLife(Int_t chainNum, Int_t elementNum, Double_t halfLife);
+    void SetAnHalfLifeError(Int_t chainNum, Int_t elementNum, Double_t halfLifeError);
+    Double_t GetAnN0(Int_t chainNum, Int_t elementNum);
+    Double_t GetAnN0Error(Int_t chainNum, Int_t elementNum);
+    Double_t GetAnHalfLife(Int_t chainNum, Int_t elementNum);
+    Double_t GetAnHalfLifeError(Int_t chainNum, Int_t elementNum);
     Int_t GetNumElements(){return numChainElements;}
     
     SingleElementFitValues(Int_t numChainElements);
@@ -42,45 +42,45 @@ SingleElementFitValues::SingleElementFitValues(Int_t numChainElements)
     }
 }
 
-void SingleElementFitValues::SetAnN0(int chainNum, int elementNum, Double_t N0)
+void SingleElementFitValues::SetAnN0(Int_t chainNum, Int_t elementNum, Double_t N0)
 {
     singleFitValues[chainNum]->SetAnN0(elementNum, N0);
 }
 
-void SingleElementFitValues::SetAnN0Error(int chainNum, int elementNum, Double_t N0Error)
+void SingleElementFitValues::SetAnN0Error(Int_t chainNum, Int_t elementNum, Double_t N0Error)
 {
     singleFitValues[chainNum]->SetAnN0Error(elementNum, N0Error);
 }
 
-void SingleElementFitValues::SetAnHalfLife(int chainNum, int elementNum, Double_t halfLife)
+void SingleElementFitValues::SetAnHalfLife(Int_t chainNum, Int_t elementNum, Double_t halfLife)
 {  
     singleFitValues[chainNum]->SetAnHalfLife(elementNum, halfLife);
 }
 
-void SingleElementFitValues::SetAnHalfLifeError(int chainNum, int elementNum, Double_t halfLifeError)
+void SingleElementFitValues::SetAnHalfLifeError(Int_t chainNum, Int_t elementNum, Double_t halfLifeError)
 {
     singleFitValues[chainNum]->SetAnHalfLifeError(elementNum, halfLifeError);
 }
 
-Double_t SingleElementFitValues::GetAnN0(int chainNum, int elementNum)
+Double_t SingleElementFitValues::GetAnN0(Int_t chainNum, Int_t elementNum)
 {
     Double_t N0 = singleFitValues[chainNum]->GetAnN0(elementNum);
     return N0;
 }
 
-Double_t SingleElementFitValues::GetAnN0Error(int chainNum, int elementNum)
+Double_t SingleElementFitValues::GetAnN0Error(Int_t chainNum, Int_t elementNum)
 {
     Double_t N0Error = singleFitValues[chainNum]->GetAnN0Error(elementNum);
     return N0Error;
 }
 
-Double_t SingleElementFitValues::GetAnHalfLife(int chainNum, int elementNum)
+Double_t SingleElementFitValues::GetAnHalfLife(Int_t chainNum, Int_t elementNum)
 {
     Double_t halfLife = singleFitValues[chainNum]->GetAnHalfLife(elementNum);
     return halfLife;
 }
 
-Double_t SingleElementFitValues::GetAnHalfLifeError(int chainNum, int elementNum)
+Double_t SingleElementFitValues::GetAnHalfLifeError(Int_t chainNum, Int_t elementNum)
 {
     Double_t halfLifeError = singleFitValues[chainNum]->GetAnHalfLifeError(elementNum);
     return halfLifeError;

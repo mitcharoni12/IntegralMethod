@@ -9,7 +9,6 @@
 #include <cstdio>
 #include <sys/stat.h>
 
-#include "ElementFit.h"
 #include "TH1.h"
 #include "TH1D.h"
 #include "TH3D.h"
@@ -17,10 +16,12 @@
 #include "TGraphErrors.h"
 #include "TCanvas.h"
 #include "TMath.h"
-#include "ChainFitValues.h"
+
+#include "ElementFit.h"
 #include "SingleElementFitValues.h"
-#include "ChainRunFitValues.h"
+#include "ChainFitValues.h"
 #include "SingleChainRunFitValues.h"
+#include "ChainRunFitValues.h"
 
 using namespace std;
 

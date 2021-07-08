@@ -3,7 +3,7 @@ ENTER INFO EACH ELEMENT IN THE FORMAT
 element 1 Name:TE
 
 element 1 N0 have value(1) or range(2):1
-element 1 N0 value:10000
+element 1 N0 value:5
 element 1 N0 lower;0
 element 1 N0 upper;200000
 

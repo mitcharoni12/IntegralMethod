@@ -14,18 +14,17 @@
 #include "TMath.h"
 #include "TRandom3.h"
 #include "TCanvas.h"
-#include "SingleCycleHistoHolder.h"
-#include "ParameterValue.h"
-#include "ChainFitValues.h"
-#include "FitValues.h"
-#include "SingleElementFitValues.h"
-#include "CycleHistoHolder.h"
-#include "CycleCanvasHolder.h"
-#include "SingleCycleCanvasHolder.h"
-#include "RunGraphHolder.h"
-#include "CycleGraphHolder.h"
-#include "SingleCycleGraphHolder.h"
 #include "TGraph.h"
+
+#include "SingleElementFitValues.h"
+#include "ChainFitValues.h"
+#include "SingleCycleHistoHolder.h"
+#include "CycleHistoHolder.h"
+#include "SingleCycleCanvasHolder.h"
+#include "CycleCanvasHolder.h"
+#include "SingleCycleGraphHolder.h"
+#include "CycleGraphHolder.h"
+#include "ParameterValue.h"
 
 using namespace std;
 
