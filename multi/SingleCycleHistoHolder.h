@@ -11,11 +11,9 @@ using namespace std;
 
 class SingleCycleHistoHolder{
 private:
-    Int_t numCycles, numRuns, timeRunEnd, numElements;
-    Int_t* binArr, *timeEndArr;
+    Int_t numElements;
     CycleHistoHolder** histoArr;
-    string histoName;
-    string* elementNames;
+    string histoParameter;
 public:
     SingleCycleHistoHolder(Int_t numCycles, Int_t numElements, Int_t numRuns, string histoName, Int_t* binArr, Int_t* timeEndArr, string* elementNames);
     ~SingleCycleHistoHolder();
@@ -25,13 +23,8 @@ public:
 
 SingleCycleHistoHolder::SingleCycleHistoHolder(Int_t numCycles, Int_t numElements, Int_t numRuns, string histoName, Int_t* binArr, Int_t* timeEndArr, string* elementNames)
 {
-    this->numCycles = numCycles;
     this->numElements = numElements;
-    this->numRuns = numRuns;
-    this->histoName = histoName;
-    this->binArr = binArr;
-    this->elementNames = elementNames;
-    string histoParameter = histoName;
+    histoParameter = histoName;
     
     histoArr = new CycleHistoHolder* [numElements];
     for(int i = 0; i < numElements; i++)

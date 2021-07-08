@@ -11,8 +11,6 @@ using namespace std;
 class RunHistoHolder{
 private:
     TH1D** histoArr;
-    Int_t cycleNum, numRuns, numBins, timeRunEnd;
-    string histoName;
 public:
     RunHistoHolder(Int_t cycleNum, Int_t numRuns, string histoName, Int_t numBins, Int_t timeRunEnd);
     ~RunHistoHolder();
@@ -23,11 +21,6 @@ public:
 RunHistoHolder::RunHistoHolder(Int_t cycleNum, Int_t numRuns, string histoName, Int_t numBins, Int_t timeRunEnd)
 {
     string tempHistoName;
-    this->cycleNum = cycleNum;
-    this->numRuns = numRuns;
-    this->numBins = numBins;
-    this->timeRunEnd = timeRunEnd;
-    this->histoName = histoName;
 
     histoArr = new TH1D* [numRuns];
     for(int i = 0; i < numRuns; i++)

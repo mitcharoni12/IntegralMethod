@@ -11,9 +11,7 @@ using namespace std;
 
 class CycleHistoHolder{
 private:
-    Int_t numCycles, numRuns;
-    Int_t* binArr;
-    string histoName;
+    Int_t numCycles;
     RunHistoHolder** histoArr;
 public:
     CycleHistoHolder(Int_t numCycles, Int_t numRuns, string histoName, Int_t* binArr, Int_t* timeEndArr);
@@ -25,9 +23,6 @@ public:
 CycleHistoHolder::CycleHistoHolder(Int_t numCycles, Int_t numRuns, string histoName, Int_t* binArr, Int_t* timeEndArr)
 {
     this->numCycles = numCycles;
-    this->numRuns = numRuns;
-    this->binArr = binArr;
-    this->histoName = histoName;
 
     histoArr = new RunHistoHolder* [numCycles];
     for(int i = 0; i < numCycles; i++)
