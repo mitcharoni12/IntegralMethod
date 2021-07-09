@@ -29,13 +29,13 @@ class Run{
     private:
         Int_t runs, numElements, eventDecrement;
         ElementFit* element;
-        ChainRunFitValues* regularFitValues, *integralFitValues;
-        SingleChainRunFitValues* singleRegularFitValues, *singleIntegralFitValues;
+        ChainRunFitValues* batemanFitValues, *integralFitValues;
+        SingleChainRunFitValues* singleBatemanFitValues, *singleIntegralFitValues;
         Double_t* eventsXAxis, *runsXAxis, *zero;
         string* elementNameStrs;
         TH3D* correlationHisto;
         TH1D** multiRunResultHistograms;
-        TGraphErrors** totalRegularGraphs, **totalIntegralGraphs, **singleRegularGraphs, **singleIntegralGraphs;
+        TGraphErrors** totalBatemanGraphs, **totalIntegralGraphs, **singleBatemanGraphs, **singleIntegralGraphs;
         TCanvas* testCan;
         TCanvas** multiRunResultCanvas;
         //helper functions
@@ -45,7 +45,7 @@ class Run{
         Double_t getMinElement(Double_t* arr);
         void runEventChange();
         void genIntegralMeanGraphs();
-        void genRegularMeanGraphs();
+        void genBatemanMeanGraphs();
     public:
         Run(Int_t runs, Int_t eventDecrement, ElementFit* element, string* elementNameStrs);
         ~Run();
@@ -62,9 +62,9 @@ class Run{
         void displayMultiRunResultHistos(TCanvas** canvasArray, TH1D** multiRunResultHistograms);
         void runNoChange(Int_t cycleIndex);
         //getter function
-        ChainRunFitValues* getRegularFitValues(){return regularFitValues;}
+        ChainRunFitValues* getBatemanFitValues(){return batemanFitValues;}
         ChainRunFitValues* getIntegralFitValues(){return integralFitValues;}
-        SingleChainRunFitValues* getSingleRegularFitValues(){return singleRegularFitValues;}
+        SingleChainRunFitValues* getSingleBatemanFitValues(){return singleBatemanFitValues;}
         SingleChainRunFitValues* getSingleIntegralFitValues(){return singleIntegralFitValues;}
         TH1D** getMultiRunResultHistos(){return multiRunResultHistograms;}
         string* getElementStringNames(){return elementNameStrs;}
@@ -92,13 +92,13 @@ Run::Run(Int_t runs, Int_t eventDecrement, ElementFit* element, string* elementN
     {
         zero[i] = 0.0f;
     }
-    regularFitValues = new ChainRunFitValues(numElements, runs);
+    batemanFitValues = new ChainRunFitValues(numElements, runs);
     integralFitValues = new ChainRunFitValues(numElements, runs);
-    singleRegularFitValues = new SingleChainRunFitValues(numElements, runs);
+    singleBatemanFitValues = new SingleChainRunFitValues(numElements, runs);
     singleIntegralFitValues = new SingleChainRunFitValues(numElements, runs);
-    totalRegularGraphs = new TGraphErrors* [numElements];
+    totalBatemanGraphs = new TGraphErrors* [numElements];
     totalIntegralGraphs = new TGraphErrors* [numElements];
-    singleRegularGraphs = new TGraphErrors* [numElements];
+    singleBatemanGraphs = new TGraphErrors* [numElements];
     singleIntegralGraphs = new TGraphErrors* [numElements];
     //testCan = new TCanvas("testCan", "testCan", 500, 500);
     for(int i = 0; i < runs; i++)
@@ -109,15 +109,15 @@ Run::Run(Int_t runs, Int_t eventDecrement, ElementFit* element, string* elementN
 
 Run::~Run()
 {
-    delete regularFitValues;
+    delete batemanFitValues;
     delete integralFitValues;
-    delete singleRegularFitValues;
+    delete singleBatemanFitValues;
     delete singleIntegralFitValues;
     delete [] eventsXAxis;
     delete [] runsXAxis;
-    delete [] totalRegularGraphs;
+    delete [] totalBatemanGraphs;
     delete [] totalIntegralGraphs;
-    delete [] singleRegularGraphs;
+    delete [] singleBatemanGraphs;
     delete [] singleIntegralGraphs;
 }
 
@@ -125,7 +125,7 @@ Run::~Run()
 //(WIP) creates and fills the correlation canvas for runs with event changes
 void Run::createCorrelationHistoEventChange()
 {
-    correlationHisto = new TH3D("CorrelationHistoEventChange", "CorrelationHistoEventChange", 100, getMinElement(regularFitErrors[0]), getMaxElement(regularFitErrors[0]), 100, getMinElement(integralFitErrors[0]), getMaxElement(integralFitErrors[0]), 100, getMinElement(eventsXAxis), getMaxElement(eventsXAxis));
+    correlationHisto = new TH3D("CorrelationHistoEventChange", "CorrelationHistoEventChange", 100, getMinElement(batemanFitErrors[0]), getMaxElement(batemanFitErrors[0]), 100, getMinElement(integralFitErrors[0]), getMaxElement(integralFitErrors[0]), 100, getMinElement(eventsXAxis), getMaxElement(eventsXAxis));
     correlationHisto->GetXaxis()->SetTitle("Reg Errors");
     correlationHisto->GetXaxis()->SetNdivisions(5);
     correlationHisto->GetXaxis()->CenterTitle(kTRUE);
@@ -140,14 +140,14 @@ void Run::createCorrelationHistoEventChange()
     correlationHisto->GetZaxis()->SetTitleColor(kRed);
     for(int i = 0; i < runs; i++)
     {
-        correlationHisto->Fill(regularFitErrors[0][i], integralFitErrors[0][i], eventsXAxis[i]);
+        correlationHisto->Fill(batemanFitErrors[0][i], integralFitErrors[0][i], eventsXAxis[i]);
     }
 }
 
 //(WIP) creates and fills the correlation canvas for runs with no changes
 void Run::createCorrelationHistoNoChange()
 {
-    correlationHisto = new TH3D("CorrelationHistoNoChange", "CorrelationHistoNoChange", 100, getMinElement(regularFitErrors[0]), getMaxElement(regularFitErrors[0]), 100, getMinElement(integralFitErrors[0]), getMaxElement(integralFitErrors[0]), 100, 0, runs);
+    correlationHisto = new TH3D("CorrelationHistoNoChange", "CorrelationHistoNoChange", 100, getMinElement(batemanFitErrors[0]), getMaxElement(batemanFitErrors[0]), 100, getMinElement(integralFitErrors[0]), getMaxElement(integralFitErrors[0]), 100, 0, runs);
     correlationHisto->GetXaxis()->SetTitle("Reg Errors");
     correlationHisto->GetXaxis()->SetNdivisions(5);
     correlationHisto->GetXaxis()->CenterTitle(kTRUE);
@@ -162,7 +162,7 @@ void Run::createCorrelationHistoNoChange()
     correlationHisto->GetZaxis()->SetTitleColor(kRed);
     for(int i = 0; i < runs; i++)
     {
-        correlationHisto->Fill(regularFitErrors[0][i], integralFitErrors[0][i], runsXAxis[i]);
+        correlationHisto->Fill(batemanFitErrors[0][i], integralFitErrors[0][i], runsXAxis[i]);
     }
 }
 */
@@ -177,7 +177,7 @@ TH1D** Run::createRunResultHistos()
     for(int i = 0; i < numElements; i++)
     {
         parameterValue = TMath::LogE()/(element->getElementParameters(i));
-        multiRunResultHistograms[(i*2)] = new TH1D((elementNameStrs[i] + " Fit Result Regular Histo").c_str(), (elementNameStrs[i] + " Fit Result Regular Histo").c_str(), 500, parameterValue*0, parameterValue*2.5);
+        multiRunResultHistograms[(i*2)] = new TH1D((elementNameStrs[i] + " Fit Result Bateman Histo").c_str(), (elementNameStrs[i] + " Fit Result Bateman Histo").c_str(), 500, parameterValue*0, parameterValue*2.5);
         multiRunResultHistograms[(i*2)+1] = new TH1D((elementNameStrs[i] + " Fit Result Integral Histo").c_str(), (elementNameStrs[i] + " Fit Result Integral Histo").c_str(), 500, parameterValue*0, parameterValue*2.5);
     }
 
@@ -194,7 +194,7 @@ TH1D** Run::createRunResultHistosSingleElements()
     for(int i = 0; i < numElements; i++)
     {
         parameterValue = TMath::LogE()/(element->getElementParameters(i));
-        multiRunResultHistosSingleElement[(i*2)] = new TH1D((elementNameStrs[i] + " Fit Result Regular Histo Single Element").c_str(), (elementNameStrs[i] + " Fit Result Regular Histo Single Element").c_str(), 500, parameterValue*0, parameterValue*2.5);
+        multiRunResultHistosSingleElement[(i*2)] = new TH1D((elementNameStrs[i] + " Fit Result Bateman Histo Single Element").c_str(), (elementNameStrs[i] + " Fit Result Bateman Histo Single Element").c_str(), 500, parameterValue*0, parameterValue*2.5);
         multiRunResultHistosSingleElement[(i*2)+1] = new TH1D((elementNameStrs[i] + " Fit Result Integral Histo Single Element").c_str(), (elementNameStrs[i] + " Fit Result Integral Histo Single Element").c_str(), 500, parameterValue*0, parameterValue*2.5);
     }
 
@@ -214,11 +214,11 @@ void Run::displayMultiRunResultGraphs(TCanvas** canvasArray)
     for(int i = 0; i < numElements; i++)
     {
         canvasArray[i]->cd(1);
-        totalRegularGraphs[i]->Draw();
+        totalBatemanGraphs[i]->Draw();
         canvasArray[i]->cd(2);
         totalIntegralGraphs[i]->Draw();
         canvasArray[i]->cd(3);
-        singleRegularGraphs[i]->Draw();
+        singleBatemanGraphs[i]->Draw();
         canvasArray[i]->cd(4);
         singleIntegralGraphs[i]->Draw();
     }
@@ -249,7 +249,7 @@ TH1D** Run::fillRunResultHistos(TH1D** multiRunResultHistograms)
         multiRunResultHistograms[(i*2)+1]->Reset("ICES");
         for(int j = 0; j < runs; j++)
         {
-            multiRunResultHistograms[(i*2)]->Fill(regularFitValues->GetAnHalfLife(j, i));
+            multiRunResultHistograms[(i*2)]->Fill(batemanFitValues->GetAnHalfLife(j, i));
             multiRunResultHistograms[(i*2)+1]->Fill(integralFitValues->GetAnHalfLife(j, i));
         }
     }
@@ -266,7 +266,7 @@ TH1D** Run::fillRunResultHistosSingleElement(TH1D** multiRunResultHistogramsSing
         multiRunResultHistogramsSingleElement[(i*2)+1]->Reset("ICES");
         for(int j = 0; j < runs; j++)
         {
-            multiRunResultHistogramsSingleElement[(i*2)]->Fill(singleRegularFitValues->GetAnHalfLife(j, i, i));
+            multiRunResultHistogramsSingleElement[(i*2)]->Fill(singleBatemanFitValues->GetAnHalfLife(j, i, i));
             multiRunResultHistogramsSingleElement[(i*2)+1]->Fill(singleIntegralFitValues->GetAnHalfLife(j, i, i));
         }
     }
@@ -279,11 +279,11 @@ void Run::genGraphsEventChange()
 {
     for(int j = 0; j < numElements; j++)
     {
-        totalRegularGraphs[j]= new TGraphErrors(runs, eventsXAxis, regularFitValues->GetHalfLifeArr(j), zero, regularFitValues->GetHalfLifeErrorArr(j));
-        totalRegularGraphs[j]->GetXaxis()->SetTitle("Events");
-        totalRegularGraphs[j]->GetYaxis()->SetTitle("Regular Fit(S)");
-        totalRegularGraphs[j]->SetTitle((elementNameStrs[j] + " Regular Fit(S)").c_str());
-        totalRegularGraphs[j]->SetName((elementNameStrs[j] + " Regular_Fit(S)").c_str());
+        totalBatemanGraphs[j]= new TGraphErrors(runs, eventsXAxis, batemanFitValues->GetHalfLifeArr(j), zero, batemanFitValues->GetHalfLifeErrorArr(j));
+        totalBatemanGraphs[j]->GetXaxis()->SetTitle("Events");
+        totalBatemanGraphs[j]->GetYaxis()->SetTitle("Bateman Fit(S)");
+        totalBatemanGraphs[j]->SetTitle((elementNameStrs[j] + " Bateman Fit(S)").c_str());
+        totalBatemanGraphs[j]->SetName((elementNameStrs[j] + " Bateman_Fit(S)").c_str());
 
         totalIntegralGraphs[j] = new TGraphErrors(runs, eventsXAxis, integralFitValues->GetHalfLifeArr(j), zero, integralFitValues->GetHalfLifeErrorArr(j));
         totalIntegralGraphs[j]->GetXaxis()->SetTitle("Events");
@@ -298,11 +298,11 @@ void Run::genGraphsNoChange()
 {
     for(int j = 0; j < numElements; j++)
     {
-        totalRegularGraphs[j]= new TGraphErrors(runs, runsXAxis, regularFitValues->GetHalfLifeArr(j), zero, regularFitValues->GetHalfLifeErrorArr(j));
-        totalRegularGraphs[j]->GetXaxis()->SetTitle("Runs");
-        totalRegularGraphs[j]->GetYaxis()->SetTitle("Regular Fit(S)");
-        totalRegularGraphs[j]->SetTitle((elementNameStrs[j] + " Regular Fit(S)").c_str());
-        totalRegularGraphs[j]->SetName((elementNameStrs[j] + " Regular_Fit(S)").c_str());
+        totalBatemanGraphs[j]= new TGraphErrors(runs, runsXAxis, batemanFitValues->GetHalfLifeArr(j), zero, batemanFitValues->GetHalfLifeErrorArr(j));
+        totalBatemanGraphs[j]->GetXaxis()->SetTitle("Runs");
+        totalBatemanGraphs[j]->GetYaxis()->SetTitle("Bateman Fit(S)");
+        totalBatemanGraphs[j]->SetTitle((elementNameStrs[j] + " bateman Fit(S)").c_str());
+        totalBatemanGraphs[j]->SetName((elementNameStrs[j] + " bateman_Fit(S)").c_str());
 
         totalIntegralGraphs[j] = new TGraphErrors(runs, runsXAxis, integralFitValues->GetHalfLifeArr(j), zero, integralFitValues->GetHalfLifeErrorArr(j));
         totalIntegralGraphs[j]->GetXaxis()->SetTitle("Runs");
@@ -317,11 +317,11 @@ void Run::genGraphsNoChangeSingleElement()
 {
     for(int j = 0; j < numElements; j++)
     {
-        singleRegularGraphs[j]= new TGraphErrors(runs, runsXAxis, singleRegularFitValues->GetHalfLifeArr(j, j), zero, singleRegularFitValues->GetHalfLifeErrorArr(j, j));
-        singleRegularGraphs[j]->GetXaxis()->SetTitle("Runs");
-        singleRegularGraphs[j]->GetYaxis()->SetTitle("Regular Fit(S)");
-        singleRegularGraphs[j]->SetTitle((elementNameStrs[j] + " Regular Fit Single Element(S)").c_str());
-        singleRegularGraphs[j]->SetName((elementNameStrs[j] + " Regular_Fit_Single_Element(S)").c_str());
+        singleBatemanGraphs[j]= new TGraphErrors(runs, runsXAxis, singleBatemanFitValues->GetHalfLifeArr(j, j), zero, singleBatemanFitValues->GetHalfLifeErrorArr(j, j));
+        singleBatemanGraphs[j]->GetXaxis()->SetTitle("Runs");
+        singleBatemanGraphs[j]->GetYaxis()->SetTitle("Bateman Fit(S)");
+        singleBatemanGraphs[j]->SetTitle((elementNameStrs[j] + " bateman Fit Single Element(S)").c_str());
+        singleBatemanGraphs[j]->SetName((elementNameStrs[j] + " bateman_Fit_Single_Element(S)").c_str());
 
         singleIntegralGraphs[j] = new TGraphErrors(runs, runsXAxis, singleIntegralFitValues->GetHalfLifeArr(j, j), zero, singleIntegralFitValues->GetHalfLifeErrorArr(j, j));
         singleIntegralGraphs[j]->GetXaxis()->SetTitle("Runs");
@@ -373,11 +373,11 @@ void Run::runEventChange()
         {
             eventsXAxis[j] = ((Double_t) element->getNumEvents());
 
-            regularFitErrors[i][j] = (fitParameters->getRegularHalfLifeError())[i];
+            batemanFitErrors[i][j] = (fitParameters->getbatemanHalfLifeError())[i];
             integralFitErrors[i][j] = (fitParameters->getIntegralHalfLifeError())[i];
-            regularFitValue[i][j] = (fitParameters->getRegularHalfLife())[i];
+            batemanFitValue[i][j] = (fitParameters->getbatemanHalfLife())[i];
             integralFitValue[i][j] = (fitParameters->getIntegralHalfLife())[i];
-            initRegularValue[i][j] = (fitParameters->getRegularN0())[i];
+            initbatemanValue[i][j] = (fitParameters->getbatemanN0())[i];
             initIntegralValue[i][j] = (fitParameters->getIntegralN0())[i];
         }
         //changes number of events
@@ -401,10 +401,10 @@ void Run::runNoChange(Int_t cycleIndex)
     {
         //generates random data and fits it. Then extract the fit parametes
         element->fitHistos(cycleIndex, j);
-        //gets total regular fit parameters
-        tempFitParameters = element->getRegularFitParameters();
+        //gets total bateman fit parameters
+        tempFitParameters = element->getBatemanFitParameters();
         
-        //move total regular parameters into respective class
+        //move total bateman parameters into respective class
         for(int i = 0; i < numElements; i++)
         {
             tempN0 = tempFitParameters->GetAnN0(i);
@@ -412,10 +412,10 @@ void Run::runNoChange(Int_t cycleIndex)
             tempHalfLife = tempFitParameters->GetAnHalfLife(i);
             tempHalfLifeError = tempFitParameters->GetAnHalfLifeError(i);
 
-            regularFitValues->SetAnN0(j, i, tempN0);
-            regularFitValues->SetAnN0Error(j, i, tempN0Error);
-            regularFitValues->SetAnHalfLife(j, i, tempHalfLife);
-            regularFitValues->SetAnHalfLifeError(j, i, tempHalfLifeError);
+            batemanFitValues->SetAnN0(j, i, tempN0);
+            batemanFitValues->SetAnN0Error(j, i, tempN0Error);
+            batemanFitValues->SetAnHalfLife(j, i, tempHalfLife);
+            batemanFitValues->SetAnHalfLifeError(j, i, tempHalfLifeError);
         }
 
         //gets total integral fit parameters
@@ -435,22 +435,22 @@ void Run::runNoChange(Int_t cycleIndex)
             integralFitValues->SetAnHalfLifeError(j, i, tempHalfLifeError);
         }
 
-        //get single regular fit parameters
-        singleTempFitParameters = element->getSingleRegularFitParameters();
+        //get single bateman fit parameters
+        singleTempFitParameters = element->getSingleBatemanFitParameters();
 
-        //move single regular fit parameters into respective class
+        //move single bateman fit parameters into respective class
         for(int i = 0; i < numElements; i++)
         {
             for(int subIndex = 0; subIndex < i+1; subIndex++)
             {
                 tempN0 = singleTempFitParameters->GetAnN0(i, subIndex);
-                singleRegularFitValues->SetAnN0(j, i, subIndex, tempN0);
+                singleBatemanFitValues->SetAnN0(j, i, subIndex, tempN0);
                 tempN0Error = singleTempFitParameters->GetAnN0Error(i, subIndex);
-                singleRegularFitValues->SetAnN0Error(j, i, subIndex, tempN0Error);
+                singleBatemanFitValues->SetAnN0Error(j, i, subIndex, tempN0Error);
                 tempHalfLife = singleTempFitParameters->GetAnHalfLife(i, subIndex);
-                singleRegularFitValues->SetAnHalfLife(j, i, subIndex, tempHalfLife);
+                singleBatemanFitValues->SetAnHalfLife(j, i, subIndex, tempHalfLife);
                 tempHalfLifeError = singleTempFitParameters->GetAnHalfLifeError(i, subIndex);
-                singleRegularFitValues->SetAnHalfLifeError(j, i, subIndex, tempHalfLifeError);
+                singleBatemanFitValues->SetAnHalfLifeError(j, i, subIndex, tempHalfLifeError);
             }
         }
 
@@ -488,9 +488,9 @@ void Run::runNoChangeGenOnce(Int_t cycleIndex, Int_t runIndex)
 
     element->fitDataGenOnce(cycleIndex, runIndex);
 
-    tempFitParameters = element->getRegularFitParameters();
+    tempFitParameters = element->getbatemanFitParameters();
         
-        //move total regular parameters into respective class
+        //move total bateman parameters into respective class
         for(int i = 0; i < numElements; i++)
         {
             tempN0 = tempFitParameters->GetAnN0(i);
@@ -498,10 +498,10 @@ void Run::runNoChangeGenOnce(Int_t cycleIndex, Int_t runIndex)
             tempHalfLife = tempFitParameters->GetAnHalfLife(i);
             tempHalfLifeError = tempFitParameters->GetAnHalfLifeError(i);
 
-            regularFitValues->SetAnN0(0, i, tempN0);
-            regularFitValues->SetAnN0Error(0, i, tempN0Error);
-            regularFitValues->SetAnHalfLife(0, i, tempHalfLife);
-            regularFitValues->SetAnHalfLifeError(0, i, tempHalfLifeError);
+            batemanFitValues->SetAnN0(0, i, tempN0);
+            batemanFitValues->SetAnN0Error(0, i, tempN0Error);
+            batemanFitValues->SetAnHalfLife(0, i, tempHalfLife);
+            batemanFitValues->SetAnHalfLifeError(0, i, tempHalfLifeError);
         }
 
         //gets total integral fit parameters
@@ -521,10 +521,10 @@ void Run::runNoChangeGenOnce(Int_t cycleIndex, Int_t runIndex)
             integralFitValues->SetAnHalfLifeError(0, i, tempHalfLifeError);
         }
 
-        //get single regular fit parameters
-        singleTempFitParameters = element->getSingleRegularFitParameters();
+        //get single bateman fit parameters
+        singleTempFitParameters = element->getSingleBatemanFitParameters();
 
-        //move single regular fit parameters into respective class
+        //move single bateman fit parameters into respective class
         for(int i = 0; i < numElements; i++)
         {
             for(int subIndex = 0; subIndex < i+1; subIndex++)
@@ -534,10 +534,10 @@ void Run::runNoChangeGenOnce(Int_t cycleIndex, Int_t runIndex)
                 tempHalfLife = singleTempFitParameters->GetAnHalfLife(i, subIndex);
                 tempHalfLifeError = singleTempFitParameters->GetAnHalfLifeError(i, subIndex);
 
-                singleRegularFitValues->SetAnN0(0, i, subIndex, tempN0);
-                singleRegularFitValues->SetAnN0Error(0, i, subIndex, tempN0Error);
-                singleRegularFitValues->SetAnHalfLife(0, i, subIndex, tempHalfLife);
-                singleRegularFitValues->SetAnHalfLifeError(0, i, subIndex, tempHalfLifeError);
+                singleBatemanFitValues->SetAnN0(0, i, subIndex, tempN0);
+                singleBatemanFitValues->SetAnN0Error(0, i, subIndex, tempN0Error);
+                singleBatemanFitValues->SetAnHalfLife(0, i, subIndex, tempHalfLife);
+                singleBatemanFitValues->SetAnHalfLifeError(0, i, subIndex, tempHalfLifeError);
             }
         }
 

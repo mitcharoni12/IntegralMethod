@@ -23,9 +23,9 @@ class Cycle{
         Run* decayChainRun;
         ElementFit* element;
         string* elementStrNames;
-        ChainRunFitValues* regularFitValues, *integralFitValues, *meanDifferenceValues;
-        SingleChainRunFitValues* singleRegularFitValues, *singleIntegralFitValues, *singleMeanDifferenceValues;
-        TGraphErrors** regularFitMeanGraphs, **integralFitMeanGraphs, **singleRegularFitMeanGraphs
+        ChainRunFitValues* batemanFitValues, *integralFitValues, *meanDifferenceValues;
+        SingleChainRunFitValues* singleBatemanFitValues, *singleIntegralFitValues, *singleMeanDifferenceValues;
+        TGraphErrors** batemanFitMeanGraphs, **integralFitMeanGraphs, **singleBatemanFitMeanGraphs
         ,**singleIntegralFitMeanGraphs, **fitDifferenceGraphs, **singleFitDifferenceGraphs;
         //TCanvas* test = new TCanvas("test", "test", 500, 500);
         //TCanvas* test2 = new TCanvas("test2", "test2", 500, 500);
@@ -62,23 +62,23 @@ Cycle::Cycle(Int_t cycles, Run* decayChainRun, ElementFit* element, Double_t x_s
     element->setNumRuns(decayChainRun->getNumRuns());
     element->setNumCycles(cycles);
     elementStrNames = decayChainRun->getElementStringNames();
-    regularFitValues = new ChainRunFitValues(numElements, cycles);
+    batemanFitValues = new ChainRunFitValues(numElements, cycles);
     integralFitValues = new ChainRunFitValues(numElements, cycles);
     meanDifferenceValues = new ChainRunFitValues(numElements, cycles);
-    singleRegularFitValues = new SingleChainRunFitValues(numElements, cycles);
+    singleBatemanFitValues = new SingleChainRunFitValues(numElements, cycles);
     singleIntegralFitValues = new SingleChainRunFitValues(numElements, cycles);
     singleMeanDifferenceValues = new SingleChainRunFitValues(numElements, cycles);
-    regularFitMeanGraphs = new TGraphErrors* [numElements];
+    batemanFitMeanGraphs = new TGraphErrors* [numElements];
     integralFitMeanGraphs = new TGraphErrors* [numElements];
-    singleRegularFitMeanGraphs = new TGraphErrors* [numElements];
+    singleBatemanFitMeanGraphs = new TGraphErrors* [numElements];
     singleIntegralFitMeanGraphs = new TGraphErrors* [numElements];
     fitDifferenceGraphs = new TGraphErrors* [numElements];
     singleFitDifferenceGraphs = new TGraphErrors* [numElements];
     for(int i = 0; i < numElements; i++)
     {
-        regularFitMeanGraphs[i] = nullptr;
+        batemanFitMeanGraphs[i] = nullptr;
         integralFitMeanGraphs[i] = nullptr;
-        singleRegularFitMeanGraphs[i] = nullptr;
+        singleBatemanFitMeanGraphs[i] = nullptr;
         singleIntegralFitMeanGraphs[i] = nullptr;
         fitDifferenceGraphs[i] = nullptr;
         singleFitDifferenceGraphs[i] = nullptr;
@@ -88,16 +88,16 @@ Cycle::Cycle(Int_t cycles, Run* decayChainRun, ElementFit* element, Double_t x_s
 Cycle::~Cycle()
 {
     delete [] timeArr;
-    delete [] regularFitMeanGraphs;
+    delete [] batemanFitMeanGraphs;
     delete [] integralFitMeanGraphs;
-    delete [] singleRegularFitMeanGraphs;
+    delete [] singleBatemanFitMeanGraphs;
     delete [] singleIntegralFitMeanGraphs;
     delete [] fitDifferenceGraphs;
     delete [] singleFitDifferenceGraphs;
-    delete regularFitValues;
+    delete batemanFitValues;
     delete integralFitValues;
     delete meanDifferenceValues;
-    delete singleRegularFitValues;
+    delete singleBatemanFitValues;
     delete singleIntegralFitValues;
     delete singleMeanDifferenceValues;
 }
@@ -120,11 +120,11 @@ void Cycle::displayMeanSeperateGraphs(TCanvas** canvasArr)
     for(int i = 0; i < numElements; i++)
     {
         canvasArr[i]->cd(1);
-        regularFitMeanGraphs[i]->Draw();
+        batemanFitMeanGraphs[i]->Draw();
         canvasArr[i]->cd(2);
         integralFitMeanGraphs[i]->Draw();
         canvasArr[i]->cd(3);
-        singleRegularFitMeanGraphs[i]->Draw();
+        singleBatemanFitMeanGraphs[i]->Draw();
         canvasArr[i]->cd(4);
         singleIntegralFitMeanGraphs[i]->Draw();
     }
@@ -148,12 +148,12 @@ void Cycle::genMeanDifferenceGraphsRebin()
     {
         fitDifferenceGraphs[i] = new TGraphErrors(cycles, binSizeArrDoubles, meanDifferenceValues->GetHalfLifeArr(i), zero, meanDifferenceValues->GetHalfLifeErrorArr(i));
         fitDifferenceGraphs[i]->GetXaxis()->SetTitle("Number Bins");
-        fitDifferenceGraphs[i]->GetYaxis()->SetTitle("Regular Fit - Integral Fit(s)");
-        fitDifferenceGraphs[i]->SetTitle((elementStrNames[i] + " Regular Histo Mean Difference").c_str());
+        fitDifferenceGraphs[i]->GetYaxis()->SetTitle("Bateman Fit - Integral Fit(s)");
+        fitDifferenceGraphs[i]->SetTitle((elementStrNames[i] + " Bateman Histo Mean Difference").c_str());
 
         singleFitDifferenceGraphs[i] = new TGraphErrors(cycles, binSizeArrDoubles, singleMeanDifferenceValues->GetHalfLifeArr(i, i), zero, singleMeanDifferenceValues->GetHalfLifeErrorArr(i, i));
         singleFitDifferenceGraphs[i]->GetXaxis()->SetTitle("Number Bins");
-        singleFitDifferenceGraphs[i]->GetYaxis()->SetTitle("Regular Fit - Integral Fit(s)");
+        singleFitDifferenceGraphs[i]->GetYaxis()->SetTitle("Bateman Fit - Integral Fit(s)");
         singleFitDifferenceGraphs[i]->SetTitle((elementStrNames[i] + " Single Histo Mean Difference").c_str());
     }
     delete [] zero;
@@ -173,12 +173,12 @@ void Cycle::genMeanDifferenceGraphsTimeDifference()
     {
         fitDifferenceGraphs[i] = new TGraphErrors(cycles, timeArr, meanDifferenceValues->GetHalfLifeArr(i), zero, meanDifferenceValues->GetHalfLifeErrorArr(i));
         fitDifferenceGraphs[i]->GetXaxis()->SetTitle("Time(s)");
-        fitDifferenceGraphs[i]->GetYaxis()->SetTitle("Regular Fit - Integral Fit(s)");
-        fitDifferenceGraphs[i]->SetTitle((elementStrNames[i] + " Regular Histo Mean Difference").c_str());
+        fitDifferenceGraphs[i]->GetYaxis()->SetTitle("Bateman Fit - Integral Fit(s)");
+        fitDifferenceGraphs[i]->SetTitle((elementStrNames[i] + " Bateman Histo Mean Difference").c_str());
 
         singleFitDifferenceGraphs[i] = new TGraphErrors(cycles, timeArr, singleMeanDifferenceValues->GetHalfLifeArr(i, i), zero, singleMeanDifferenceValues->GetHalfLifeErrorArr(i, i));
         singleFitDifferenceGraphs[i]->GetXaxis()->SetTitle("Time(s)");
-        singleFitDifferenceGraphs[i]->GetYaxis()->SetTitle("Regular Fit - Integral Fit");
+        singleFitDifferenceGraphs[i]->GetYaxis()->SetTitle("Bateman Fit - Integral Fit");
         singleFitDifferenceGraphs[i]->SetTitle((elementStrNames[i] + " Single Histo Mean Difference(s)").c_str());
     }
     delete [] zero;
@@ -194,14 +194,14 @@ void Cycle::genSingleMeanDifference()
     {
         for(int k = 0; k < cycles; k++)
         {
-            differenceHalfLife = regularFitValues->GetAnHalfLife(k, i) - integralFitValues->GetAnHalfLife(k, i);
+            differenceHalfLife = batemanFitValues->GetAnHalfLife(k, i) - integralFitValues->GetAnHalfLife(k, i);
             meanDifferenceValues->SetAnHalfLife(k, i, differenceHalfLife);
-            differenceHalfLife = singleRegularFitValues->GetAnHalfLife(k, i, i) - singleIntegralFitValues->GetAnHalfLife(k, i, i);
+            differenceHalfLife = singleBatemanFitValues->GetAnHalfLife(k, i, i) - singleIntegralFitValues->GetAnHalfLife(k, i, i);
             singleMeanDifferenceValues->SetAnHalfLife(k, i, i, differenceHalfLife);
 
-            differenceHalfLifeError = sqrt(TMath::Power(regularFitValues->GetAnHalfLifeError(k, i),2) + TMath::Power(integralFitValues->GetAnHalfLifeError(k, i),2));
+            differenceHalfLifeError = sqrt(TMath::Power(batemanFitValues->GetAnHalfLifeError(k, i),2) + TMath::Power(integralFitValues->GetAnHalfLifeError(k, i),2));
             meanDifferenceValues->SetAnHalfLifeError(k, i, differenceHalfLifeError);
-            differenceHalfLifeError = sqrt(TMath::Power(singleRegularFitValues->GetAnHalfLifeError(k, i, i),2) + TMath::Power(singleIntegralFitValues->GetAnHalfLifeError(k, i, i),2));
+            differenceHalfLifeError = sqrt(TMath::Power(singleBatemanFitValues->GetAnHalfLifeError(k, i, i),2) + TMath::Power(singleIntegralFitValues->GetAnHalfLifeError(k, i, i),2));
             singleMeanDifferenceValues->SetAnHalfLifeError(k, i, i, differenceHalfLifeError);
         }
     }
@@ -225,19 +225,19 @@ void Cycle::genSeperateMeanGraphsRebin()
 
     for(int i = 0; i < numElements; i++)
     {
-        tempFitVals = regularFitValues->GetHalfLifeArr(i);
-        tempFitErrors = regularFitValues->GetHalfLifeErrorArr(i);
-        regularFitMeanGraphs[i] = new TGraphErrors(cycles, binSizeArrDoubles, tempFitVals, zero, tempFitErrors);
-        regularFitMeanGraphs[i]->GetXaxis()->SetTitle("Bin Number");
-        regularFitMeanGraphs[i]->GetYaxis()->SetTitle("Fit Value(s)");
-        regularFitMeanGraphs[i]->SetTitle((elementStrNames[i] + " Regular Graph Mean").c_str());
+        tempFitVals = batemanFitValues->GetHalfLifeArr(i);
+        tempFitErrors = batemanFitValues->GetHalfLifeErrorArr(i);
+        batemanFitMeanGraphs[i] = new TGraphErrors(cycles, binSizeArrDoubles, tempFitVals, zero, tempFitErrors);
+        batemanFitMeanGraphs[i]->GetXaxis()->SetTitle("Bin Number");
+        batemanFitMeanGraphs[i]->GetYaxis()->SetTitle("Fit Value(s)");
+        batemanFitMeanGraphs[i]->SetTitle((elementStrNames[i] + " Bateman Graph Mean").c_str());
 
-        tempFitVals = singleRegularFitValues->GetHalfLifeArr(i, i);
-        tempFitErrors = singleRegularFitValues->GetHalfLifeErrorArr(i, i);
-        singleRegularFitMeanGraphs[i] = new TGraphErrors(cycles, binSizeArrDoubles, tempFitVals, zero, tempFitErrors);
-        singleRegularFitMeanGraphs[i]->GetXaxis()->SetTitle("Bin Number");
-        singleRegularFitMeanGraphs[i]->GetYaxis()->SetTitle("Fit Value(s)");
-        singleRegularFitMeanGraphs[i]->SetTitle((elementStrNames[i] + " Single Regular Graph Mean").c_str());
+        tempFitVals = singleBatemanFitValues->GetHalfLifeArr(i, i);
+        tempFitErrors = singleBatemanFitValues->GetHalfLifeErrorArr(i, i);
+        singleBatemanFitMeanGraphs[i] = new TGraphErrors(cycles, binSizeArrDoubles, tempFitVals, zero, tempFitErrors);
+        singleBatemanFitMeanGraphs[i]->GetXaxis()->SetTitle("Bin Number");
+        singleBatemanFitMeanGraphs[i]->GetYaxis()->SetTitle("Fit Value(s)");
+        singleBatemanFitMeanGraphs[i]->SetTitle((elementStrNames[i] + " Single bateman Graph Mean").c_str());
 
         tempFitVals = integralFitValues->GetHalfLifeArr(i);
         tempFitErrors = integralFitValues->GetHalfLifeErrorArr(i);
@@ -270,19 +270,19 @@ void Cycle::genSeperateMeanGraphsTimeDifference()
 
     for(int i = 0; i < numElements; i++)
     {
-        tempFitVals = regularFitValues->GetHalfLifeArr(i);
-        tempFitErrors = regularFitValues->GetHalfLifeErrorArr(i);
-        regularFitMeanGraphs[i] = new TGraphErrors(cycles, timeArr, tempFitVals, zero, tempFitErrors);
-        regularFitMeanGraphs[i]->GetXaxis()->SetTitle("Time(s)");
-        regularFitMeanGraphs[i]->GetYaxis()->SetTitle("Fit Value(s)");
-        regularFitMeanGraphs[i]->SetTitle((elementStrNames[i] + " Regular Graph Mean").c_str());
+        tempFitVals = batemanFitValues->GetHalfLifeArr(i);
+        tempFitErrors = batemanFitValues->GetHalfLifeErrorArr(i);
+        batemanFitMeanGraphs[i] = new TGraphErrors(cycles, timeArr, tempFitVals, zero, tempFitErrors);
+        batemanFitMeanGraphs[i]->GetXaxis()->SetTitle("Time(s)");
+        batemanFitMeanGraphs[i]->GetYaxis()->SetTitle("Fit Value(s)");
+        batemanFitMeanGraphs[i]->SetTitle((elementStrNames[i] + " Bateman Graph Mean").c_str());
 
-        tempFitVals = singleRegularFitValues->GetHalfLifeArr(i, i);
-        tempFitErrors = singleRegularFitValues->GetHalfLifeErrorArr(i, i);
-        singleRegularFitMeanGraphs[i] = new TGraphErrors(cycles, timeArr, tempFitVals, zero, tempFitErrors);
-        singleRegularFitMeanGraphs[i]->GetXaxis()->SetTitle("Time(s)");
-        singleRegularFitMeanGraphs[i]->GetYaxis()->SetTitle("Fit Value(s)");
-        singleRegularFitMeanGraphs[i]->SetTitle((elementStrNames[i] + " Single Regular Graph Mean").c_str());
+        tempFitVals = singleBatemanFitValues->GetHalfLifeArr(i, i);
+        tempFitErrors = singleBatemanFitValues->GetHalfLifeErrorArr(i, i);
+        singleBatemanFitMeanGraphs[i] = new TGraphErrors(cycles, timeArr, tempFitVals, zero, tempFitErrors);
+        singleBatemanFitMeanGraphs[i]->GetXaxis()->SetTitle("Time(s)");
+        singleBatemanFitMeanGraphs[i]->GetYaxis()->SetTitle("Fit Value(s)");
+        singleBatemanFitMeanGraphs[i]->SetTitle((elementStrNames[i] + " Single Bateman Graph Mean").c_str());
 
         tempFitVals = integralFitValues->GetHalfLifeArr(i);
         tempFitErrors = integralFitValues->GetHalfLifeErrorArr(i);
@@ -302,7 +302,7 @@ void Cycle::genSeperateMeanGraphsTimeDifference()
     delete [] zero;
 }
 
-//runs the cycles, gets the mean for integral and regular histograms and takes difference for the rebin function
+//runs the cycles, gets the mean for integral and bateman histograms and takes difference for the rebin function
 void Cycle::runDifferenceMeanRebin()
 {
     Double_t differenceHalfLife, differenceHalfLifeError;
@@ -310,7 +310,7 @@ void Cycle::runDifferenceMeanRebin()
     TH1D** multiRunHisto = decayChainRun->createRunResultHistos();
     TH1D** multiRunSingleHistos = decayChainRun->createRunResultHistosSingleElements();
     
-    //elements in array stored in order, regular, single
+    //elements in array stored in order, bateman, single
     for(int i = 0; i < cycles; i++)
     {
         //runs (numRuns) runs and generates run result histos
@@ -342,7 +342,7 @@ void Cycle::runDifferenceMeanRebin()
     delete [] multiRunSingleHistos;
 }
 
-//runs the cycles, gets the mean for integral and regular histograms and takes difference (dynamic)
+//runs the cycles, gets the mean for integral and bateman histograms and takes difference (dynamic)
 void Cycle::runDifferenceMeanTimeDifference()
 {
     Double_t differenceHalfLife, differenceHalfLifeError;
@@ -354,7 +354,7 @@ void Cycle::runDifferenceMeanTimeDifference()
     TH1D** multiRunHisto = decayChainRun->createRunResultHistos();
     TH1D** multiRunSingleHistos = decayChainRun->createRunResultHistosSingleElements();
     
-    //elements in array stored in order, regular, single
+    //elements in array stored in order, bateman, single
     for(int i = 0; i < cycles; i++)
     {
         //runs (numRuns) runs and generates run result histos
@@ -397,7 +397,7 @@ void Cycle::runDifferenceMeanTimeDifference()
     delete [] multiRunSingleHistos;
 }
 
-//runs the cycles and puts the data of the integral method mean and the regular method mean into their respective arrays (dynamic)
+//runs the cycles and puts the data of the integral method mean and the bateman method mean into their respective arrays (dynamic)
 void Cycle::runSeperateMeanRebin()
 {
     Double_t tempMeanVal;
@@ -418,18 +418,18 @@ void Cycle::runSeperateMeanRebin()
         for(int k = 0; k < numElements; k++)
         {
             tempMeanVal = multiRunHisto[(k*2)]->GetMean();
-            regularFitValues->SetAnHalfLife(i, k, tempMeanVal);
+            batemanFitValues->SetAnHalfLife(i, k, tempMeanVal);
             tempErrorVal = multiRunHisto[(k*2)]->GetMeanError();
-            regularFitValues->SetAnHalfLifeError(i, k, tempErrorVal);
+            batemanFitValues->SetAnHalfLifeError(i, k, tempErrorVal);
             tempMeanVal = multiRunHisto[(k*2)+1]->GetMean();
             integralFitValues->SetAnHalfLife(i, k, tempMeanVal);
             tempErrorVal = multiRunHisto[(k*2)+1]->GetMeanError();
             integralFitValues->SetAnHalfLifeError(i, k, tempErrorVal);
 
             tempMeanVal = multiRunHistoSingle[(k*2)]->GetMean();
-            singleRegularFitValues->SetAnHalfLife(i, k, k, tempMeanVal);
+            singleBatemanFitValues->SetAnHalfLife(i, k, k, tempMeanVal);
             tempErrorVal = multiRunHistoSingle[(k*2)]->GetMeanError();
-            singleRegularFitValues->SetAnHalfLifeError(i, k, k, tempErrorVal);
+            singleBatemanFitValues->SetAnHalfLifeError(i, k, k, tempErrorVal);
             tempMeanVal = multiRunHistoSingle[(k*2)+1]->GetMean();
             singleIntegralFitValues->SetAnHalfLife(i, k, k, tempMeanVal);
             tempErrorVal = multiRunHistoSingle[(k*2)+1]->GetMeanError();
@@ -446,7 +446,7 @@ void Cycle::runSeperateMeanRebin()
     delete [] multiRunHistoSingle;
 }
 
-//runs the cycles and puts the data of the integral method mean and the regular method mean into their respective arrays (dynamic)
+//runs the cycles and puts the data of the integral method mean and the bateman method mean into their respective arrays (dynamic)
 void Cycle::runSeperateMeanTimeDifference()
 {
     //setting inital values for time, 1= start const end moving, 2= end const start moving
@@ -470,18 +470,18 @@ void Cycle::runSeperateMeanTimeDifference()
         for(int k = 0; k < numElements; k++)
         {
             tempMeanVal = multiRunHisto[(k*2)]->GetMean();
-            regularFitValues->SetAnHalfLife(i, k, tempMeanVal);
+            batemanFitValues->SetAnHalfLife(i, k, tempMeanVal);
             tempErrorVal = multiRunHisto[(k*2)]->GetMeanError();
-            regularFitValues->SetAnHalfLifeError(i, k, tempErrorVal);
+            batemanFitValues->SetAnHalfLifeError(i, k, tempErrorVal);
             tempMeanVal = multiRunHisto[(k*2)+1]->GetMean();
             integralFitValues->SetAnHalfLife(i, k, tempMeanVal);
             tempErrorVal = multiRunHisto[(k*2)+1]->GetMeanError();
             integralFitValues->SetAnHalfLifeError(i, k, tempErrorVal);
 
             tempMeanVal = multiRunHistoSingle[(k*2)]->GetMean();
-            singleRegularFitValues->SetAnHalfLife(i, k, k, tempMeanVal);
+            singleBatemanFitValues->SetAnHalfLife(i, k, k, tempMeanVal);
             tempErrorVal = multiRunHistoSingle[(k*2)]->GetMeanError();
-            singleRegularFitValues->SetAnHalfLifeError(i, k, k, tempErrorVal);
+            singleBatemanFitValues->SetAnHalfLifeError(i, k, k, tempErrorVal);
             tempMeanVal = multiRunHistoSingle[(k*2)+1]->GetMean();
             singleIntegralFitValues->SetAnHalfLife(i, k, k, tempMeanVal);
             tempErrorVal = multiRunHistoSingle[(k*2)+1]->GetMeanError();
@@ -531,10 +531,10 @@ void Cycle::runSeperateSingleGen()
         //runs the fit
         decayChainRun->runNoChangeGenOnce(i, 0);
         
-        //gets total regular fit data from fit
-        tempVals = decayChainRun->getRegularFitValues();
+        //gets total bateman fit data from fit
+        tempVals = decayChainRun->getbatemanFitValues();
 
-        //move total regular parameters in to respective class
+        //move total bateman parameters in to respective class
         for(int k = 0; k < numElements; k++)
         {
             N0 = tempVals->GetAnN0(0, k);
@@ -542,10 +542,10 @@ void Cycle::runSeperateSingleGen()
             halfLife = tempVals->GetAnHalfLife(0, k);
             halfLifeError = tempVals->GetAnHalfLifeError(0, k);
 
-            regularFitValues->SetAnN0(i, k, N0);
-            regularFitValues->SetAnN0Error(i, k, N0Error);
-            regularFitValues->SetAnHalfLife(i, k, halfLife);
-            regularFitValues->SetAnHalfLifeError(i, k, halfLifeError);
+            batemanFitValues->SetAnN0(i, k, N0);
+            batemanFitValues->SetAnN0Error(i, k, N0Error);
+            batemanFitValues->SetAnHalfLife(i, k, halfLife);
+            batemanFitValues->SetAnHalfLifeError(i, k, halfLifeError);
         }
         //gets integral fit data from fit
         tempVals = decayChainRun->getIntegralFitValues();
@@ -564,10 +564,10 @@ void Cycle::runSeperateSingleGen()
             integralFitValues->SetAnHalfLifeError(i, k, halfLifeError);
         }
 
-        //gets single regular fit data from fit
-        singleTempVals = decayChainRun->getSingleRegularFitValues();
+        //gets single bateman fit data from fit
+        singleTempVals = decayChainRun->getSingleBatemanFitValues();
 
-        //move single regular parameters in to respective class
+        //move single bateman parameters in to respective class
         for(int k = 0; k < numElements; k++)
         {
             for(int subElement = 0; subElement < k+1; subElement++)
@@ -577,17 +577,17 @@ void Cycle::runSeperateSingleGen()
                 halfLife = singleTempVals->GetAnHalfLife(0, k, subElement);
                 halfLifeError = singleTempVals->GetAnHalfLifeError(0, k, subElement);
 
-                singleRegularFitValues->SetAnN0(i, k, subElement, N0);
-                singleRegularFitValues->SetAnN0Error(i, k, subElement, N0Error);
-                singleRegularFitValues->SetAnHalfLife(i, k, subElement, halfLife);
-                singleRegularFitValues->SetAnHalfLifeError(i, k, subElement, halfLifeError);
+                singleBatemanFitValues->SetAnN0(i, k, subElement, N0);
+                singleBatemanFitValues->SetAnN0Error(i, k, subElement, N0Error);
+                singleBatemanFitValues->SetAnHalfLife(i, k, subElement, halfLife);
+                singleBatemanFitValues->SetAnHalfLifeError(i, k, subElement, halfLifeError);
             }
         }
 
-        //gets single regular fit data from fit
+        //gets single bateman fit data from fit
         singleTempVals = decayChainRun->getSingleIntegralFitValues();
 
-        //move single regular parameters in to respective class
+        //move single bateman parameters in to respective class
         for(int k = 0; k < numElements; k++)
         {
             for(int subElement = 0; subElement < k+1; subElement++)

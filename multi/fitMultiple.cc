@@ -1,16 +1,19 @@
 #include <fstream>
+
 #include "TMath.h"
 #include "TCanvas.h"
-#include "ElementFit.h"
 #include "TGraph.h"
+#include "TF1.h"
 #include "TH1D.h"
+#include "TGraphErrors.h"
+
+#include "ElementFit.h"
 #include "Run.h"
 #include "Cycle.h"
-#include "TGraphErrors.h"
 #include "ParameterValue.h"
-#include "TF1.h"
 #include "CycleCanvasHolder.h"
 #include "SingleCycleCanvasHolder.h"
+#include "FitOptions.h"
 
 using namespace std;
 
@@ -21,12 +24,12 @@ Double_t CSDecaybyActivity(Double_t* x, Double_t *par);
 Double_t BADecaybyActivity(Double_t *x, Double_t *par);
 Double_t LADecaybyActivity(Double_t *x, Double_t *par);
 Double_t IntegralDecaybyActivity(Double_t *x, Double_t *par);
-Double_t RegularDecaybyActivity(Double_t *x, Double_t *par);
+Double_t BatemanDecaybyActivity(Double_t *x, Double_t *par);
 
 typedef Double_t (*decayFunction)(Double_t *x, Double_t *par);
-decayFunction* regularFitFunctions;
+decayFunction* batemanFitFunctions;
 decayFunction* integralFitFunctions;
-int numElements;
+Int_t numElements;
 
 void fitMultiple();
 
@@ -43,6 +46,7 @@ void fitMultiple()
     Int_t eventDecrement, numBins, rebinDifference;
     Double_t timeRun, valueHolder, leaveOutStartBinNumber, leaveOutEndBinNumber;
     int histoSimulateChoice, rangeValueChoice, displayIndividualFitsChoice, rebinChoice;
+    FitOption option = new FitOptions();
     ElementFit* element;
     ifstream inFile;
     
@@ -62,10 +66,10 @@ void fitMultiple()
     fitFunctions[5] = LADecaybyActivityIntegral;
     
     //arrays used to create the full decay function in a modular fassion in main
-    regularFitFunctions = new decayFunction [numElements];
-    regularFitFunctions[0] = CSDecaybyActivity;
-    regularFitFunctions[1] = BADecaybyActivity;
-    regularFitFunctions[2] = LADecaybyActivity;
+    batemanFitFunctions = new decayFunction [numElements];
+    batemanFitFunctions[0] = CSDecaybyActivity;
+    batemanFitFunctions[1] = BADecaybyActivity;
+    batemanFitFunctions[2] = LADecaybyActivity;
     integralFitFunctions = new decayFunction [numElements];
     integralFitFunctions[0] = CSDecaybyActivityIntegral;
     integralFitFunctions[1] = BADecaybyActivityIntegral;
@@ -184,7 +188,7 @@ void fitMultiple()
                 //single run of histogam
                 case 1:
                 {
-                    element = new ElementFit(events, 1, 1, RegularDecaybyActivity, IntegralDecaybyActivity, fitFunctions, numElements, timeRun, numBins, elementNames, paraVals, 2, 2, 0, leaveOutStartBinNumber, leaveOutEndBinNumber, 0);
+                    element = new ElementFit(events, 1, 1, BatemanDecaybyActivity, IntegralDecaybyActivity, fitFunctions, numElements, timeRun, numBins, elementNames, paraVals, 2, 2, 0, leaveOutStartBinNumber, leaveOutEndBinNumber, 0);
                     inFile.open("simulated_single_run.txt");
                     element->fitHistos(0, 0);
                     element->displayParameters();
@@ -203,13 +207,13 @@ void fitMultiple()
                         TCanvas** singleCanvas = new TCanvas* [numElements*2];
                         for(int i = 0; i < numElements; i++)
                         {
-                            singleCanvas[(i*2)] = new TCanvas((elementNames[i] + " Single Regular Histo").c_str(), (elementNames[i] + " Single Regular Histo").c_str(), 500, 500);
+                            singleCanvas[(i*2)] = new TCanvas((elementNames[i] + " Single Bateman Histo").c_str(), (elementNames[i] + " Single Bateman Histo").c_str(), 500, 500);
                             singleCanvas[(i*2)+1] = new TCanvas((elementNames[i] + " Single Integral Histo").c_str(), (elementNames[i] + " Single Integral Histo").c_str(), 500, 500);
                         }
-                        TCanvas* regularTotalCanvas = new TCanvas("Total Regular Histo", "Total Regular Histo", 500, 500);
+                        TCanvas* batemanTotalCanvas = new TCanvas("Total Bateman Histo", "Total Bateman Histo", 500, 500);
                         TCanvas* integralTotalCanvas = new TCanvas("Total Integral Histo", "Total Integral Histo", 500, 500);
                         element->displaySingleHistos(singleCanvas);
-                        element->displayRegularHisto(regularTotalCanvas);
+                        element->displayBatemanHisto(batemanTotalCanvas);
                         element->displayIntegralHisto(integralTotalCanvas);
                         delete [] singleCanvas;
                     }
@@ -239,7 +243,7 @@ void fitMultiple()
                     inFile.ignore(256, ':');
                     inFile >> upperRunHistoIndex;
                     
-                    element = new ElementFit(events, runs, 1, RegularDecaybyActivity, IntegralDecaybyActivity, fitFunctions, numElements, timeRun, numBins, elementNames, paraVals, 2, 2, 0, leaveOutStartBinNumber, leaveOutEndBinNumber, 0);
+                    element = new ElementFit(events, runs, 1, BatemanDecaybyActivity, IntegralDecaybyActivity, fitFunctions, numElements, timeRun, numBins, elementNames, paraVals, 2, 2, 0, leaveOutStartBinNumber, leaveOutEndBinNumber, 0);
                     Run* elementRun = new Run(runs, eventDecrement, element, elementNames); 
                     
                     elementRun->runNoChange(0);
@@ -308,16 +312,16 @@ void fitMultiple()
                 //case for displaying the individual fits for runs
                 if(displayIndividualFitsChoice == 1)
                 {
-                    CycleCanvasHolder* regularCanvases = new CycleCanvasHolder(lowerRunHistoIndex, upperRunHistoIndex, 0, 0, "Total Regular Fit");
+                    CycleCanvasHolder* batemanCanvases = new CycleCanvasHolder(lowerRunHistoIndex, upperRunHistoIndex, 0, 0, "Total Bateman Fit");
                     CycleCanvasHolder* integralCanvases = new CycleCanvasHolder(lowerRunHistoIndex, upperRunHistoIndex, 0, 0, "Total Integral Fit");
-                    SingleCycleCanvasHolder* singleRegularCanvases = new SingleCycleCanvasHolder(lowerRunHistoIndex, upperRunHistoIndex, 0, 0, numElements, elementNames, "Single Regular Fit");
+                    SingleCycleCanvasHolder* singleBatemanCanvases = new SingleCycleCanvasHolder(lowerRunHistoIndex, upperRunHistoIndex, 0, 0, numElements, elementNames, "Single bateman Fit");
                     SingleCycleCanvasHolder* singleIntegralCanvases = new SingleCycleCanvasHolder(lowerRunHistoIndex, upperRunHistoIndex, 0, 0, numElements, elementNames, "Single Integral Fit");
 
-                    element->DrawIndividualHistos(regularCanvases, integralCanvases, singleRegularCanvases, singleIntegralCanvases, lowerRunHistoIndex, upperRunHistoIndex, 0, 0);
+                    element->DrawIndividualHistos(batemanCanvases, integralCanvases, singleBatemanCanvases, singleIntegralCanvases, lowerRunHistoIndex, upperRunHistoIndex, 0, 0);
                     
-                    delete regularCanvases;
+                    delete batemanCanvases;
                     delete integralCanvases;
-                    delete singleRegularCanvases;
+                    delete singleBatemanCanvases;
                     delete singleIntegralCanvases;
                 }
 
@@ -370,7 +374,7 @@ void fitMultiple()
                     inFile.ignore(256,':');
                     inFile >> rebinDifference;
 
-                    element = new ElementFit(events, numRuns, numCycles, RegularDecaybyActivity, IntegralDecaybyActivity, fitFunctions, numElements, timeRun, numBins, elementNames, paraVals, singleSourceHistoChoice, rebinChoice, rebinDifference, leaveOutStartBinNumber, leaveOutEndBinNumber, x_inc);
+                    element = new ElementFit(events, numRuns, numCycles, batemanDecaybyActivity, IntegralDecaybyActivity, fitFunctions, numElements, timeRun, numBins, elementNames, paraVals, singleSourceHistoChoice, rebinChoice, rebinDifference, leaveOutStartBinNumber, leaveOutEndBinNumber, x_inc);
                     Run* elementRunsCycle = new Run(numRuns, eventDecrement, element, elementNames);
                     Cycle* cycle = new Cycle(numCycles, elementRunsCycle, element, x_start, x_stop, x_inc, cycleChangeChoice);
 
@@ -472,16 +476,16 @@ void fitMultiple()
                     //case for displaying the individual fits for runs
                     if(displayIndividualFitsChoice == 1)
                     {
-                        CycleCanvasHolder* regularCanvases = new CycleCanvasHolder(lowerRunHistoIndex, upperRunHistoIndex, lowerCycleHistoIndex, upperCycleHistoIndex, "Total Regular Fit");
+                        CycleCanvasHolder* batemanCanvases = new CycleCanvasHolder(lowerRunHistoIndex, upperRunHistoIndex, lowerCycleHistoIndex, upperCycleHistoIndex, "Total bateman Fit");
                         CycleCanvasHolder* integralCanvases = new CycleCanvasHolder(lowerRunHistoIndex, upperRunHistoIndex, lowerCycleHistoIndex, upperCycleHistoIndex, "Total Integral Fit");
-                        SingleCycleCanvasHolder* singleRegularCanvases = new SingleCycleCanvasHolder(lowerRunHistoIndex, upperRunHistoIndex, lowerCycleHistoIndex, upperCycleHistoIndex, numElements, elementNames, "Single Regular Fit");
+                        SingleCycleCanvasHolder* singleBatemanCanvases = new SingleCycleCanvasHolder(lowerRunHistoIndex, upperRunHistoIndex, lowerCycleHistoIndex, upperCycleHistoIndex, numElements, elementNames, "Single bateman Fit");
                         SingleCycleCanvasHolder* singleIntegralCanvases = new SingleCycleCanvasHolder(lowerRunHistoIndex, upperRunHistoIndex, lowerCycleHistoIndex, upperCycleHistoIndex, numElements, elementNames, "Single Integral Fit");
 
-                        element->DrawIndividualHistos(regularCanvases, integralCanvases, singleRegularCanvases, singleIntegralCanvases, lowerRunHistoIndex, upperRunHistoIndex, lowerCycleHistoIndex, upperCycleHistoIndex);
+                        element->DrawIndividualHistos(batemanCanvases, integralCanvases, singleBatemanCanvases, singleIntegralCanvases, lowerRunHistoIndex, upperRunHistoIndex, lowerCycleHistoIndex, upperCycleHistoIndex);
                         
-                        delete regularCanvases;
+                        delete batemanCanvases;
                         delete integralCanvases;
-                        delete singleRegularCanvases;
+                        delete singleBatemanCanvases;
                         delete singleIntegralCanvases;
                     }
 
@@ -616,12 +620,12 @@ Double_t LADecaybyActivity(Double_t *x, Double_t *par)
     return f;
 }
 
-Double_t RegularDecaybyActivity(Double_t *x, Double_t *par)
+Double_t BatemanDecaybyActivity(Double_t *x, Double_t *par)
 {
     Double_t hold = 0.0;
     for(int i = 0; i < numElements; i++)
     {
-        hold += regularFitFunctions[i](x, par);
+        hold += batemanFitFunctions[i](x, par);
     }
     return hold;
 }
