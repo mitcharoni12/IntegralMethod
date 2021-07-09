@@ -1,5 +1,6 @@
 Histo events:5
-Histo Bins:1000
+Histo Bins(only if rebin):1000
+Bin Width:400
 Time generate until:4000000
 single run(1) multi run(2) multiple cycle(3):3
 leave out x first bins:0

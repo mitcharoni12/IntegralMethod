@@ -13,7 +13,7 @@
 #include "ParameterValue.h"
 #include "CycleCanvasHolder.h"
 #include "SingleCycleCanvasHolder.h"
-#include "FitOptions.h"
+#include "FitOption.h"
 
 using namespace std;
 
@@ -39,14 +39,12 @@ int main()
     return 0;
 }
 
-//RUN(N)- process that happens N times in which histograms of the decay is generated and the fit parameters are extracted and put into a histogram
-//CYCLE(M)- process that happens M time in which the mean values for the histograms of the RUN process are in some way compared and then graphed
 void fitMultiple()
 {
     Int_t eventDecrement, numBins, rebinDifference;
-    Double_t timeRun, valueHolder, leaveOutStartBinNumber, leaveOutEndBinNumber;
+    Double_t timeRunEnd, valueHolder, leaveOutStartBinNumber, leaveOutEndBinNumber;
     int histoSimulateChoice, rangeValueChoice, displayIndividualFitsChoice, rebinChoice;
-    FitOption option = new FitOptions();
+    FitOption* fitOptions = new FitOption();
     ElementFit* element;
     ifstream inFile;
     
@@ -54,6 +52,7 @@ void fitMultiple()
     inFile.open("elementInput.txt");
     inFile.ignore(256,':');
     inFile >> numElements;
+    fitOptions->SetNumElements(numElements);
 
     //fitFunctions array passed in and used in element object
     Int_t numFitFunction = numElements*2;
@@ -161,10 +160,9 @@ void fitMultiple()
         //runs case for simulating the histogram
         case 1:
         {
-            Int_t events;
-            Int_t numBins;
-            int fitGenerationChoice;
-            int writeToFileChoice;
+            Int_t events, numBins;
+            Double_t binWidth;
+            int programExecutionType;
 
             inFile.open("simulate.txt");
             //gets events, bins, and timeRun
@@ -173,51 +171,48 @@ void fitMultiple()
             inFile.ignore(256,':');
             inFile >> numBins;
             inFile.ignore(256,':');
-            inFile >> timeRun;
+            inFile >> binWidth;
+            inFile.ignore(256,':');
+            inFile >> timeRunEnd;
             //gets the fit generation choice
             inFile.ignore(256,':');
-            inFile >> fitGenerationChoice;
+            inFile >> programExecutionType;
             inFile.ignore(256,':');
             inFile >> leaveOutStartBinNumber;
             inFile.ignore(256,':');
             inFile >> leaveOutEndBinNumber;
             inFile.close();
 
-            switch(fitGenerationChoice)
+            fitOptions->SetNumEvents(events);
+            fitOptions->SetNumBins(numBins);
+            fitOptions->SetBinWidth(binWidth);
+            fitOptions->SetTimeRunEnd(timeRunEnd);
+            fitOptions->SetProgramExecutionType(programExecutionType);
+            fitOptions->SetLeaveOutStartBinNumber(leaveOutStartBinNumber);
+            fitOptions->SetLeaveOutEndBinNumber(leaveOutEndBinNumber);
+
+            switch(programExecutionType)
             {
                 //single run of histogam
                 case 1:
                 {
                     element = new ElementFit(events, 1, 1, BatemanDecaybyActivity, IntegralDecaybyActivity, fitFunctions, numElements, timeRun, numBins, elementNames, paraVals, 2, 2, 0, leaveOutStartBinNumber, leaveOutEndBinNumber, 0);
-                    inFile.open("simulated_single_run.txt");
                     element->fitHistos(0, 0);
                     element->displayParameters();
-                    //gets write file choice
-                    inFile.ignore(256,':');
-                    inFile >> writeToFileChoice;
-                    //case for writing to file
-                    if(writeToFileChoice == 1)
-                    {
-                        //gets file name
-                        string fileName;
-                        inFile.ignore(256,';');
-                        inFile >> fileName;
+                
                     //case for displaying histogram
-                    }else{
-                        TCanvas** singleCanvas = new TCanvas* [numElements*2];
-                        for(int i = 0; i < numElements; i++)
-                        {
-                            singleCanvas[(i*2)] = new TCanvas((elementNames[i] + " Single Bateman Histo").c_str(), (elementNames[i] + " Single Bateman Histo").c_str(), 500, 500);
-                            singleCanvas[(i*2)+1] = new TCanvas((elementNames[i] + " Single Integral Histo").c_str(), (elementNames[i] + " Single Integral Histo").c_str(), 500, 500);
-                        }
-                        TCanvas* batemanTotalCanvas = new TCanvas("Total Bateman Histo", "Total Bateman Histo", 500, 500);
-                        TCanvas* integralTotalCanvas = new TCanvas("Total Integral Histo", "Total Integral Histo", 500, 500);
-                        element->displaySingleHistos(singleCanvas);
-                        element->displayBatemanHisto(batemanTotalCanvas);
-                        element->displayIntegralHisto(integralTotalCanvas);
-                        delete [] singleCanvas;
+                    TCanvas** singleCanvas = new TCanvas* [numElements*2];
+                    for(int i = 0; i < numElements; i++)
+                    {
+                        singleCanvas[(i*2)] = new TCanvas((elementNames[i] + " Single Bateman Histo").c_str(), (elementNames[i] + " Single Bateman Histo").c_str(), 500, 500);
+                        singleCanvas[(i*2)+1] = new TCanvas((elementNames[i] + " Single Integral Histo").c_str(), (elementNames[i] + " Single Integral Histo").c_str(), 500, 500);
                     }
-                    inFile.close();
+                    TCanvas* batemanTotalCanvas = new TCanvas("Total Bateman Histo", "Total Bateman Histo", 500, 500);
+                    TCanvas* integralTotalCanvas = new TCanvas("Total Integral Histo", "Total Integral Histo", 500, 500);
+                    element->displaySingleHistos(singleCanvas);
+                    element->displayBatemanHisto(batemanTotalCanvas);
+                    element->displayIntegralHisto(integralTotalCanvas);
+                    delete [] singleCanvas;
                     delete element;
                 break;
                 }
@@ -233,8 +228,6 @@ void fitMultiple()
                     inFile.ignore(256,':');
                     inFile >> eventDecrement;
                     inFile.ignore(256,':');
-                    inFile >> writeToFileChoice;
-                    inFile.ignore(256,':');
                     inFile >> graphOrHistoChoice;
                     inFile.ignore(256, ':');
                     inFile >> displayIndividualFitsChoice;
@@ -242,6 +235,9 @@ void fitMultiple()
                     inFile >> lowerRunHistoIndex;
                     inFile.ignore(256, ':');
                     inFile >> upperRunHistoIndex;
+
+                    fitOptions->SetNumRuns(runs);
+                    fitOptions->SetEventDecrement(eventDecrement);
                     
                     element = new ElementFit(events, runs, 1, BatemanDecaybyActivity, IntegralDecaybyActivity, fitFunctions, numElements, timeRun, numBins, elementNames, paraVals, 2, 2, 0, leaveOutStartBinNumber, leaveOutEndBinNumber, 0);
                     Run* elementRun = new Run(runs, eventDecrement, element, elementNames); 
@@ -287,26 +283,15 @@ void fitMultiple()
                     }else{
                         elementRun->genGraphsNoChange();
                         elementRun->genGraphsNoChangeSingleElement();                
-
-                        //case for writing to file
-                        if(writeToFileChoice == 1)
+                        
+                        TCanvas** runResultCanvases = new TCanvas* [numElements];
+                        for(int i = 0; i < numElements; i++)
                         {
-                            string fileName;
-                            inFile.ignore(256,';');
-                            inFile >> fileName;
-                            
-                        //case for displaying results
-                        }else{
-                            TCanvas** runResultCanvases = new TCanvas* [numElements];
-                            for(int i = 0; i < numElements; i++)
-                            {
-                                runResultCanvases[i] = new TCanvas((elementNames[i] + "ResultGraph").c_str(), (elementNames[i] + "ResultGraph").c_str(), 1100, 1100);
-                                runResultCanvases[i]->Divide(2,2,.02,.02);
-                            }
-                            elementRun->displayMultiRunResultGraphs(runResultCanvases);
-
-                            delete [] runResultCanvases;
+                            runResultCanvases[i] = new TCanvas((elementNames[i] + "ResultGraph").c_str(), (elementNames[i] + "ResultGraph").c_str(), 1100, 1100);
+                            runResultCanvases[i]->Divide(2,2,.02,.02);
                         }
+                        elementRun->displayMultiRunResultGraphs(runResultCanvases);
+                        delete [] runResultCanvases;                        
                     }
 
                 //case for displaying the individual fits for runs
@@ -334,9 +319,9 @@ void fitMultiple()
                 //multiple runs of histogram
                 case 3:
                 {
-                    Int_t numRuns, numCycles, writeToFileChoice, singleSourceHistoChoice, cycleChangeChoice,
+                    Int_t numRuns, numCycles, singleSourceHistoChoice, timeShiftType,
                           lowerRunHistoIndex, upperRunHistoIndex, lowerCycleHistoIndex, upperCycleHistoIndex;
-                    Double_t x_start, x_stop, x_inc, cycleMeanChoice;
+                    Double_t x_inc, runMeanDifference;
 
                     inFile.open("simulated_multi_cycle.txt");
                     inFile.ignore(256,':');
@@ -346,19 +331,13 @@ void fitMultiple()
                     inFile.ignore(256,':');
                     inFile >> eventDecrement;
                     inFile.ignore(256,':');
-                    inFile >> writeToFileChoice;
+                    inFile >> timeShiftType;
                     inFile.ignore(256,':');
-                    inFile >> cycleChangeChoice;
-                    inFile.ignore(256,':');
-                    inFile >> x_start;
-                    inFile.ignore(256,':');
-                    inFile >> x_stop;
-                    inFile.ignore(256,':');
-                    inFile >> x_inc;
+                    inFile >> binTimeFitInc;
                     inFile.ignore(256,':');
                     inFile >> singleSourceHistoChoice;
                     inFile.ignore(256,':');
-                    inFile >> cycleMeanChoice;
+                    inFile >> runMeanDifference;
                     inFile.ignore(256,':');
                     inFile >> displayIndividualFitsChoice;
                     inFile.ignore(256,':');
@@ -374,9 +353,28 @@ void fitMultiple()
                     inFile.ignore(256,':');
                     inFile >> rebinDifference;
 
+                    fitOptions->setNumRuns(numRuns);
+                    fitOptions->setNumCycles(numCycles);
+                    fitOptions->setEventDecrement(eventDecrement);
+                    fitOptions->SetTimeShiftType(timeShiftType);
+                    fitOptions->SetTimeFitBinInc(binTimeFitInc);
+                    if(singleSourceHistoChoice == 2)
+                    {
+                        fitOptions->SetMultiSourceChoice(true);
+                    }
+                    if(runMeanDifference == 2)
+                    {
+                        fitOptions->SetRunMeanDifference(true);
+                    }
+                    if(rebinChoice == 1)
+                    {
+                        fitOptions->SetRebinChoice(true);
+                    }
+                    fitOptions->SetRebinDifference(rebinDifference);
+
                     element = new ElementFit(events, numRuns, numCycles, batemanDecaybyActivity, IntegralDecaybyActivity, fitFunctions, numElements, timeRun, numBins, elementNames, paraVals, singleSourceHistoChoice, rebinChoice, rebinDifference, leaveOutStartBinNumber, leaveOutEndBinNumber, x_inc);
                     Run* elementRunsCycle = new Run(numRuns, eventDecrement, element, elementNames);
-                    Cycle* cycle = new Cycle(numCycles, elementRunsCycle, element, x_start, x_stop, x_inc, cycleChangeChoice);
+                    Cycle* cycle = new Cycle(numCycles, elementRunsCycle, element, x_inc, cycleChangeChoice);
 
                     TCanvas** canvasArr;
 
@@ -384,7 +382,7 @@ void fitMultiple()
                     if(singleSourceHistoChoice == 1 && rebinChoice == 2)
                     {
                         //mean difference
-                        if(cycleMeanChoice == 1)
+                        if(runMeanDifference == 1)
                         {
                             cycle->runSeperateSingleGen();
                             cycle->genSingleMeanDifference();
@@ -414,7 +412,7 @@ void fitMultiple()
                     }else if(singleSourceHistoChoice == 2 && rebinChoice == 2)
                     {
                         //mean difference
-                        if(cycleMeanChoice == 1)
+                        if(runMeanDifference == 1)
                         {
                             cycle->runDifferenceMeanTimeDifference();
                             cycle->genMeanDifferenceGraphsTimeDifference();
@@ -427,7 +425,7 @@ void fitMultiple()
                             cycle->displayMeanDifferenceGraphs(canvasArr);
                             delete [] canvasArr;
                         //seperate mean
-                        }else if(cycleMeanChoice == 2)
+                        }else if(runMeanDifference == 2)
                         {
                             cycle->runSeperateMeanTimeDifference();
                             cycle->genSeperateMeanGraphsTimeDifference();

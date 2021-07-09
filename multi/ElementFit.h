@@ -25,6 +25,7 @@
 #include "SingleCycleGraphHolder.h"
 #include "CycleGraphHolder.h"
 #include "ParameterValue.h"
+#include "FitOption.h"
 
 using namespace std;
 
@@ -32,8 +33,8 @@ typedef Double_t (*decayFunction)(Double_t *x, Double_t *par);
 
 class ElementFit{
     public:
-        ElementFit(Int_t events, Int_t numRuns, Int_t numCycles, Double_t (*batemanFunc)(Double_t*, Double_t*), Double_t (*integralFunc)(Double_t*, Double_t*), Double_t (**fitFunctions)(Double_t*, Double_t*), Int_t numElements,
-                   Double_t timeRunEnd, Int_t numBins, string* elementNames,  ParameterValue** paraVals, Int_t singleHistoChoice, Int_t rebinChoice, Int_t rebinDifference, Double_t leaveOutStartBinNumber, Double_t leaveOutEndBinNumber, Int_t timeInc);
+        ElementFit(Double_t (*batemanFunc)(Double_t*, Double_t*), Double_t (*integralFunc)(Double_t*, Double_t*), Double_t (**fitFunctions)(Double_t*, Double_t*),
+                   string* elementNames,  ParameterValue** paraVals, FitOption fitOptions)
         ~ElementFit();
         //getter function
         Double_t getElementParameters(int i){return paraVals[i]->getValueDecayConst();}
@@ -69,6 +70,7 @@ class ElementFit{
         void genAndFillHistos();
     private:
         //private variables
+        FitOption fitOptions;
         string* elementNames;
         Int_t events, numElements, numBins, numParameters, numRuns, numCycles, singleHistoChoice, rebinChoice, rebinDifference, timeInc;
         Int_t* binNumArr, *timeEndArr;
@@ -106,21 +108,22 @@ class ElementFit{
 };  
 
 //constructor for generating a histogram
-ElementFit::ElementFit(Int_t events, Int_t numRuns, Int_t numCycles, Double_t (*batemanFunc)(Double_t*, Double_t*), Double_t (*integralFunc)(Double_t*, Double_t*), Double_t (**fitFunctions)(Double_t*, Double_t*), Int_t numElements,
-                       Double_t timeRunEnd, Int_t numBins, string* elementNames,  ParameterValue** paraVals, Int_t singleHistoChoice, Int_t rebinChoice, Int_t rebinDifference, Double_t leaveOutStartBinNumber, Double_t leaveOutEndBinNumber, Int_t timeInc)
+ElementFit::ElementFit(Double_t (*batemanFunc)(Double_t*, Double_t*), Double_t (*integralFunc)(Double_t*, Double_t*), Double_t (**fitFunctions)(Double_t*, Double_t*),
+                       string* elementNames,  ParameterValue** paraVals, FitOption fitOptions)
 {
     //setting variables
-    this->events = events;
-    this->numRuns = numRuns;
-    this->numCycles = numCycles;
+    this->fitOptions = fitOptions;
+    this->events = fitOptions->GetNumEvents();
+    this->numRuns = fitOptions->GetNumRuns();
+    this->numCycles = fitOptions->GetNumCycles();
     this->elementNames = elementNames;
     this->fitFunctions = fitFunctions;
-    this->numElements = numElements;
+    this->numElements = fitOptions->GetNumElements();
     this->numParameters = numElements*2;
-    this->numBins = numBins;
+    this->numBins = fitOptions->GetNumBins();
     this->passedBatemanFunction = batemanFunc;
     this->passedIntegralFunction = integralFunc;
-    this->timeRunEnd = timeRunEnd;
+    this->timeRunEnd = fitOptions->GetTimeRunEnd();
     this->paraVals = paraVals;
     this->singleHistoChoice = singleHistoChoice;
     this->rebinChoice = rebinChoice;
