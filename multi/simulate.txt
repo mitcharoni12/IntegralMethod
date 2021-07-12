@@ -1,7 +1,7 @@
-Histo events:5
-Histo Bins(only if rebin):1000
-Bin Width:400
-Time generate until:4000000
-single run(1) multi run(2) multiple cycle(3):3
+Histo events:10000
+Histo Bins(only if rebin):10
+Bin Width:.4
+Inital Time Fit:400
+single run(1) multi run(2) multiple cycle(3):2
 leave out x first bins:0
 leave out x last bins:0

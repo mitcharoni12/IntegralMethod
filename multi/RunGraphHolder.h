@@ -25,6 +25,7 @@ RunGraphHolder::RunGraphHolder(Int_t cycleNum, Int_t numRuns, string graphName, 
     graphArr = new TGraph* [numRuns];
     for(int i = 0; i < numRuns; i++)
     {
+        cout << "RUN " << i << " " << tempGraphName << " Cycle: " << cycleNum << " Runs: " << numRuns << " points " << numPoints << endl;
         tempGraphName = graphName + " Run: " + (to_string(i+1)).c_str() + " Cycle: " + (to_string(cycleNum+1)).c_str();
         graphArr[i] = new TGraph(numPoints);
         graphArr[i]->SetNameTitle(tempGraphName.c_str());

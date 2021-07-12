@@ -22,12 +22,14 @@
 #include "ChainFitValues.h"
 #include "SingleChainRunFitValues.h"
 #include "ChainRunFitValues.h"
+#include "FitOption.h"
 
 using namespace std;
 
 class Run{
     private:
         Int_t runs, numElements, eventDecrement;
+        FitOption* fitOptions;
         ElementFit* element;
         ChainRunFitValues* batemanFitValues, *integralFitValues;
         SingleChainRunFitValues* singleBatemanFitValues, *singleIntegralFitValues;
@@ -47,7 +49,7 @@ class Run{
         void genIntegralMeanGraphs();
         void genBatemanMeanGraphs();
     public:
-        Run(Int_t runs, Int_t eventDecrement, ElementFit* element, string* elementNameStrs);
+        Run(ElementFit* element);
         ~Run();
         void runNoChangeGenOnce(Int_t cycleIndex, Int_t runIndex);
         void genGraphsEventChange();
@@ -73,15 +75,15 @@ class Run{
         void setNumRuns(Int_t numRuns){this->runs = numRuns;}
 };
 
-Run::Run(Int_t runs, Int_t eventDecrement, ElementFit* element, string* elementNameStrs)
+Run::Run(ElementFit* element)
 {
     //variable parameter setting
-    this->runs = runs;
-    this->eventDecrement = eventDecrement;
+    this->fitOptions = element->getFitOptions();
+    this->runs = fitOptions->GetNumRuns();
+    this->eventDecrement = fitOptions->GetEventDecrement();
     this->element = element;
-    this->elementNameStrs = elementNameStrs;
-    numElements = element->getNumElements();
-    element->setNumRuns(runs);
+    this->elementNameStrs = fitOptions->GetElementNames();
+    numElements = fitOptions->GetNumElements();
 
     //dynamically allocating required arrays and root variables
     //dynamic array
@@ -121,53 +123,7 @@ Run::~Run()
     delete [] singleIntegralGraphs;
 }
 
-/*
-//(WIP) creates and fills the correlation canvas for runs with event changes
-void Run::createCorrelationHistoEventChange()
-{
-    correlationHisto = new TH3D("CorrelationHistoEventChange", "CorrelationHistoEventChange", 100, getMinElement(batemanFitErrors[0]), getMaxElement(batemanFitErrors[0]), 100, getMinElement(integralFitErrors[0]), getMaxElement(integralFitErrors[0]), 100, getMinElement(eventsXAxis), getMaxElement(eventsXAxis));
-    correlationHisto->GetXaxis()->SetTitle("Reg Errors");
-    correlationHisto->GetXaxis()->SetNdivisions(5);
-    correlationHisto->GetXaxis()->CenterTitle(kTRUE);
-    correlationHisto->GetXaxis()->SetTitleColor(kRed);
-    correlationHisto->GetYaxis()->SetTitle("Integral Errors");
-    correlationHisto->GetYaxis()->SetNdivisions(5);
-    correlationHisto->GetYaxis()->CenterTitle(kTRUE);
-    correlationHisto->GetYaxis()->SetTitleColor(kRed);
-    correlationHisto->GetZaxis()->SetTitle("Events");
-    correlationHisto->GetZaxis()->SetNdivisions(5);
-    correlationHisto->GetZaxis()->CenterTitle(kTRUE);
-    correlationHisto->GetZaxis()->SetTitleColor(kRed);
-    for(int i = 0; i < runs; i++)
-    {
-        correlationHisto->Fill(batemanFitErrors[0][i], integralFitErrors[0][i], eventsXAxis[i]);
-    }
-}
-
-//(WIP) creates and fills the correlation canvas for runs with no changes
-void Run::createCorrelationHistoNoChange()
-{
-    correlationHisto = new TH3D("CorrelationHistoNoChange", "CorrelationHistoNoChange", 100, getMinElement(batemanFitErrors[0]), getMaxElement(batemanFitErrors[0]), 100, getMinElement(integralFitErrors[0]), getMaxElement(integralFitErrors[0]), 100, 0, runs);
-    correlationHisto->GetXaxis()->SetTitle("Reg Errors");
-    correlationHisto->GetXaxis()->SetNdivisions(5);
-    correlationHisto->GetXaxis()->CenterTitle(kTRUE);
-    correlationHisto->GetXaxis()->SetTitleColor(kRed);
-    correlationHisto->GetYaxis()->SetTitle("Integral Errors");
-    correlationHisto->GetYaxis()->SetNdivisions(5);
-    correlationHisto->GetYaxis()->CenterTitle(kTRUE);
-    correlationHisto->GetYaxis()->SetTitleColor(kRed);
-    correlationHisto->GetZaxis()->SetTitle("runs");
-    correlationHisto->GetZaxis()->SetNdivisions(5);
-    correlationHisto->GetZaxis()->CenterTitle(kTRUE);
-    correlationHisto->GetZaxis()->SetTitleColor(kRed);
-    for(int i = 0; i < runs; i++)
-    {
-        correlationHisto->Fill(batemanFitErrors[0][i], integralFitErrors[0][i], runsXAxis[i]);
-    }
-}
-*/
-
-//creates histograms for the run result of the total functions (dynamic)
+//creates histograms for the run result of the total functions
 TH1D** Run::createRunResultHistos()
 {
     TH1D** multiRunResultHistograms = new TH1D* [numElements*2];
@@ -184,7 +140,7 @@ TH1D** Run::createRunResultHistos()
     return multiRunResultHistograms;
 }
 
-//newB creates histograms for the run result of the single element functions (dynamcic)
+//creates histograms for the run result of the single element functions
 TH1D** Run::createRunResultHistosSingleElements()
 {
     TH1D** multiRunResultHistosSingleElement = new TH1D* [numElements*2];
@@ -359,33 +315,6 @@ Double_t Run::getMinElement(Double_t* arr)
     return hold;
 }
 
-/*
-//does run for changing events and puts data in respective array
-void Run::runEventChange()
-{
-    FitParameterStore* fitParameters = element->getTotalFitParameters();
-    for(int j = 0; j < runs; j++)
-    {
-        //generates random data and fits it. Then extract the fit parametes
-        element->fitData();
-        //takes fit parameters and puts them in their respective arrays
-        for(int i = 0; i < numElements; i++)
-        {
-            eventsXAxis[j] = ((Double_t) element->getNumEvents());
-
-            batemanFitErrors[i][j] = (fitParameters->getbatemanHalfLifeError())[i];
-            integralFitErrors[i][j] = (fitParameters->getIntegralHalfLifeError())[i];
-            batemanFitValue[i][j] = (fitParameters->getbatemanHalfLife())[i];
-            integralFitValue[i][j] = (fitParameters->getIntegralHalfLife())[i];
-            initbatemanValue[i][j] = (fitParameters->getbatemanN0())[i];
-            initIntegralValue[i][j] = (fitParameters->getIntegralN0())[i];
-        }
-        //changes number of events
-        element->setNumEvents(element->getNumEvents()- eventDecrement);
-    }
-}
-*/
-
 //does run for no change and puts data in respective array
 void Run::runNoChange(Int_t cycleIndex)
 {
@@ -488,7 +417,7 @@ void Run::runNoChangeGenOnce(Int_t cycleIndex, Int_t runIndex)
 
     element->fitDataGenOnce(cycleIndex, runIndex);
 
-    tempFitParameters = element->getbatemanFitParameters();
+    tempFitParameters = element->getBatemanFitParameters();
         
         //move total bateman parameters into respective class
         for(int i = 0; i < numElements; i++)

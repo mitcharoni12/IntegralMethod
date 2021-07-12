@@ -34,22 +34,17 @@ typedef Double_t (*decayFunction)(Double_t *x, Double_t *par);
 class ElementFit{
     public:
         ElementFit(Double_t (*batemanFunc)(Double_t*, Double_t*), Double_t (*integralFunc)(Double_t*, Double_t*), Double_t (**fitFunctions)(Double_t*, Double_t*),
-                   string* elementNames,  ParameterValue** paraVals, FitOption fitOptions)
+                   ParameterValue** paraVals, FitOption* fitOptions);
         ~ElementFit();
         //getter function
         Double_t getElementParameters(int i){return paraVals[i]->getValueDecayConst();}
-        Int_t getNumEvents(){return events;}
-        Int_t getNumElements(){return numElements;}
-        Int_t* getBinArr(){return binNumArr;}
-        Int_t getTimeRunEnd(){return timeRunEnd;}
+        FitOption* getFitOptions(){return fitOptions;}
         ChainFitValues* getBatemanFitParameters(){return totalBatemanFitParameters;}
         ChainFitValues* getIntegralFitParameters(){return totalIntegralFitParameters;}
         SingleElementFitValues* getSingleBatemanFitParameters(){return singleBatemanFitParameters;}
         SingleElementFitValues* getSingleIntegralFitParameters(){return singleIntegralFitParameters;}
         //setter function
         //void setNumBins(Int_t numBins);
-        void setTimeRunStart(Double_t timeRunStart){this->timeRunStart = timeRunStart;}
-        void setTimeRunEnd(Double_t timeRunEnd){this->timeRunEnd = timeRunEnd;}
         void setNumRuns(Int_t numRuns){this->numRuns = numRuns;}
         void setNumCycles(Int_t numCycles){this->numCycles = numCycles;}
         //public functions
@@ -70,10 +65,11 @@ class ElementFit{
         void genAndFillHistos();
     private:
         //private variables
-        FitOption fitOptions;
+        FitOption* fitOptions;
         string* elementNames;
-        Int_t events, numElements, numBins, numParameters, numRuns, numCycles, singleHistoChoice, rebinChoice, rebinDifference, timeInc;
-        Int_t* binNumArr, *timeEndArr;
+        Int_t events, numElements, numBins, numParameters, numRuns, numCycles;
+        bool multiSourceChoice, rebinChoice;
+        Int_t* binNumArr;
         TF1* integralFunction, *batemanFunction;
         TF1** singleFitFunctions;
         CycleHistoHolder* batemanHisto, *integralHisto;
@@ -85,7 +81,7 @@ class ElementFit{
         decayFunction passedBatemanFunction, passedIntegralFunction;
         TRandom3 rand;
         Double_t timeRunStart, timeRunEnd, leaveOutStartBinNumber, leaveOutEndBinNumber, doubleEvents;
-        Double_t* randArr, *binWidth;
+        Double_t* randArr, *binWidth, *timeEndArr;
         ChainFitValues* totalBatemanFitParameters, *totalIntegralFitParameters;
         SingleElementFitValues* singleBatemanFitParameters, *singleIntegralFitParameters;
         ParameterValue** paraVals;
@@ -109,14 +105,14 @@ class ElementFit{
 
 //constructor for generating a histogram
 ElementFit::ElementFit(Double_t (*batemanFunc)(Double_t*, Double_t*), Double_t (*integralFunc)(Double_t*, Double_t*), Double_t (**fitFunctions)(Double_t*, Double_t*),
-                       string* elementNames,  ParameterValue** paraVals, FitOption fitOptions)
+                       ParameterValue** paraVals, FitOption* fitOptions)
 {
     //setting variables
     this->fitOptions = fitOptions;
     this->events = fitOptions->GetNumEvents();
     this->numRuns = fitOptions->GetNumRuns();
     this->numCycles = fitOptions->GetNumCycles();
-    this->elementNames = elementNames;
+    this->elementNames = fitOptions->GetElementNames();
     this->fitFunctions = fitFunctions;
     this->numElements = fitOptions->GetNumElements();
     this->numParameters = numElements*2;
@@ -125,12 +121,10 @@ ElementFit::ElementFit(Double_t (*batemanFunc)(Double_t*, Double_t*), Double_t (
     this->passedIntegralFunction = integralFunc;
     this->timeRunEnd = fitOptions->GetTimeRunEnd();
     this->paraVals = paraVals;
-    this->singleHistoChoice = singleHistoChoice;
-    this->rebinChoice = rebinChoice;
-    this->rebinDifference = rebinDifference;
-    this->leaveOutStartBinNumber = leaveOutStartBinNumber;
-    this->leaveOutEndBinNumber = leaveOutEndBinNumber;
-    this->timeInc = timeInc;
+    this->multiSourceChoice = fitOptions->GetMultiSourceChoice();
+    this->rebinChoice = fitOptions->GetRebinChoice();
+    this->leaveOutStartBinNumber = fitOptions->GetStartBinLeaveOut();
+    this->leaveOutEndBinNumber = fitOptions->GetEndBinLeaveOut();
     doubleEvents = (Double_t) events;
 
     //creating fit parameter holders
@@ -138,48 +132,21 @@ ElementFit::ElementFit(Double_t (*batemanFunc)(Double_t*, Double_t*), Double_t (
     singleIntegralFitParameters = new SingleElementFitValues(numElements);
     totalBatemanFitParameters = new ChainFitValues(numElements);
     totalIntegralFitParameters = new ChainFitValues(numElements);
-    //creating array tracking when the fit time ends between cycles
-    timeEndArr = new Int_t [numCycles];
-    for(int i = 0; i < numCycles; i++)
-    {
-        timeEndArr[i] = timeRunEnd + timeInc * i;
-    }
-    //creating array containing how many bins will exist in histograms between cycles
-    binNumArr = new Int_t [numCycles];
-    int rebinSize = numBins;
+
     singleFitFunctions = new TF1* [numElements*2];
-    //case if rebining
-    if(rebinChoice == 1)
-    {
-        for(int i = 0; i < numCycles; i++)
-        {
-            binNumArr[i] = rebinSize;
-            rebinSize = rebinSize + rebinDifference;
-        }
-    //case if not rebining
-    }else{
-        for(int i = 0; i < numCycles; i++)
-        {
-            binNumArr[i] = rebinSize;
-        }
-    }
-    //creating array containing the bin widths between cycles
-    timeRunStart = 0;
-    binWidth = new Double_t [numCycles];
-    Double_t tempTimeRun;
-    for(int i = 0; i < numCycles; i++)
-    {
-        tempTimeRun = timeEndArr[i] - timeRunStart;
-        binWidth[i] = tempTimeRun / binNumArr[i];
-    }
     //setting values for randomization
     randArr = new Double_t [numElements];
     Tclock = clock();
+    //creates required arrays for number of bins and time fit
+    fitOptions->CreateRequiredDataSets();
+    binWidth = fitOptions->GetBinWidthArr();
+    timeEndArr = fitOptions->GetTimeFitEndArr();
+    binNumArr = fitOptions->GetBinNumArr();
     //generates all the histo objects and 
     genAndFillHistos();
     //removes restrictions on fitting function calls and itterations
-    ROOT::Math::MinimizerOptions::SetDefaultMaxIterations(100000000);
-    ROOT::Math::MinimizerOptions::SetDefaultMaxFunctionCalls(100000000);
+    //ROOT::Math::MinimizerOptions::SetDefaultMaxIterations(100000000);
+    //ROOT::Math::MinimizerOptions::SetDefaultMaxFunctionCalls(100000000);
 }
 
 ElementFit::~ElementFit()
@@ -200,9 +167,6 @@ ElementFit::~ElementFit()
     delete integralHisto;
     delete singleBatemanHisto;
     delete singleIntegralHisto;
-    delete [] binNumArr;
-    delete [] binWidth;
-    delete [] timeEndArr;
     delete integralGraph;
     delete singleIntegralGraph;
 }
@@ -379,7 +343,7 @@ void ElementFit::displaySingleHistos(TCanvas** can)
 }
 
 //used to display the individual histograms
-void ElementFit::DrawIndividualHistos(CycleCanvasHolder* batemanTotalCanvases, CycleCanvasHolder* integralTotalCanvases, SingleCycleCanvasHolder* singlebatemanCanvases, SingleCycleCanvasHolder* singleIntegralCanvases,
+void ElementFit::DrawIndividualHistos(CycleCanvasHolder* batemanTotalCanvases, CycleCanvasHolder* integralTotalCanvases, SingleCycleCanvasHolder* singleBatemanCanvases, SingleCycleCanvasHolder* singleIntegralCanvases,
                                       Int_t lowerRunIndex, Int_t upperRunIndex, Int_t lowerCycleIndex, Int_t upperCycleIndex)
 {
     upperRunIndex = upperRunIndex + 1;
@@ -652,7 +616,7 @@ void ElementFit::genRandomAlternate()
     Double_t hold = 0;
     Double_t stack = 0;
     //case for generating single histogram
-    if(singleHistoChoice == 1 && rebinChoice == 2)
+    if(!rebinChoice && !multiSourceChoice)
     {   //generate the single histogram
         TH1D* tempHisto;
         TH1D** tempSingleHisto;
@@ -684,7 +648,7 @@ void ElementFit::genRandomAlternate()
 
         delete [] tempSingleHisto;
     //case for multiple histogram generation
-    }else if(singleHistoChoice == 2 && rebinChoice == 2)
+    }else if(!rebinChoice && multiSourceChoice)
     {
         for(int cycleIndex = 0; cycleIndex < numCycles; cycleIndex++)
         {
@@ -715,7 +679,7 @@ void ElementFit::genRandomAlternate()
             }
         }
     //case for generating data with rebinning
-    }else if(rebinChoice == 1)
+    }else if(rebinChoice)
     {
         //numbers generated same but data fed in differently. We want all the events in each cycle to be identical so we can see the effects of rebinning, therefore data generated in run index 0 of cycle 1 must be identical to run index 0 of cycle 2
         for(int runIndex = 0; runIndex < numRuns; runIndex++)

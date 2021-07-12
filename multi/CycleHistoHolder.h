@@ -14,13 +14,13 @@ private:
     Int_t numCycles;
     RunHistoHolder** histoArr;
 public:
-    CycleHistoHolder(Int_t numCycles, Int_t numRuns, string histoName, Int_t* binArr, Int_t* timeEndArr);
+    CycleHistoHolder(Int_t numCycles, Int_t numRuns, string histoName, Int_t* binArr, Double_t* timeEndArr);
     ~CycleHistoHolder();
     TH1D* GetAHisto(Int_t cycleIndex, Int_t runIndex);
     void SetAHisto(Int_t cycleIndex, Int_t runIndex, TH1D* histo);
 };
 
-CycleHistoHolder::CycleHistoHolder(Int_t numCycles, Int_t numRuns, string histoName, Int_t* binArr, Int_t* timeEndArr)
+CycleHistoHolder::CycleHistoHolder(Int_t numCycles, Int_t numRuns, string histoName, Int_t* binArr, Double_t* timeEndArr)
 {
     this->numCycles = numCycles;
 

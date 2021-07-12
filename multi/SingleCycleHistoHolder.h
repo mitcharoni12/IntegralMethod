@@ -15,24 +15,22 @@ private:
     CycleHistoHolder** histoArr;
     string histoParameter;
 public:
-    SingleCycleHistoHolder(Int_t numCycles, Int_t numElements, Int_t numRuns, string histoName, Int_t* binArr, Int_t* timeEndArr, string* elementNames);
+    SingleCycleHistoHolder(Int_t numCycles, Int_t numElements, Int_t numRuns, string histoName, Int_t* binArr, Double_t* timeEndArr, string* elementNames);
     ~SingleCycleHistoHolder();
     TH1D* GetAHisto(Int_t cycleIndex, Int_t runIndex, Int_t elementIndex);
     void SetAHisto(Int_t cycleIndex, Int_t runIndex, Int_t elementIndex, TH1D* histo);
 };
 
-SingleCycleHistoHolder::SingleCycleHistoHolder(Int_t numCycles, Int_t numElements, Int_t numRuns, string histoName, Int_t* binArr, Int_t* timeEndArr, string* elementNames)
+SingleCycleHistoHolder::SingleCycleHistoHolder(Int_t numCycles, Int_t numElements, Int_t numRuns, string histoName, Int_t* binArr, Double_t* timeEndArr, string* elementNames)
 {
     this->numElements = numElements;
     histoParameter = histoName;
-    
     histoArr = new CycleHistoHolder* [numElements];
     for(int i = 0; i < numElements; i++)
     {
         histoName = elementNames[i] + " " + histoName;
         histoArr[i] = new CycleHistoHolder(numCycles, numRuns, histoName, binArr, timeEndArr);
         histoName = histoParameter;
-
     }
 }
 

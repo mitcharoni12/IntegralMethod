@@ -190,13 +190,14 @@ void fitMultiple()
             fitOptions->SetProgramExecutionType(programExecutionType);
             fitOptions->SetLeaveOutStartBinNumber(leaveOutStartBinNumber);
             fitOptions->SetLeaveOutEndBinNumber(leaveOutEndBinNumber);
+            fitOptions->SetElementNames(elementNames);
 
             switch(programExecutionType)
             {
                 //single run of histogam
                 case 1:
                 {
-                    element = new ElementFit(events, 1, 1, BatemanDecaybyActivity, IntegralDecaybyActivity, fitFunctions, numElements, timeRun, numBins, elementNames, paraVals, 2, 2, 0, leaveOutStartBinNumber, leaveOutEndBinNumber, 0);
+                    element = new ElementFit(BatemanDecaybyActivity, IntegralDecaybyActivity, fitFunctions, paraVals, fitOptions);
                     element->fitHistos(0, 0);
                     element->displayParameters();
                 
@@ -239,8 +240,8 @@ void fitMultiple()
                     fitOptions->SetNumRuns(runs);
                     fitOptions->SetEventDecrement(eventDecrement);
                     
-                    element = new ElementFit(events, runs, 1, BatemanDecaybyActivity, IntegralDecaybyActivity, fitFunctions, numElements, timeRun, numBins, elementNames, paraVals, 2, 2, 0, leaveOutStartBinNumber, leaveOutEndBinNumber, 0);
-                    Run* elementRun = new Run(runs, eventDecrement, element, elementNames); 
+                    element = new ElementFit(BatemanDecaybyActivity, IntegralDecaybyActivity, fitFunctions, paraVals, fitOptions);
+                    Run* elementRun = new Run(element); 
                     
                     elementRun->runNoChange(0);
 
@@ -321,7 +322,7 @@ void fitMultiple()
                 {
                     Int_t numRuns, numCycles, singleSourceHistoChoice, timeShiftType,
                           lowerRunHistoIndex, upperRunHistoIndex, lowerCycleHistoIndex, upperCycleHistoIndex;
-                    Double_t x_inc, runMeanDifference;
+                    Double_t binTimeFitInc, runMeanDifference;
 
                     inFile.open("simulated_multi_cycle.txt");
                     inFile.ignore(256,':');
@@ -353,9 +354,9 @@ void fitMultiple()
                     inFile.ignore(256,':');
                     inFile >> rebinDifference;
 
-                    fitOptions->setNumRuns(numRuns);
-                    fitOptions->setNumCycles(numCycles);
-                    fitOptions->setEventDecrement(eventDecrement);
+                    fitOptions->SetNumRuns(numRuns);
+                    fitOptions->SetNumCycles(numCycles);
+                    fitOptions->SetEventDecrement(eventDecrement);
                     fitOptions->SetTimeShiftType(timeShiftType);
                     fitOptions->SetTimeFitBinInc(binTimeFitInc);
                     if(singleSourceHistoChoice == 2)
@@ -372,9 +373,9 @@ void fitMultiple()
                     }
                     fitOptions->SetRebinDifference(rebinDifference);
 
-                    element = new ElementFit(events, numRuns, numCycles, batemanDecaybyActivity, IntegralDecaybyActivity, fitFunctions, numElements, timeRun, numBins, elementNames, paraVals, singleSourceHistoChoice, rebinChoice, rebinDifference, leaveOutStartBinNumber, leaveOutEndBinNumber, x_inc);
-                    Run* elementRunsCycle = new Run(numRuns, eventDecrement, element, elementNames);
-                    Cycle* cycle = new Cycle(numCycles, elementRunsCycle, element, x_inc, cycleChangeChoice);
+                    element = new ElementFit(BatemanDecaybyActivity, IntegralDecaybyActivity, fitFunctions, paraVals, fitOptions);
+                    Run* elementRunsCycle = new Run(element);
+                    Cycle* cycle = new Cycle(elementRunsCycle, element);
 
                     TCanvas** canvasArr;
 
@@ -442,7 +443,7 @@ void fitMultiple()
                     }else if(rebinChoice == 1)
                     {
                         //mean difference
-                        if(cycleMeanChoice == 1)
+                        if(runMeanDifference == 1)
                         {
                             cycle->runDifferenceMeanRebin();
                             cycle->genSeperateMeanGraphsRebin();
@@ -455,7 +456,7 @@ void fitMultiple()
                             cycle->displayMeanDifferenceGraphs(canvasArr);
                             delete [] canvasArr;
                         //seperate mean
-                        }else if(cycleMeanChoice == 2)
+                        }else if(runMeanDifference == 2)
                         {
                             cycle->runSeperateMeanRebin();
                             cycle->genSeperateMeanGraphsRebin();
