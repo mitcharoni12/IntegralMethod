@@ -435,8 +435,18 @@ void Cycle::runSeperateMeanRebin()
 //runs the cycles and puts the data of the integral method mean and the bateman method mean into their respective arrays (dynamic)
 void Cycle::runSeperateMeanTimeDifference()
 {
-    Double_t tempMeanVal;
-    Double_t tempErrorVal;
+    Double_t tempMeanVal, tempErrorVal;
+    Double_t *runningSingleBateman = new Double_t [numElements];
+    Double_t *runningTotalBateman = new Double_t [numElements];
+    Double_t *runningSingleIntegral = new Double_t [numElements];
+    Double_t *runningTotalIntegral = new Double_t [numElements];
+    for(int i = 0; i < numElements; i++)
+    {
+        runningTotalIntegral[i] = 0.0f;
+        runningTotalBateman[i] = 0.0f;
+        runningSingleBateman[i] = 0.0f;
+        runningSingleIntegral[i] = 0.0f;
+    }
 
     TH1D** multiRunHisto = decayChainRun->createRunResultHistos();
     TH1D** multiRunHistoSingle = decayChainRun->createRunResultHistosSingleElements();
@@ -454,24 +464,40 @@ void Cycle::runSeperateMeanTimeDifference()
         {
             tempMeanVal = multiRunHisto[(k*2)]->GetMean();
             batemanFitValues->SetAnHalfLife(i, k, tempMeanVal);
+            runningTotalBateman[k] += tempMeanVal;
             tempErrorVal = multiRunHisto[(k*2)]->GetMeanError();
             batemanFitValues->SetAnHalfLifeError(i, k, tempErrorVal);
             tempMeanVal = multiRunHisto[(k*2)+1]->GetMean();
             integralFitValues->SetAnHalfLife(i, k, tempMeanVal);
+            runningTotalIntegral[k] += tempMeanVal;
             tempErrorVal = multiRunHisto[(k*2)+1]->GetMeanError();
             integralFitValues->SetAnHalfLifeError(i, k, tempErrorVal);
 
             tempMeanVal = multiRunHistoSingle[(k*2)]->GetMean();
             singleBatemanFitValues->SetAnHalfLife(i, k, k, tempMeanVal);
+            runningSingleBateman[k] += tempMeanVal;
             tempErrorVal = multiRunHistoSingle[(k*2)]->GetMeanError();
             singleBatemanFitValues->SetAnHalfLifeError(i, k, k, tempErrorVal);
             tempMeanVal = multiRunHistoSingle[(k*2)+1]->GetMean();
+            runningSingleIntegral[k] += tempMeanVal;
             singleIntegralFitValues->SetAnHalfLife(i, k, k, tempMeanVal);
             tempErrorVal = multiRunHistoSingle[(k*2)+1]->GetMeanError();
             singleIntegralFitValues->SetAnHalfLifeError(i, k, k, tempErrorVal);
         }
     }
 
+    for(int i = 0; i < numElements; i++)
+    {
+        cout << elementStrNames[i] << " AVERAGE BATEMAN TOTAL: " << runningTotalBateman[i] / cycles << endl;
+        cout << elementStrNames[i] << " AVERAGE INTEGRAL TOTAL: " << runningTotalIntegral[i] / cycles << endl;
+        cout << elementStrNames[i] << " AVERAGE BATEMAN SINGLE: " << runningSingleBateman[i] / cycles << endl;
+        cout << elementStrNames[i] << " AVERAGE INTEGRAL SINGLE: " << runningSingleIntegral[i] / cycles << endl << endl;
+    }
+
+    delete [] runningTotalBateman;
+    delete [] runningTotalIntegral;
+    delete [] runningSingleBateman;
+    delete [] runningSingleIntegral;
     for(int i = 0; i < numElements*2; i++)
     {
         delete multiRunHisto[i];
