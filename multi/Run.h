@@ -415,7 +415,7 @@ void Run::runNoChangeGenOnce(Int_t cycleIndex, Int_t runIndex)
     Double_t tempHalfLife;
     Double_t tempHalfLifeError;
 
-    element->fitDataGenOnce(cycleIndex, runIndex);
+    element->fitHistos(cycleIndex, runIndex);
 
     tempFitParameters = element->getBatemanFitParameters();
         

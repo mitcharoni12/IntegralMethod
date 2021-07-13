@@ -11,7 +11,7 @@ using namespace std;
 class FitOption{
 private:
     Int_t numRuns = 1, numCycles = 1, numElements, numBins, binRebinInc = 0, startBinLeaveOut = 0, endBinLeaveOut = 0, programExecutionType = 1
-         ,eventDecrement = 0, timeShiftType, rebinDifference = 0, binTimeFitInc = 0;
+         ,eventDecrement = 0, timeShiftType = 1, rebinDifference = 0, binTimeFitInc = 0;
     Double_t timeRunEnd, events, binWidth;
     Double_t* timeFitEndArr, *timeFitStartArr, *binWidthArr;
     string* elementNames;
@@ -36,7 +36,7 @@ public:
     void SetBinWidth(Double_t binWidth){this->binWidth = binWidth;}
     void SetMultiSourceChoice(bool multiSource){this->multiSource = multiSource;}
     void SetRebinChoice(bool rebin){this->rebin = rebin;}
-    void SetRunMeanDifference(bool runMeanDifference){this->runMeanDifference = runMeanDifference;}
+    void SetRunMeanDifference(bool runMeanDifference){this->runMeanDifference = runMeanDifference;cout << "SETTING TRUE" << endl;}
     void SetElementNames(string* elementNames){this->elementNames = elementNames;}
     Int_t GetNumRuns(){return numRuns;}
     Int_t GetNumCycles(){return numCycles;}

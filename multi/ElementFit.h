@@ -54,7 +54,6 @@ class ElementFit{
         void displaySingleHistos(TCanvas** can);
         void displayParameters();
         void DrawIndividualHistos(CycleCanvasHolder* batemanTotalCanvases, CycleCanvasHolder* integralTotalCanvases, SingleCycleCanvasHolder* singleBatemanCanvases, SingleCycleCanvasHolder* singleIntegralCanvases, Int_t lowerRunIndex, Int_t upperRunIndex, Int_t lowerCycleIndex, Int_t upperCycleIndex);
-        void fitDataGenOnce(Int_t cycleIndex, Int_t runIndex);
         void fitHistos(Int_t cycleIndex, Int_t runIndex);
         void fitIntegralHisto(Int_t cycleIndex, Int_t runIndex, Double_t startFit, Double_t endFit);
         void fitBatemanHisto(Int_t cycleIndex, Int_t runIndex, Double_t startFit, Double_t endFit);
@@ -81,7 +80,7 @@ class ElementFit{
         decayFunction passedBatemanFunction, passedIntegralFunction;
         TRandom3 rand;
         Double_t timeRunStart, timeRunEnd, leaveOutStartBinNumber, leaveOutEndBinNumber, doubleEvents;
-        Double_t* randArr, *binWidth, *timeEndArr;
+        Double_t* randArr, *binWidth, *timeEndArr, *timeStartArr;
         ChainFitValues* totalBatemanFitParameters, *totalIntegralFitParameters;
         SingleElementFitValues* singleBatemanFitParameters, *singleIntegralFitParameters;
         ParameterValue** paraVals;
@@ -141,6 +140,7 @@ ElementFit::ElementFit(Double_t (*batemanFunc)(Double_t*, Double_t*), Double_t (
     fitOptions->CreateRequiredDataSets();
     binWidth = fitOptions->GetBinWidthArr();
     timeEndArr = fitOptions->GetTimeFitEndArr();
+    timeStartArr = fitOptions->GetTimeFitStartArr();
     binNumArr = fitOptions->GetBinNumArr();
     //generates all the histo objects and 
     genAndFillHistos();
@@ -376,29 +376,8 @@ void ElementFit::DrawIndividualHistos(CycleCanvasHolder* batemanTotalCanvases, C
 //fits all histos
 void ElementFit::fitHistos(Int_t cycleIndex, Int_t runIndex)
 {
-    createSingleFitFunctions(timeEndArr[cycleIndex]);
-    createTotalFitFunctions(timeEndArr[cycleIndex]);
-    setFunctionParametersTotal();
-    setFunctionParamersSingle();
-    setParaLimits();
-
-    Double_t startFitOffset;
-    Double_t startFit;
-    startFitOffset = leaveOutStartBinNumber * binWidth[cycleIndex];
-    startFit = startFitOffset + timeRunStart;
-    Double_t endFitOffset;
-    Double_t endFit;
-    endFitOffset = leaveOutEndBinNumber * binWidth[cycleIndex];
-    endFit = endFitOffset + timeRunEnd;
-
-    fitBatemanHisto(cycleIndex, runIndex, startFit, endFit);
-    fitIntegralHisto(cycleIndex, runIndex, startFit, endFit);
-    fitSingleHistos(cycleIndex, runIndex, startFit, endFit);
-}
-
-//fits data of the one histogram generated
-void ElementFit::fitDataGenOnce(Int_t cycleIndex, Int_t runIndex)
-{
+    timeRunStart = timeStartArr[cycleIndex];
+    timeRunEnd = timeEndArr[cycleIndex];
     createSingleFitFunctions(timeEndArr[cycleIndex]);
     createTotalFitFunctions(timeEndArr[cycleIndex]);
     setFunctionParametersTotal();
@@ -413,6 +392,8 @@ void ElementFit::fitDataGenOnce(Int_t cycleIndex, Int_t runIndex)
     Double_t endFit;
     endFitOffset = leaveOutEndBinNumber * binWidth[cycleIndex];
     endFit = timeRunEnd - endFitOffset;
+
+    cout << "CYCLE: " << cycleIndex << " START FIT: " << startFit << " END FIT: " << endFit << endl;
 
     fitBatemanHisto(cycleIndex, runIndex, startFit, endFit);
     fitIntegralHisto(cycleIndex, runIndex, startFit, endFit);
@@ -618,6 +599,7 @@ void ElementFit::genRandomAlternate()
     //case for generating single histogram
     if(!rebinChoice && !multiSourceChoice)
     {   //generate the single histogram
+    cout << "PATH 1" << endl;
         TH1D* tempHisto;
         TH1D** tempSingleHisto;
         tempSingleHisto = new TH1D* [numElements];
@@ -650,6 +632,7 @@ void ElementFit::genRandomAlternate()
     //case for multiple histogram generation
     }else if(!rebinChoice && multiSourceChoice)
     {
+        cout << "PATH 2" << endl;
         for(int cycleIndex = 0; cycleIndex < numCycles; cycleIndex++)
         {
             for(int runIndex = 0; runIndex < numRuns; runIndex++)
@@ -681,6 +664,7 @@ void ElementFit::genRandomAlternate()
     //case for generating data with rebinning
     }else if(rebinChoice)
     {
+        cout << "PATH 3" << endl;
         //numbers generated same but data fed in differently. We want all the events in each cycle to be identical so we can see the effects of rebinning, therefore data generated in run index 0 of cycle 1 must be identical to run index 0 of cycle 2
         for(int runIndex = 0; runIndex < numRuns; runIndex++)
         {

@@ -197,6 +197,7 @@ void fitMultiple()
                 //single run of histogam
                 case 1:
                 {
+                    fitOptions->SetMultiSourceChoice(true);
                     element = new ElementFit(BatemanDecaybyActivity, IntegralDecaybyActivity, fitFunctions, paraVals, fitOptions);
                     element->fitHistos(0, 0);
                     element->displayParameters();
@@ -239,6 +240,7 @@ void fitMultiple()
 
                     fitOptions->SetNumRuns(runs);
                     fitOptions->SetEventDecrement(eventDecrement);
+                    fitOptions->SetMultiSourceChoice(true);
                     
                     element = new ElementFit(BatemanDecaybyActivity, IntegralDecaybyActivity, fitFunctions, paraVals, fitOptions);
                     Run* elementRun = new Run(element); 
@@ -363,7 +365,7 @@ void fitMultiple()
                     {
                         fitOptions->SetMultiSourceChoice(true);
                     }
-                    if(runMeanDifference == 2)
+                    if(runMeanDifference == 1)
                     {
                         fitOptions->SetRunMeanDifference(true);
                     }
@@ -446,7 +448,7 @@ void fitMultiple()
                         if(runMeanDifference == 1)
                         {
                             cycle->runDifferenceMeanRebin();
-                            cycle->genSeperateMeanGraphsRebin();
+                            cycle->genMeanDifferenceGraphsRebin();
                             canvasArr = new TCanvas* [numElements];
                             for(int i = 0; i < numElements; i++)
                             {
