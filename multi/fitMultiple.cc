@@ -655,6 +655,7 @@ void CreateFitFunctions(string* elementNames)
 
     for(int elementIndex = 0; elementIndex < numElements; elementIndex++)
     {
+        //FOR BATEMAN FUNCTION
         outFile << "Double_t " << elementNames[elementIndex] << "DecayByActivity(Double_t *x, Double_t *par)" << endl;
         outFile << "{" << endl;
 
@@ -696,6 +697,53 @@ void CreateFitFunctions(string* elementNames)
         }
         outFile << "\treturn f;" << endl;
         outFile << "}" << endl << endl;
+
+
+
+
+        //FOR INTEGRAL FUNCTION
+        outFile << "Double_t " << elementNames[elementIndex] << "DecayByActivityIntegral(Double_t *x, Double_t *par)" << endl;
+        outFile << "{" << endl;
+
+        //variable declaration
+        outFile << "\tFloat_t timeVar = x[0];" << endl;
+        for(int elementSubIndex = 0; elementSubIndex <= elementIndex; elementSubIndex++)
+        {
+            outFile << "\tDouble_t " << N0Names[elementSubIndex] << " = par["
+            << (elementSubIndex * 2) << "];" << endl;
+            outFile << "\tDouble_t " << lambdaNames[elementSubIndex] << " = par["
+            << ((elementSubIndex*2) + 1) << "];" << endl;
+        }
+        outFile << endl;
+
+        //function creation
+        outFile << "\tDouble_t f = " << N0Names[elementIndex] << " * (1.0 - TMath::Exp(-" << lambdaNames[elementIndex] << " * timeVar));" << endl << endl;
+
+        for(int m = 0; m < elementIndex; m++)
+        {
+            for(int k = m; k <= elementIndex; k++)
+            {
+                outFile << "\tf += (" << N0Names[m] << " * " << lambdaNames[elementIndex];
+                for(int q = m; q < elementIndex; q++)
+                {
+                    outFile << " * " << lambdaNames[q];
+                }
+                outFile << " * ((TMath::Exp(-" << lambdaNames[k] << " * timeVar))/(1";
+                for(int j = m; j <= elementIndex; j++)
+                {
+                    if(j != k)
+                    {
+                        outFile << "*(" << lambdaNames[j] << "-" << lambdaNames[k] << ")";
+                    }
+                }
+                outFile << ")));" << endl;
+            }
+            outFile << endl;
+        }
+
+        outFile << "}" << endl << endl;
+
+
     }
 
     delete [] N0Names;
