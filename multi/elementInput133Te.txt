@@ -37,3 +37,4 @@ element 3 half life lower;0
 element 3 half life upper;2.10
 HISTO SIMULATE CHOICES
 Simulate(1) or load(2) in histogram:1
+Create Fit Functions(1) Dont Create Fit Function(2):1

@@ -25,6 +25,7 @@ Double_t BADecaybyActivity(Double_t *x, Double_t *par);
 Double_t LADecaybyActivity(Double_t *x, Double_t *par);
 Double_t IntegralDecaybyActivity(Double_t *x, Double_t *par);
 Double_t BatemanDecaybyActivity(Double_t *x, Double_t *par);
+void CreateFitFunctions(string* elementNames);
 
 typedef Double_t (*decayFunction)(Double_t *x, Double_t *par);
 decayFunction* batemanFitFunctions;
@@ -41,13 +42,13 @@ int main()
 
 void fitMultiple()
 {
-    Int_t eventDecrement, numBins, rebinDifference;
+    Int_t eventDecrement, numBins, rebinDifference, createFitFunctionsChoice;
     Double_t timeRunEnd, valueHolder, leaveOutStartBinNumber, leaveOutEndBinNumber;
     int histoSimulateChoice, rangeValueChoice, displayIndividualFitsChoice, rebinChoice;
     FitOption* fitOptions = new FitOption();
     ElementFit* element;
     ifstream inFile;
-    
+
     //open first option file
     inFile.open("elementInput.txt");
     inFile.ignore(256,':');
@@ -142,7 +143,15 @@ void fitMultiple()
     //gets histogram choice
     inFile.ignore(256,':');
     inFile >> histoSimulateChoice;
+    inFile.ignore(256,':');
+    inFile >> createFitFunctionsChoice;
     inFile.close();
+
+    if(createFitFunctionsChoice == 1)
+    {
+        CreateFitFunctions(elementNames);
+        return;
+    }
     
     //calculates the decay constant values
     for(int i = 0; i < numElements; i++)
@@ -629,4 +638,66 @@ Double_t BatemanDecaybyActivity(Double_t *x, Double_t *par)
         hold += batemanFitFunctions[i](x, par);
     }
     return hold;
+}
+
+void CreateFitFunctions(string* elementNames)
+{
+    ofstream outFile;
+    outFile.open("function.txt");
+    string* N0Names = new string [numElements];
+    string* lambdaNames = new string [numElements];
+
+    for(int i = 0; i < numElements; i++)
+    {
+        N0Names[i] = elementNames[i] + "0";
+        lambdaNames[i] = "lambda" + elementNames[i];
+    }
+
+    for(int elementIndex = 0; elementIndex < numElements; elementIndex++)
+    {
+        outFile << "Double_t " << elementNames[elementIndex] << "DecayByActivity(Double_t *x, Double_t *par)" << endl;
+        outFile << "{" << endl;
+
+        //variable declaration
+        outFile << "\tFloat_t timeVar = x[0];" << endl;
+        for(int elementSubIndex = 0; elementSubIndex <= elementIndex; elementSubIndex++)
+        {
+            outFile << "\tDouble_t " << N0Names[elementSubIndex] << " = par["
+            << (elementSubIndex * 2) << "];" << endl;
+            outFile << "\tDouble_t " << lambdaNames[elementSubIndex] << " = par["
+            << ((elementSubIndex*2) + 1) << "];" << endl;
+        }
+        outFile << endl;
+
+        //function creation
+        outFile << "\tDouble_t f = (" << N0Names[elementIndex] << " * " << lambdaNames[elementIndex] << " * (TMath::Exp(-" 
+        << lambdaNames[elementIndex] << " * timeVar)));" << endl << endl;
+
+        for(int m = 0; m < elementIndex; m++)
+        {
+            for(int k = m; k <= elementIndex; k++)
+            {
+                outFile << "\tf += (" << N0Names[m] << " * " << lambdaNames[elementIndex];
+                for(int q = m; q < elementIndex; q++)
+                {
+                    outFile << " * " << lambdaNames[q];
+                }
+                outFile << " * ((TMath::Exp(-" << lambdaNames[k] << " * timeVar))/(1";
+                for(int j = m; j <= elementIndex; j++)
+                {
+                    if(j != k)
+                    {
+                        outFile << "*(" << lambdaNames[j] << "-" << lambdaNames[k] << ")";
+                    }
+                }
+                outFile << ")));" << endl;
+            }
+            outFile << endl;
+        }
+        outFile << "\treturn f;" << endl;
+        outFile << "}" << endl << endl;
+    }
+
+    delete [] N0Names;
+    delete [] lambdaNames;
 }
