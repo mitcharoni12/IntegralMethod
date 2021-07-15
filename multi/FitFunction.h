@@ -14,13 +14,16 @@ private:
 	decayFunction* integralFitFunctions;
 	decayFunction* fitFunctions;
 public:
-	Double_t CSDecayByActivity(Double_t *x, Double_t par);
-	Double_t CSDecayByActivityIntegral(Double_t *x, Double_t par);
-	Double_t BADecayByActivity(Double_t *x, Double_t par);
-	Double_t BADecayByActivityIntegral(Double_t *x, Double_t par);
-	Double_t LADecayByActivity(Double_t *x, Double_t par);
-	Double_t LADecayByActivityIntegral(Double_t *x, Double_t par);
-};
+	Double_t MGDecayByActivity(Double_t *x, Double_t* par);
+	Double_t MGDecayByActivityIntegral(Double_t *x, Double_t* par);
+	Double_t ALDecayByActivity(Double_t *x, Double_t* par);
+	Double_t ALDecayByActivityIntegral(Double_t *x, Double_t* par);
+	Double_t SIDecayByActivity(Double_t *x, Double_t* par);
+	Double_t SIDecayByActivityIntegral(Double_t *x, Double_t* par);
+	Double_t PDecayByActivity(Double_t *x, Double_t* par);
+	Double_t PDecayByActivityIntegral(Double_t *x, Double_t* par);
+
+FitFunction(Int_t numElements)};
 
 FitFunction::FitFunction(Int_t numElements)
 {
@@ -28,114 +31,176 @@ FitFunction::FitFunction(Int_t numElements)
 	batemanFitFunctions = new decayFunction [numElements];
 	integralFitFunctions = new decayFunction [numElements];
 	fitFunctions = new decayFunction [numElements*2];
-	fitFunction[0] = CSDecayByActivity;
-	fitFunction[1] = CSDecayByActivityIntegral;
-	batemanFitFunctions[0] = CSDecayByActivity;
-	integralFitFunction[0] = CSDecayByActivityIntegral;
-	fitFunction[2] = BADecayByActivity;
-	fitFunction[3] = BADecayByActivityIntegral;
-	batemanFitFunctions[1] = BADecayByActivity;
-	integralFitFunction[1] = BADecayByActivityIntegral;
-	fitFunction[4] = LADecayByActivity;
-	fitFunction[5] = LADecayByActivityIntegral;
-	batemanFitFunctions[2] = LADecayByActivity;
-	integralFitFunction[2] = LADecayByActivityIntegral;
+	fitFunctions[0] = MGDecayByActivity;
+	fitFunctions[1] = MGDecayByActivityIntegral;
+	batemanFitFunctions[0] = MGDecayByActivity;
+	integralFitFunctions[0] = MGDecayByActivityIntegral;
+	fitFunctions[2] = ALDecayByActivity;
+	fitFunctions[3] = ALDecayByActivityIntegral;
+	batemanFitFunctions[1] = ALDecayByActivity;
+	integralFitFunctions[1] = ALDecayByActivityIntegral;
+	fitFunctions[4] = SIDecayByActivity;
+	fitFunctions[5] = SIDecayByActivityIntegral;
+	batemanFitFunctions[2] = SIDecayByActivity;
+	integralFitFunctions[2] = SIDecayByActivityIntegral;
+	fitFunctions[6] = PDecayByActivity;
+	fitFunctions[7] = PDecayByActivityIntegral;
+	batemanFitFunctions[3] = PDecayByActivity;
+	integralFitFunctions[3] = PDecayByActivityIntegral;
 }
 
-Double_t FitFunction::CSDecayByActivity(Double_t *x, Double_t *par)
+Double_t FitFunction::MGDecayByActivity(Double_t *x, Double_t *par)
 {
 	Float_t timeVar = x[0];
-	Double_t CS0 = par[0];
-	Double_t lambdaCS = par[1];
+	Double_t MG0 = par[0];
+	Double_t lambdaMG = par[1];
 
-	Double_t f = (CS0 * lambdaCS * (TMath::Exp(-lambdaCS * timeVar)));
+	Double_t f = (MG0 * lambdaMG * (TMath::Exp(-lambdaMG * timeVar)));
 
 	return f;
 }
 
-Double_t FitFunction::CSDecayByActivityIntegral(Double_t *x, Double_t *par)
+Double_t FitFunction::MGDecayByActivityIntegral(Double_t *x, Double_t *par)
 {
 	Float_t timeVar = x[0];
-	Double_t CS0 = par[0];
-	Double_t lambdaCS = par[1];
+	Double_t MG0 = par[0];
+	Double_t lambdaMG = par[1];
 
-	Double_t f = CS0 * (1.0 - TMath::Exp(-lambdaCS * timeVar));
+	Double_t f = MG0 * (1.0 - TMath::Exp(-lambdaMG * timeVar));
 
 	return f;
 }
 
-Double_t FitFunction::BADecayByActivity(Double_t *x, Double_t *par)
+Double_t FitFunction::ALDecayByActivity(Double_t *x, Double_t *par)
 {
 	Float_t timeVar = x[0];
-	Double_t CS0 = par[0];
-	Double_t lambdaCS = par[1];
-	Double_t BA0 = par[2];
-	Double_t lambdaBA = par[3];
+	Double_t MG0 = par[0];
+	Double_t lambdaMG = par[1];
+	Double_t AL0 = par[2];
+	Double_t lambdaAL = par[3];
 
-	Double_t f = (BA0 * lambdaBA * (TMath::Exp(-lambdaBA * timeVar)));
+	Double_t f = (AL0 * lambdaAL * (TMath::Exp(-lambdaAL * timeVar)));
 
-	f += (CS0 * lambdaBA * lambdaCS * ((TMath::Exp(-lambdaCS * timeVar)) / ((lambdaBA-lambdaCS))));
-	f += (CS0 * lambdaBA * lambdaCS * ((TMath::Exp(-lambdaBA * timeVar)) / ((lambdaCS-lambdaBA))));
+	f += (MG0 * lambdaAL * lambdaMG * ((TMath::Exp(-lambdaMG * timeVar)) / ((lambdaAL-lambdaMG))));
+	f += (MG0 * lambdaAL * lambdaMG * ((TMath::Exp(-lambdaAL * timeVar)) / ((lambdaMG-lambdaAL))));
 
 	return f;
 }
 
-Double_t FitFunction::BADecayByActivityIntegral(Double_t *x, Double_t *par)
+Double_t FitFunction::ALDecayByActivityIntegral(Double_t *x, Double_t *par)
 {
 	Float_t timeVar = x[0];
-	Double_t CS0 = par[0];
-	Double_t lambdaCS = par[1];
-	Double_t BA0 = par[2];
-	Double_t lambdaBA = par[3];
+	Double_t MG0 = par[0];
+	Double_t lambdaMG = par[1];
+	Double_t AL0 = par[2];
+	Double_t lambdaAL = par[3];
 
-	Double_t f = BA0 * (1.0 - TMath::Exp(-lambdaBA * timeVar));
+	Double_t f = AL0 * (1.0 - TMath::Exp(-lambdaAL * timeVar));
 
-	f += CS0 * lambdaBA * (1.0 - TMath::Exp(-lambdaCS * timeVar)) / (lambdaBA-lambdaCS));
-	f += CS0 * lambdaCS * (1.0 - TMath::Exp(-lambdaBA * timeVar)) / (lambdaCS-lambdaBA));
+	f += MG0 * lambdaAL * (1.0 - TMath::Exp(-lambdaMG * timeVar)) / (lambdaAL-lambdaMG);
+	f += MG0 * lambdaMG * (1.0 - TMath::Exp(-lambdaAL * timeVar)) / (lambdaMG-lambdaAL);
 
 	return f;
 }
 
-Double_t FitFunction::LADecayByActivity(Double_t *x, Double_t *par)
+Double_t FitFunction::SIDecayByActivity(Double_t *x, Double_t *par)
 {
 	Float_t timeVar = x[0];
-	Double_t CS0 = par[0];
-	Double_t lambdaCS = par[1];
-	Double_t BA0 = par[2];
-	Double_t lambdaBA = par[3];
-	Double_t LA0 = par[4];
-	Double_t lambdaLA = par[5];
+	Double_t MG0 = par[0];
+	Double_t lambdaMG = par[1];
+	Double_t AL0 = par[2];
+	Double_t lambdaAL = par[3];
+	Double_t SI0 = par[4];
+	Double_t lambdaSI = par[5];
 
-	Double_t f = (LA0 * lambdaLA * (TMath::Exp(-lambdaLA * timeVar)));
+	Double_t f = (SI0 * lambdaSI * (TMath::Exp(-lambdaSI * timeVar)));
 
-	f += (CS0 * lambdaLA * lambdaCS * lambdaBA * ((TMath::Exp(-lambdaCS * timeVar)) / ((lambdaBA-lambdaCS)*(lambdaLA-lambdaCS))));
-	f += (CS0 * lambdaLA * lambdaCS * lambdaBA * ((TMath::Exp(-lambdaBA * timeVar)) / ((lambdaCS-lambdaBA)*(lambdaLA-lambdaBA))));
-	f += (CS0 * lambdaLA * lambdaCS * lambdaBA * ((TMath::Exp(-lambdaLA * timeVar)) / ((lambdaCS-lambdaLA)*(lambdaBA-lambdaLA))));
+	f += (MG0 * lambdaSI * lambdaMG * lambdaAL * ((TMath::Exp(-lambdaMG * timeVar)) / ((lambdaAL-lambdaMG)*(lambdaSI-lambdaMG))));
+	f += (MG0 * lambdaSI * lambdaMG * lambdaAL * ((TMath::Exp(-lambdaAL * timeVar)) / ((lambdaMG-lambdaAL)*(lambdaSI-lambdaAL))));
+	f += (MG0 * lambdaSI * lambdaMG * lambdaAL * ((TMath::Exp(-lambdaSI * timeVar)) / ((lambdaMG-lambdaSI)*(lambdaAL-lambdaSI))));
 
-	f += (BA0 * lambdaLA * lambdaBA * ((TMath::Exp(-lambdaBA * timeVar)) / ((lambdaLA-lambdaBA))));
-	f += (BA0 * lambdaLA * lambdaBA * ((TMath::Exp(-lambdaLA * timeVar)) / ((lambdaBA-lambdaLA))));
+	f += (AL0 * lambdaSI * lambdaAL * ((TMath::Exp(-lambdaAL * timeVar)) / ((lambdaSI-lambdaAL))));
+	f += (AL0 * lambdaSI * lambdaAL * ((TMath::Exp(-lambdaSI * timeVar)) / ((lambdaAL-lambdaSI))));
 
 	return f;
 }
 
-Double_t FitFunction::LADecayByActivityIntegral(Double_t *x, Double_t *par)
+Double_t FitFunction::SIDecayByActivityIntegral(Double_t *x, Double_t *par)
 {
 	Float_t timeVar = x[0];
-	Double_t CS0 = par[0];
-	Double_t lambdaCS = par[1];
-	Double_t BA0 = par[2];
-	Double_t lambdaBA = par[3];
-	Double_t LA0 = par[4];
-	Double_t lambdaLA = par[5];
+	Double_t MG0 = par[0];
+	Double_t lambdaMG = par[1];
+	Double_t AL0 = par[2];
+	Double_t lambdaAL = par[3];
+	Double_t SI0 = par[4];
+	Double_t lambdaSI = par[5];
 
-	Double_t f = LA0 * (1.0 - TMath::Exp(-lambdaLA * timeVar));
+	Double_t f = SI0 * (1.0 - TMath::Exp(-lambdaSI * timeVar));
 
-	f += CS0 * lambdaBA * lambdaLA * (1.0 - TMath::Exp(-lambdaCS * timeVar)) / (lambdaBA-lambdaCS)*(lambdaLA-lambdaCS));
-	f += CS0 * lambdaCS * lambdaLA * (1.0 - TMath::Exp(-lambdaBA * timeVar)) / (lambdaCS-lambdaBA)*(lambdaLA-lambdaBA));
-	f += CS0 * lambdaCS * lambdaBA * (1.0 - TMath::Exp(-lambdaLA * timeVar)) / (lambdaCS-lambdaLA)*(lambdaBA-lambdaLA));
+	f += MG0 * lambdaAL * lambdaSI * (1.0 - TMath::Exp(-lambdaMG * timeVar)) / (lambdaAL-lambdaMG)*(lambdaSI-lambdaMG);
+	f += MG0 * lambdaMG * lambdaSI * (1.0 - TMath::Exp(-lambdaAL * timeVar)) / (lambdaMG-lambdaAL)*(lambdaSI-lambdaAL);
+	f += MG0 * lambdaMG * lambdaAL * (1.0 - TMath::Exp(-lambdaSI * timeVar)) / (lambdaMG-lambdaSI)*(lambdaAL-lambdaSI);
 
-	f += BA0 * lambdaLA * (1.0 - TMath::Exp(-lambdaBA * timeVar)) / (lambdaLA-lambdaBA));
-	f += BA0 * lambdaBA * (1.0 - TMath::Exp(-lambdaLA * timeVar)) / (lambdaBA-lambdaLA));
+	f += AL0 * lambdaSI * (1.0 - TMath::Exp(-lambdaAL * timeVar)) / (lambdaSI-lambdaAL);
+	f += AL0 * lambdaAL * (1.0 - TMath::Exp(-lambdaSI * timeVar)) / (lambdaAL-lambdaSI);
+
+	return f;
+}
+
+Double_t FitFunction::PDecayByActivity(Double_t *x, Double_t *par)
+{
+	Float_t timeVar = x[0];
+	Double_t MG0 = par[0];
+	Double_t lambdaMG = par[1];
+	Double_t AL0 = par[2];
+	Double_t lambdaAL = par[3];
+	Double_t SI0 = par[4];
+	Double_t lambdaSI = par[5];
+	Double_t P0 = par[6];
+	Double_t lambdaP = par[7];
+
+	Double_t f = (P0 * lambdaP * (TMath::Exp(-lambdaP * timeVar)));
+
+	f += (MG0 * lambdaP * lambdaMG * lambdaAL * lambdaSI * ((TMath::Exp(-lambdaMG * timeVar)) / ((lambdaAL-lambdaMG)*(lambdaSI-lambdaMG)*(lambdaP-lambdaMG))));
+	f += (MG0 * lambdaP * lambdaMG * lambdaAL * lambdaSI * ((TMath::Exp(-lambdaAL * timeVar)) / ((lambdaMG-lambdaAL)*(lambdaSI-lambdaAL)*(lambdaP-lambdaAL))));
+	f += (MG0 * lambdaP * lambdaMG * lambdaAL * lambdaSI * ((TMath::Exp(-lambdaSI * timeVar)) / ((lambdaMG-lambdaSI)*(lambdaAL-lambdaSI)*(lambdaP-lambdaSI))));
+	f += (MG0 * lambdaP * lambdaMG * lambdaAL * lambdaSI * ((TMath::Exp(-lambdaP * timeVar)) / ((lambdaMG-lambdaP)*(lambdaAL-lambdaP)*(lambdaSI-lambdaP))));
+
+	f += (AL0 * lambdaP * lambdaAL * lambdaSI * ((TMath::Exp(-lambdaAL * timeVar)) / ((lambdaSI-lambdaAL)*(lambdaP-lambdaAL))));
+	f += (AL0 * lambdaP * lambdaAL * lambdaSI * ((TMath::Exp(-lambdaSI * timeVar)) / ((lambdaAL-lambdaSI)*(lambdaP-lambdaSI))));
+	f += (AL0 * lambdaP * lambdaAL * lambdaSI * ((TMath::Exp(-lambdaP * timeVar)) / ((lambdaAL-lambdaP)*(lambdaSI-lambdaP))));
+
+	f += (SI0 * lambdaP * lambdaSI * ((TMath::Exp(-lambdaSI * timeVar)) / ((lambdaP-lambdaSI))));
+	f += (SI0 * lambdaP * lambdaSI * ((TMath::Exp(-lambdaP * timeVar)) / ((lambdaSI-lambdaP))));
+
+	return f;
+}
+
+Double_t FitFunction::PDecayByActivityIntegral(Double_t *x, Double_t *par)
+{
+	Float_t timeVar = x[0];
+	Double_t MG0 = par[0];
+	Double_t lambdaMG = par[1];
+	Double_t AL0 = par[2];
+	Double_t lambdaAL = par[3];
+	Double_t SI0 = par[4];
+	Double_t lambdaSI = par[5];
+	Double_t P0 = par[6];
+	Double_t lambdaP = par[7];
+
+	Double_t f = P0 * (1.0 - TMath::Exp(-lambdaP * timeVar));
+
+	f += MG0 * lambdaAL * lambdaSI * lambdaP * (1.0 - TMath::Exp(-lambdaMG * timeVar)) / (lambdaAL-lambdaMG)*(lambdaSI-lambdaMG)*(lambdaP-lambdaMG);
+	f += MG0 * lambdaMG * lambdaSI * lambdaP * (1.0 - TMath::Exp(-lambdaAL * timeVar)) / (lambdaMG-lambdaAL)*(lambdaSI-lambdaAL)*(lambdaP-lambdaAL);
+	f += MG0 * lambdaMG * lambdaAL * lambdaP * (1.0 - TMath::Exp(-lambdaSI * timeVar)) / (lambdaMG-lambdaSI)*(lambdaAL-lambdaSI)*(lambdaP-lambdaSI);
+	f += MG0 * lambdaMG * lambdaAL * lambdaSI * (1.0 - TMath::Exp(-lambdaP * timeVar)) / (lambdaMG-lambdaP)*(lambdaAL-lambdaP)*(lambdaSI-lambdaP);
+
+	f += AL0 * lambdaSI * lambdaP * (1.0 - TMath::Exp(-lambdaAL * timeVar)) / (lambdaSI-lambdaAL)*(lambdaP-lambdaAL);
+	f += AL0 * lambdaAL * lambdaP * (1.0 - TMath::Exp(-lambdaSI * timeVar)) / (lambdaAL-lambdaSI)*(lambdaP-lambdaSI);
+	f += AL0 * lambdaAL * lambdaSI * (1.0 - TMath::Exp(-lambdaP * timeVar)) / (lambdaAL-lambdaP)*(lambdaSI-lambdaP);
+
+	f += SI0 * lambdaP * (1.0 - TMath::Exp(-lambdaSI * timeVar)) / (lambdaP-lambdaSI);
+	f += SI0 * lambdaSI * (1.0 - TMath::Exp(-lambdaP * timeVar)) / (lambdaSI-lambdaP);
 
 	return f;
 }
@@ -150,7 +215,7 @@ Double_t FitFunction::BatemanDecaybyActivty(Double_t *x, Double_t *par)
 	return hold;
 }
 
-Double_t IntegralDecaybyActivity(Double_t *x, Double_t *par)
+Double_t FitFunction::IntegralDecaybyActivity(Double_t *x, Double_t *par)
 {
 	Double_t hold = 0.0;
 	for(int i = 0; i < numElements; i++)
@@ -158,6 +223,11 @@ Double_t IntegralDecaybyActivity(Double_t *x, Double_t *par)
 		hold += integralFitFunctions[i](x, par);
 	}
 	return hold;
+}
+
+double FitFunction::Add()
+{
+	return 8.9;
 }
 
 endif;

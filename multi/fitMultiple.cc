@@ -13,7 +13,7 @@
 #include "ParameterValue.h"
 #include "CycleCanvasHolder.h"
 #include "SingleCycleCanvasHolder.h"
-#include "FitOption.h"
+#include "FitFunction.h"
 
 using namespace std;
 
@@ -37,7 +37,6 @@ void fitMultiple();
 int main()
 {
     fitMultiple();
-    cout << "finished" << endl;
     return 0;
 }
 
@@ -160,7 +159,6 @@ void fitMultiple()
         delete [] elementNames;
         return;
     }
-    cout << "more" << endl;
     
     //calculates the decay constant values
     for(int i = 0; i < numElements; i++)
@@ -242,7 +240,7 @@ void fitMultiple()
                     Int_t runs;
                     int graphOrHistoChoice, lowerRunHistoIndex, upperRunHistoIndex;
 
-                    inFile.open("simulated_single_cylce.txt");
+                    inFile.open("simulated_single_cycle.txt");
                     inFile.ignore(256,':');
                     inFile >> runs;
                     inFile.ignore(256,':');
@@ -680,12 +678,14 @@ void CreateFitFunctions(string* elementNames)
     outFile << "\tdecayFunction* batemanFitFunctions;" << endl;
     outFile << "\tdecayFunction* integralFitFunctions;" << endl;
     outFile << "\tdecayFunction* fitFunctions;" << endl;
+
     outFile << "public:" << endl;
     for(int i = 0; i < numElements; i++)
     {
-        outFile << "\tDouble_t " << batemanFunctionNames[i] << "(Double_t *x, Double_t par);" << endl;
-        outFile << "\tDouble_t " << integralFunctionNames[i] << "(Double_t *x, Double_t par);" << endl;
+        outFile << "\tDouble_t " << batemanFunctionNames[i] << "(Double_t *x, Double_t* par);" << endl;
+        outFile << "\tDouble_t " << integralFunctionNames[i] << "(Double_t *x, Double_t* par);" << endl;
     }
+    outFile << endl << "FitFunction(Int_t numElements)";
     outFile << "};" << endl << endl;
 
     //constructor
@@ -697,10 +697,10 @@ void CreateFitFunctions(string* elementNames)
     outFile << "\tfitFunctions = new decayFunction [numElements*2];" << endl;
     for(int i = 0; i < numElements; i++)
     {
-        outFile << "\tfitFunction[" << (i*2) << "] = " << batemanFunctionNames[i] << ";" << endl;
-        outFile << "\tfitFunction[" << ((i*2)+1) << "] = " << integralFunctionNames[i] << ";" << endl;
+        outFile << "\tfitFunctions[" << (i*2) << "] = " << batemanFunctionNames[i] << ";" << endl;
+        outFile << "\tfitFunctions[" << ((i*2)+1) << "] = " << integralFunctionNames[i] << ";" << endl;
         outFile << "\tbatemanFitFunctions[" << i << "] = " << batemanFunctionNames[i] << ";" << endl;
-        outFile << "\tintegralFitFunction[" << i << "] = " << integralFunctionNames[i] << ";" << endl; 
+        outFile << "\tintegralFitFunctions[" << i << "] = " << integralFunctionNames[i] << ";" << endl; 
     }
     outFile << "}" << endl << endl;
 
@@ -804,7 +804,7 @@ void CreateFitFunctions(string* elementNames)
                         outFile << "(" << lambdaNames[j] << "-" << lambdaNames[k] << ")";
                     }
                 }
-                outFile << ");" << endl;
+                outFile << ";" << endl;
             }
             outFile << endl;
         }
@@ -823,7 +823,7 @@ void CreateFitFunctions(string* elementNames)
     outFile << "}\n" << endl;
 
     //total integral function
-    outFile << "Double_t IntegralDecaybyActivity(Double_t *x, Double_t *par)" << endl;
+    outFile << "Double_t FitFunction::IntegralDecaybyActivity(Double_t *x, Double_t *par)" << endl;
     outFile << "{" << endl;
     outFile << "\tDouble_t hold = 0.0;" << endl;
     outFile << "\tfor(int i = 0; i < numElements; i++)" << endl;
@@ -831,6 +831,11 @@ void CreateFitFunctions(string* elementNames)
     outFile << "\t\thold += integralFitFunctions[i](x, par);" << endl;
     outFile << "\t}" << endl;
     outFile << "\treturn hold;" << endl;
+    outFile << "}" << endl << endl;
+
+    outFile << "double FitFunction::Add()" << endl;
+    outFile << "{" << endl;
+    outFile << "\treturn 8.9;" << endl;
     outFile << "}" << endl << endl;
 
     outFile << "endif;";
