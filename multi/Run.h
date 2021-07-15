@@ -27,52 +27,52 @@
 using namespace std;
 
 class Run{
-    private:
-        Int_t runs, numElements, eventDecrement;
-        FitOption* fitOptions;
-        ElementFit* element;
-        ChainRunFitValues* batemanFitValues, *integralFitValues;
-        SingleChainRunFitValues* singleBatemanFitValues, *singleIntegralFitValues;
-        Double_t* eventsXAxis, *runsXAxis, *zero;
-        string* elementNameStrs;
-        TH3D* correlationHisto;
-        TH1D** multiRunResultHistograms;
-        TGraphErrors** totalBatemanGraphs, **totalIntegralGraphs, **singleBatemanGraphs, **singleIntegralGraphs;
-        TCanvas* testCan;
-        TCanvas** multiRunResultCanvas;
-        //helper functions
-        void createCorrelationHistoEventChange();
-        void createCorrelationHistoNoChange();
-        Double_t getMaxElement(Double_t* arr);
-        Double_t getMinElement(Double_t* arr);
-        void runEventChange();
-        void genIntegralMeanGraphs();
-        void genBatemanMeanGraphs();
-    public:
-        Run(ElementFit* element);
-        ~Run();
-        void runNoChangeGenOnce(Int_t cycleIndex, Int_t runIndex);
-        void genGraphsEventChange();
-        void genGraphsNoChange();
-        void genGraphsNoChangeSingleElement();
-        TH1D** createRunResultHistos();
-        TH1D** createRunResultHistosSingleElements();
-        TH1D** fillRunResultHistos(TH1D** multiRunResultHistograms);
-        TH1D** fillRunResultHistosSingleElement(TH1D** multiRunResultHistogramsSingleElement);
-        void displayMultiRunResultGraphs(TCanvas** canvasArray);
-        void displayCorrelationHisto(TCanvas* canvas);
-        void displayMultiRunResultHistos(TCanvas** canvasArray, TH1D** multiRunResultHistograms);
-        void runNoChange(Int_t cycleIndex);
-        //getter function
-        ChainRunFitValues* getBatemanFitValues(){return batemanFitValues;}
-        ChainRunFitValues* getIntegralFitValues(){return integralFitValues;}
-        SingleChainRunFitValues* getSingleBatemanFitValues(){return singleBatemanFitValues;}
-        SingleChainRunFitValues* getSingleIntegralFitValues(){return singleIntegralFitValues;}
-        TH1D** getMultiRunResultHistos(){return multiRunResultHistograms;}
-        string* getElementStringNames(){return elementNameStrs;}
-        Int_t getNumRuns(){return runs;}
-        //setter function
-        void setNumRuns(Int_t numRuns){this->runs = numRuns;}
+private:
+    Int_t runs, numElements, eventDecrement;
+    FitOption* fitOptions;
+    ElementFit* element;
+    ChainRunFitValues* batemanFitValues, *integralFitValues;
+    SingleChainRunFitValues* singleBatemanFitValues, *singleIntegralFitValues;
+    Double_t* eventsXAxis, *runsXAxis, *zero;
+    string* elementNameStrs;
+    TH3D* correlationHisto;
+    TH1D** multiRunResultHistograms;
+    TGraphErrors** totalBatemanGraphs, **totalIntegralGraphs, **singleBatemanGraphs, **singleIntegralGraphs;
+    TCanvas* testCan;
+    TCanvas** multiRunResultCanvas;
+    //helper functions
+    void createCorrelationHistoEventChange();
+    void createCorrelationHistoNoChange();
+    Double_t getMaxElement(Double_t* arr);
+    Double_t getMinElement(Double_t* arr);
+    void runEventChange();
+    void genIntegralMeanGraphs();
+    void genBatemanMeanGraphs();
+public:
+    Run(ElementFit* element);
+    ~Run();
+    void runNoChangeGenOnce(Int_t cycleIndex, Int_t runIndex);
+    void genGraphsEventChange();
+    void genGraphsNoChange();
+    void genGraphsNoChangeSingleElement();
+    TH1D** createRunResultHistos();
+    TH1D** createRunResultHistosSingleElements();
+    TH1D** fillRunResultHistos(TH1D** multiRunResultHistograms);
+    TH1D** fillRunResultHistosSingleElement(TH1D** multiRunResultHistogramsSingleElement);
+    void displayMultiRunResultGraphs(TCanvas** canvasArray);
+    void displayCorrelationHisto(TCanvas* canvas);
+    void displayMultiRunResultHistos(TCanvas** canvasArray, TH1D** multiRunResultHistograms);
+    void runNoChange(Int_t cycleIndex);
+    //getter function
+    ChainRunFitValues* getBatemanFitValues(){return batemanFitValues;}
+    ChainRunFitValues* getIntegralFitValues(){return integralFitValues;}
+    SingleChainRunFitValues* getSingleBatemanFitValues(){return singleBatemanFitValues;}
+    SingleChainRunFitValues* getSingleIntegralFitValues(){return singleIntegralFitValues;}
+    TH1D** getMultiRunResultHistos(){return multiRunResultHistograms;}
+    string* getElementStringNames(){return elementNameStrs;}
+    Int_t getNumRuns(){return runs;}
+    //setter function
+    void setNumRuns(Int_t numRuns){this->runs = numRuns;}
 };
 
 Run::Run(ElementFit* element)
