@@ -25,6 +25,7 @@
 #include "SingleCycleGraphHolder.h"
 #include "CycleGraphHolder.h"
 #include "ParameterValue.h"
+#include "FitFunction.h"
 #include "FitOption.h"
 
 using namespace std;
@@ -33,7 +34,7 @@ typedef Double_t (*decayFunction)(Double_t *x, Double_t *par);
 
 class ElementFit{
     public:
-        ElementFit(Double_t (*batemanFunc)(Double_t*, Double_t*), Double_t (*integralFunc)(Double_t*, Double_t*), Double_t (**fitFunctions)(Double_t*, Double_t*),
+        ElementFit(Double_t (*batemanFunc)(Double_t*, Double_t*), Double_t (*integralFunc)(Double_t*, Double_t*), Double_t (**batemanFitFunctions)(Double_t*, Double_t*), Double_t (**integralFitFunctions)(Double_t*, Double_t*),
                    ParameterValue** paraVals, FitOption* fitOptions);
         ~ElementFit();
         //getter function
@@ -76,7 +77,7 @@ class ElementFit{
         CycleGraphHolder* integralGraph;
         SingleCycleGraphHolder* singleIntegralGraph;
         //passed fit functions used to make the TF1 for fitting
-        decayFunction* fitFunctions;
+        decayFunction* batemanFitFunctions, *integralFitFunctions;
         decayFunction passedBatemanFunction, passedIntegralFunction;
         TRandom3 rand;
         Double_t timeRunStart, timeRunEnd, leaveOutStartBinNumber, leaveOutEndBinNumber, doubleEvents;
@@ -103,8 +104,8 @@ class ElementFit{
 };  
 
 //constructor for generating a histogram
-ElementFit::ElementFit(Double_t (*batemanFunc)(Double_t*, Double_t*), Double_t (*integralFunc)(Double_t*, Double_t*), Double_t (**fitFunctions)(Double_t*, Double_t*),
-                       ParameterValue** paraVals, FitOption* fitOptions)
+ElementFit::ElementFit(Double_t (*batemanFunc)(Double_t*, Double_t*), Double_t (*integralFunc)(Double_t*, Double_t*), Double_t (**batemanFitFunctions)(Double_t*, Double_t*), Double_t (**integralFitFunctions)(Double_t*, Double_t*),
+                   ParameterValue** paraVals, FitOption* fitOptions)
 {
     //setting variables
     this->fitOptions = fitOptions;
@@ -112,7 +113,8 @@ ElementFit::ElementFit(Double_t (*batemanFunc)(Double_t*, Double_t*), Double_t (
     this->numRuns = fitOptions->GetNumRuns();
     this->numCycles = fitOptions->GetNumCycles();
     this->elementNames = fitOptions->GetElementNames();
-    this->fitFunctions = fitFunctions;
+    this->batemanFitFunctions = batemanFitFunctions;
+    this->integralFitFunctions = integralFitFunctions;
     this->numElements = fitOptions->GetNumElements();
     this->numParameters = numElements*2;
     this->numBins = fitOptions->GetNumBins();
@@ -251,11 +253,11 @@ void ElementFit::createSingleFitFunctions(Int_t timeEnd)
 {
     for(int i = 0; i < numElements; i++)
     {
-        singleFitFunctions[(i*2)] = new TF1((elementNames[i] + "RegSingFunc").c_str(), fitFunctions[(i*2)], 0., timeEnd, (i+1)*2);
-        singleFitFunctions[(i*2)+1] = new TF1((elementNames[i] + "InteSingFunc").c_str(), fitFunctions[(i*2)+1], 0., timeEnd, (i+1)*2);
+        singleFitFunctions[(i*2)] = new TF1((elementNames[i] + "RegSingFunc").c_str(), batemanFitFunctions[i], 0., timeEnd, (i+1)*2);
+        singleFitFunctions[(i*2)+1] = new TF1((elementNames[i] + "InteSingFunc").c_str(), integralFitFunctions[i], 0., timeEnd, (i+1)*2);
     }
-    tempBatemanCs = new TF1("Cs Bateman Single Function", fitFunctions[0], 0., timeEnd, 2);
-    tempIntegralCs = new TF1("Cs Integral Single Function", fitFunctions[1], 0., timeEnd, 2);
+    tempBatemanCs = new TF1("Cs Bateman Single Function", batemanFitFunctions[0], 0., timeEnd, 2);
+    tempIntegralCs = new TF1("Cs Integral Single Function", integralFitFunctions[0], 0., timeEnd, 2);
 }
 
 //dynamically allocates the total fit functions

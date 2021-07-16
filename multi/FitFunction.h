@@ -3,17 +3,11 @@
 
 #include "TMath.h"
 
-typedef Double_t (*decayFunction)(Double_t *x, Double_t *par);
-
 using namespace std;
 
 class FitFunction{
-private:
-	Int_t numElements;
-	decayFunction* batemanFitFunctions;
-	decayFunction* integralFitFunctions;
-	decayFunction* fitFunctions;
 public:
+	typedef Double_t (FitFunction::*decayFunction)(Double_t *x, Double_t *par);
 	Double_t MGDecayByActivity(Double_t *x, Double_t* par);
 	Double_t MGDecayByActivityIntegral(Double_t *x, Double_t* par);
 	Double_t ALDecayByActivity(Double_t *x, Double_t* par);
@@ -22,31 +16,28 @@ public:
 	Double_t SIDecayByActivityIntegral(Double_t *x, Double_t* par);
 	Double_t PDecayByActivity(Double_t *x, Double_t* par);
 	Double_t PDecayByActivityIntegral(Double_t *x, Double_t* par);
-
-FitFunction(Int_t numElements)};
+	FitFunction(Int_t numElements);
+	FitFunction::decayFunction* GetBatemanFitFunctions(){return batemanFitFunctions;}
+	FitFunction::decayFunction* GetIntegralFitFunctions(){return integralFitFunctions;}
+private:
+	Int_t numElements;
+	FitFunction::decayFunction* batemanFitFunctions;
+	FitFunction::decayFunction* integralFitFunctions;
+};
 
 FitFunction::FitFunction(Int_t numElements)
 {
 	this->numElements = numElements;
-	batemanFitFunctions = new decayFunction [numElements];
-	integralFitFunctions = new decayFunction [numElements];
-	fitFunctions = new decayFunction [numElements*2];
-	fitFunctions[0] = MGDecayByActivity;
-	fitFunctions[1] = MGDecayByActivityIntegral;
-	batemanFitFunctions[0] = MGDecayByActivity;
-	integralFitFunctions[0] = MGDecayByActivityIntegral;
-	fitFunctions[2] = ALDecayByActivity;
-	fitFunctions[3] = ALDecayByActivityIntegral;
-	batemanFitFunctions[1] = ALDecayByActivity;
-	integralFitFunctions[1] = ALDecayByActivityIntegral;
-	fitFunctions[4] = SIDecayByActivity;
-	fitFunctions[5] = SIDecayByActivityIntegral;
-	batemanFitFunctions[2] = SIDecayByActivity;
-	integralFitFunctions[2] = SIDecayByActivityIntegral;
-	fitFunctions[6] = PDecayByActivity;
-	fitFunctions[7] = PDecayByActivityIntegral;
-	batemanFitFunctions[3] = PDecayByActivity;
-	integralFitFunctions[3] = PDecayByActivityIntegral;
+	batemanFitFunctions = new FitFunction::decayFunction [numElements];
+	integralFitFunctions = new FitFunction::decayFunction [numElements];
+	batemanFitFunctions[0] = &FitFunction::MGDecayByActivity;
+	integralFitFunctions[0] = &FitFunction::MGDecayByActivityIntegral;
+	batemanFitFunctions[1] = &FitFunction::ALDecayByActivity;
+	integralFitFunctions[1] = &FitFunction::ALDecayByActivityIntegral;
+	batemanFitFunctions[2] = &FitFunction::SIDecayByActivity;
+	integralFitFunctions[2] = &FitFunction::SIDecayByActivityIntegral;
+	batemanFitFunctions[3] = &FitFunction::PDecayByActivity;
+	integralFitFunctions[3] = &FitFunction::PDecayByActivityIntegral;
 }
 
 Double_t FitFunction::MGDecayByActivity(Double_t *x, Double_t *par)
@@ -205,29 +196,4 @@ Double_t FitFunction::PDecayByActivityIntegral(Double_t *x, Double_t *par)
 	return f;
 }
 
-Double_t FitFunction::BatemanDecaybyActivty(Double_t *x, Double_t *par)
-{
-	Double_t hold = 0.0;
-	for(int i = 0; i < numElements; i++)
-	{
-		hold += batemanFitFunctions[i](x, par);
-	}
-	return hold;
-}
-
-Double_t FitFunction::IntegralDecaybyActivity(Double_t *x, Double_t *par)
-{
-	Double_t hold = 0.0;
-	for(int i = 0; i < numElements; i++)
-	{
-		hold += integralFitFunctions[i](x, par);
-	}
-	return hold;
-}
-
-double FitFunction::Add()
-{
-	return 8.9;
-}
-
-endif;
+#endif
