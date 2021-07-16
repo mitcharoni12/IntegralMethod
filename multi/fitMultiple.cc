@@ -17,12 +17,6 @@
 
 using namespace std;
 
-Double_t BADecaybyActivityIntegral(Double_t *x, Double_t *par);
-Double_t CSDecaybyActivityIntegral(Double_t *x, Double_t *par);
-Double_t LADecaybyActivityIntegral(Double_t *x, Double_t *par);
-Double_t CSDecaybyActivity(Double_t* x, Double_t *par);
-Double_t BADecaybyActivity(Double_t *x, Double_t *par);
-Double_t LADecaybyActivity(Double_t *x, Double_t *par);
 Double_t IntegralDecaybyActivity(Double_t *x, Double_t *par);
 Double_t BatemanDecaybyActivity(Double_t *x, Double_t *par);
 void CreateFitFunctions(string* elementNames);
@@ -57,8 +51,6 @@ void fitMultiple()
 
     //fitFunctions array passed in and used in element object
     Int_t numFitFunction = numElements*2;
-    decayFunction batemanFitFunctions;
-    decayFunction integralFitFunctions;
     /*
     decayFunction* fitFunctions = new decayFunction[numFitFunction];
     fitFunctions[0] = CSDecaybyActivity;
@@ -164,8 +156,8 @@ void fitMultiple()
         return;
     }
     FitFunction* fitFunctions = new FitFunction(numElements);
-    batemanFitFunctions = (decayFunction) fitFunctions->GetBatemanFitFunctions();
-    integralFitFunctions = (decayFunction) fitFunctions->GetIntegralFitFunctions();
+    batemanFitFunctions = fitFunctions->GetBatemanFitFunctions();
+    integralFitFunctions = fitFunctions->GetIntegralFitFunctions();
     
     //calculates the decay constant values
     for(int i = 0; i < numElements; i++)
@@ -531,60 +523,14 @@ void fitMultiple()
     delete [] elementNames;
 }
 
-//formula for CS activity
-Double_t CSDecaybyActivityIntegral(Double_t *x, Double_t *par)
+Double_t BatemanDecaybyActivity(Double_t *x, Double_t *par)
 {
-    Float_t timeVar = x[0];
-    Double_t CS0 = par[0];
-    Double_t lambdaCS = par[1];
-
-    Double_t f = CS0 * (1.0 - TMath::Exp(- lambdaCS * timeVar));
-    return f;
-}
-
-//formula for BA activity
-Double_t BADecaybyActivityIntegral(Double_t *x, Double_t *par)
-{
-    Float_t timeVar = x[0];
-    Double_t CS0 = par[0];
-    Double_t lambdaCS = par[1];
-    Double_t BA0 = par[2];
-    Double_t lambdaBA = par[3];
-
-    //inital BA
-    Double_t f = BA0*(1.0 - TMath::Exp(-lambdaBA * timeVar));
-    //first summation
-    f += (((CS0*lambdaBA)/(lambdaBA-lambdaCS))*(1.0 - TMath::Exp(-lambdaCS * timeVar)));
-    //second summation
-    f += (((CS0*lambdaCS)/(lambdaCS-lambdaBA))*(1.0 - TMath::Exp(-lambdaBA * timeVar)));
-
-    return f;
-}
-
-//formla for LA activity
-Double_t LADecaybyActivityIntegral(Double_t *x, Double_t *par)
-{
-    Float_t timeVar = x[0];
-    Double_t CS0 = par[0];
-    Double_t lambdaCS = par[1]; 
-    Double_t BA0 = par[2];
-    Double_t lambdaBA = par[3];
-    Double_t LA0 = par[4];
-    Double_t lambdaLA = par[5];
-
-    //intial LA
-    Double_t f = LA0 * ( 1.0 - TMath::Exp( - lambdaLA * timeVar ) );
-    
-    //intial BA
-    f += BA0 * lambdaLA / (lambdaLA - lambdaBA ) * ( 1.0 - TMath::Exp( - lambdaBA * timeVar ) );
-    f += BA0 * lambdaBA / (lambdaBA - lambdaLA ) * ( 1.0 - TMath::Exp( - lambdaLA * timeVar ) );
-
-    //first, second, and third part of summation
-    f += CS0 * lambdaCS * lambdaBA / (lambdaCS - lambdaLA ) / ( lambdaBA - lambdaLA ) * ( 1.0 - TMath::Exp( - lambdaLA * timeVar ) );
-    f += CS0 * lambdaCS * lambdaLA / (lambdaCS - lambdaBA ) / ( lambdaLA - lambdaBA ) * ( 1.0 - TMath::Exp( - lambdaBA * timeVar ) );
-    f += CS0 * lambdaBA * lambdaLA / (lambdaBA - lambdaCS ) / ( lambdaLA - lambdaCS ) * ( 1.0 - TMath::Exp( - lambdaCS * timeVar ) );
- 
-    return f;
+    Double_t hold = 0.0;
+    for(int i = 0; i < numElements; i++)
+    {
+        hold += batemanFitFunctions[i](x, par);
+    }
+    return hold;
 }
 
 Double_t IntegralDecaybyActivity(Double_t *x, Double_t *par)
@@ -593,63 +539,6 @@ Double_t IntegralDecaybyActivity(Double_t *x, Double_t *par)
     for(int i = 0; i < numElements; i++)
     {
         hold += integralFitFunctions[i](x, par);
-    }
-    return hold;
-}
-
-Double_t CSDecaybyActivity(Double_t* x, Double_t *par)
-{
-    Float_t timeVar = x[0];
-    Double_t CS0 = par[0];
-    Double_t lambdaCS = par[1];
-
-    Double_t f = CS0*lambdaCS*TMath::Exp(- lambdaCS* timeVar);
-    return f;
-}
-
-Double_t BADecaybyActivity(Double_t *x, Double_t *par)
-{
-    Float_t timeVar = x[0];
-    Double_t CS0 = par[0];
-    Double_t lambdaCS = par[1];
-    Double_t BA0 = par[2];
-    Double_t lambdaBA = par[3];
-
-    Double_t f = BA0 * lambdaBA * TMath::Exp(- lambdaBA*timeVar);
-
-    f += CS0 * lambdaCS * lambdaBA * ((TMath::Exp(- lambdaCS*timeVar))/(lambdaBA-lambdaCS));
-    f += CS0 * lambdaCS * lambdaBA * ((TMath::Exp(- lambdaBA*timeVar))/(lambdaCS-lambdaBA));
-    return f;
-}
-
-Double_t LADecaybyActivity(Double_t *x, Double_t *par)
-{
-    Float_t timeVar = x[0];
-    Double_t CS0 = par[0];
-    Double_t lambdaCS = par[1];
-    Double_t BA0 = par[2];
-    Double_t lambdaBA = par[3];
-    Double_t LA0 = par[4];
-    Double_t lambdaLA = par[5];
-
-    Double_t f = (LA0 * lambdaLA * (TMath::Exp(-lambdaLA * timeVar)));
-
-    f += (BA0 * lambdaBA *lambdaLA*((TMath::Exp(- lambdaBA * timeVar))/(lambdaLA - lambdaBA)));
-    f += (BA0 * lambdaBA *lambdaLA*((TMath::Exp(- lambdaLA * timeVar))/(lambdaBA - lambdaLA)));
-
-    f += (CS0 * lambdaCS * lambdaBA * lambdaLA*((TMath::Exp(- lambdaCS * timeVar))/((lambdaBA-lambdaCS)*(lambdaLA-lambdaCS))));
-    f += (CS0 * lambdaCS * lambdaBA * lambdaLA*((TMath::Exp(- lambdaBA * timeVar))/((lambdaCS-lambdaBA)*(lambdaLA-lambdaBA))));
-    f += (CS0 * lambdaCS * lambdaBA * lambdaLA*((TMath::Exp(- lambdaLA * timeVar))/((lambdaCS-lambdaLA)*(lambdaBA-lambdaLA))));
-
-    return f;
-}
-
-Double_t BatemanDecaybyActivity(Double_t *x, Double_t *par)
-{
-    Double_t hold = 0.0;
-    for(int i = 0; i < numElements; i++)
-    {
-        hold += batemanFitFunctions[i](x, par);
     }
     return hold;
 }
@@ -680,11 +569,11 @@ void CreateFitFunctions(string* elementNames)
 
     outFile << "class FitFunction{" << endl;
     outFile << "public:" << endl;
-    outFile << "\ttypedef Double_t (FitFunction::*decayFunction)(Double_t *x, Double_t *par);" << endl;
+    outFile << "\ttypedef Double_t (*decayFunction)(Double_t *x, Double_t *par);" << endl;
     for(int i = 0; i < numElements; i++)
     {
-        outFile << "\tDouble_t " << batemanFunctionNames[i] << "(Double_t *x, Double_t* par);" << endl;
-        outFile << "\tDouble_t " << integralFunctionNames[i] << "(Double_t *x, Double_t* par);" << endl;
+        outFile << "\tstatic Double_t " << batemanFunctionNames[i] << "(Double_t *x, Double_t* par);" << endl;
+        outFile << "\tstatic Double_t " << integralFunctionNames[i] << "(Double_t *x, Double_t* par);" << endl;
     }
     outFile << "\tFitFunction(Int_t numElements);" << endl;
     outFile << "\tdecayFunction* GetBatemanFitFunctions(){return batemanFitFunctions;}" << endl;
@@ -692,20 +581,20 @@ void CreateFitFunctions(string* elementNames)
 
     outFile << "private:" << endl;
     outFile << "\tInt_t numElements;" << endl;
-    outFile << "\tFitFunction::decayFunction* batemanFitFunctions;" << endl;
-    outFile << "\tFitFunction::decayFunction* integralFitFunctions;" << endl;
+    outFile << "\tdecayFunction* batemanFitFunctions;" << endl;
+    outFile << "\tdecayFunction* integralFitFunctions;" << endl;
     outFile << "};" << endl << endl;
 
     //constructor
     outFile << "FitFunction::FitFunction(Int_t numElements)" << endl;
     outFile << "{" << endl;
     outFile << "\tthis->numElements = numElements;" << endl;
-    outFile << "\tbatemanFitFunctions = new FitFunction::decayFunction [numElements];" << endl;
-    outFile << "\tintegralFitFunctions = new FitFunction::decayFunction [numElements];" << endl;
+    outFile << "\tbatemanFitFunctions = new decayFunction [numElements];" << endl;
+    outFile << "\tintegralFitFunctions = new decayFunction [numElements];" << endl;
     for(int i = 0; i < numElements; i++)
     {
-        outFile << "\tbatemanFitFunctions[" << i << "] = &FitFunction::" << batemanFunctionNames[i] << ";" << endl;
-        outFile << "\tintegralFitFunctions[" << i << "] = &FitFunction::" << integralFunctionNames[i] << ";" << endl; 
+        outFile << "\tbatemanFitFunctions[" << i << "] = " << batemanFunctionNames[i] << ";" << endl;
+        outFile << "\tintegralFitFunctions[" << i << "] = " << integralFunctionNames[i] << ";" << endl; 
     }
     outFile << "}" << endl << endl;
 
