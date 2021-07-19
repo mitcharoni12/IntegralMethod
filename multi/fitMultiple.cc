@@ -228,7 +228,7 @@ void fitMultiple()
                     TCanvas* integralTotalCanvas = new TCanvas("Total Integral Histo", "Total Integral Histo", 500, 500);
                     element->displaySingleHistos(singleCanvas);
                     element->displayBatemanHisto(batemanTotalCanvas);
-                    element->displayIntegralHisto(integralTotalCanvas);
+                    element->displayIntegralGraph(integralTotalCanvas);
                     delete [] singleCanvas;
                     delete element;
                 break;
