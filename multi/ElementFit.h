@@ -50,22 +50,18 @@ class ElementFit{
         void setNumRuns(Int_t numRuns){this->numRuns = numRuns;}
         void setNumCycles(Int_t numCycles){this->numCycles = numCycles;}
         //public functions
-        void createHistoHolders();
         void displayIntegralGraph(TCanvas* can);
         void displayBatemanHisto(TCanvas* can);
         void displaySingleHistos(TCanvas** can);
         void displayParameters();
         void DrawIndividualHistos(CycleCanvasHolder* batemanTotalCanvases, CycleCanvasHolder* integralTotalCanvases, SingleCycleCanvasHolder* singleBatemanCanvases, SingleCycleCanvasHolder* singleIntegralCanvases, Int_t lowerRunIndex, Int_t upperRunIndex, Int_t lowerCycleIndex, Int_t upperCycleIndex);
         void fitHistos(Int_t cycleIndex, Int_t runIndex);
-        void genIntegralHisto();
-        void genIntegralSingleHistos();
-        void genBatemanHistograms();
         void genAndFillHistos();
     private:
         //private variables
         FitOption* fitOptions;
         string* elementNames;
-        Int_t events, numElements, numBins, numParameters, numRuns, numCycles;
+        Int_t numEvents, numElements, numBins, numParameters, numRuns, numCycles;
         bool multiSourceChoice, rebinChoice;
         Int_t* binNumArr;
         TF1* integralFunction, *batemanFunction;
@@ -78,15 +74,16 @@ class ElementFit{
         decayFunction* batemanFitFunctions, *integralFitFunctions;
         decayFunction passedBatemanFunction, passedIntegralFunction;
         TRandom3 rand;
-        Double_t timeRunStart, timeRunEnd, leaveOutStartBinNumber, leaveOutEndBinNumber, doubleEvents;
+        Double_t timeRunStart, timeRunEnd, leaveOutStartBinNumber, leaveOutEndBinNumber, doubleNumEvents;
         Double_t* randArr, *binWidth, *timeEndArr, *timeStartArr;
         ChainFitValues* totalBatemanFitParameters, *totalIntegralFitParameters;
         SingleElementFitValues* singleBatemanFitParameters, *singleIntegralFitParameters;
-        ParameterValue** paraVals;
+        ParameterValue** paraVals; ///< Accepted values for all parameters in all the fit functions
         Int_t globalSeedChanger = 0;
         //helper functions
         void changeSeed();
         void createIntegralGraph();
+        void createHistoHolders();
         void createSingleFitFunctions(Int_t timeEnd);
         void createTotalFitFunctions(Int_t timeEnd);
         void fitIntegralHisto(Int_t cycleIndex, Int_t runIndex, Double_t startFit, Double_t endFit);
@@ -94,6 +91,9 @@ class ElementFit{
         void fitSingleHistos(Int_t cycleIndex, Int_t runIndex, Double_t startFit, Double_t endFits);
         void DisplayParameterLimits();
         void DisplayTotalFunctionParameters();
+        void genBatemanHistograms();
+        void genIntegralHisto();
+        void genIntegralSingleHistos();
         void genIntegralHistoSimulated();
         void setFunctionParametersTotal();
         void setFunctionParamersSingle();
@@ -102,7 +102,7 @@ class ElementFit{
         clock_t Tclock;
 };  
 
-/// \brief the constructor
+/// \brief The constructor
 ///
 /// Will take the fit fuctions for the program and the fit options for both the Run class and Cycle class. Dynamically allocates the fit parameter storages here.
 /// Creates data required for creating the histograms between runs and cycles. Runs the call for creating all the histograms.
@@ -111,7 +111,7 @@ ElementFit::ElementFit(Double_t (*batemanFunc)(Double_t*, Double_t*), Double_t (
 {
     //setting variables
     this->fitOptions = fitOptions;
-    this->events = fitOptions->GetNumEvents();
+    this->numEvents = fitOptions->GetNumEvents();
     this->numRuns = fitOptions->GetNumRuns();
     this->numCycles = fitOptions->GetNumCycles();
     this->elementNames = fitOptions->GetElementNames();
@@ -128,7 +128,7 @@ ElementFit::ElementFit(Double_t (*batemanFunc)(Double_t*, Double_t*), Double_t (
     this->rebinChoice = fitOptions->GetRebinChoice();
     this->leaveOutStartBinNumber = fitOptions->GetStartBinLeaveOut();
     this->leaveOutEndBinNumber = fitOptions->GetEndBinLeaveOut();
-    doubleEvents = (Double_t) events;
+    doubleNumEvents = (Double_t) numEvents;
 
     //creating fit parameter holders
     singleBatemanFitParameters = new SingleElementFitValues(numElements);
@@ -191,8 +191,9 @@ void ElementFit::createHistoHolders()
     singleIntegralHisto = new SingleCycleHistoHolder(numCycles, numElements, numRuns, histoName, binNumArr, timeEndArr, elementNames);
 }
 
-///creates the integral
-///NOTE: it is an integral graph, not an integral histogram. This was required in order to fit at the end of the bin.
+/// \brief creates the integral graphs from integral histogram
+///
+/// creates integral graphs from integral histogram. Does this for all integral histograms once function is called.
 void ElementFit::createIntegralGraph()
 {
     TH1D* tempHisto;
@@ -247,7 +248,7 @@ void ElementFit::createIntegralGraph()
     delete [] pointsArr;
 }
 
-//changes seed for random number generator
+/// \brief changes seed for random number generator
 void ElementFit::changeSeed()
 {
     Double_t seederSeed;
@@ -260,7 +261,9 @@ void ElementFit::changeSeed()
     globalSeedChanger++;
 }
 
-//creates the TF1 objects for the single Bateman and integral fit functions from the passed fit functions in order to fit with
+/// \brief creates the TF1 objects for the single Bateman and integral fit functions 
+/// creates the TF1 objects for the single Bateman and integral fit functions. Creates these from the passed fit function.
+/// Must create these because you have to fit with a TF1 function.
 void ElementFit::createSingleFitFunctions(Int_t timeEnd)
 {
     for(int i = 0; i < numElements; i++)
@@ -270,7 +273,9 @@ void ElementFit::createSingleFitFunctions(Int_t timeEnd)
     }
 }
 
-//creates the TF1 objects for the total Bateman and integral fit functions from the passed fit functions in order to fit with
+/// \brief creates the TF1 objects for the total Bateman and integral fit functions 
+/// creates the TF1 objects for the total Bateman and integral fit functions. Creates these from the passed fit function.
+/// Must create these because you have to fit with a TF1 function.
 void ElementFit::createTotalFitFunctions(Int_t timeEnd)
 {
     batemanFunction = new TF1("TotalBatemanFunction", passedBatemanFunction, 0., timeEnd, numParameters);
@@ -565,7 +570,7 @@ void ElementFit::genAndFillHistos()
 /// \brief Generates all total integral histograms for total Bateman histograms
 ///
 /// Generates all total integral histograms for total Bateman histograms.
-/// each individual bin(i) in the integral histogram is the sum of the integral bin i-1 plus the bin i from the regular histogram.
+/// Each individual bin(i) in the integral histogram is the sum of the integral bin i-1 plus the bin i from the regular histogram.
 void ElementFit::genIntegralHisto()
 {
     //resets histogram so it can be used between runs
@@ -592,16 +597,17 @@ void ElementFit::genIntegralHisto()
 /// \brief Generates all integral histograms from the Bateman histograms
 ///
 /// Generates all integral histograms from the Bateman histograms.
-/// Just call to sub functions
+/// Just call to sub functions.
 void ElementFit::genIntegralHistoSimulated()
 {
     genIntegralHisto();
     genIntegralSingleHistos();
 }
 
-/// \brief generates all the
+/// \brief Generates all the single integral histograms from the single Bateman histograms.
 ///
-/// More detaied
+/// Generates all the single integral histograms from the single Bateman histograms.
+/// Each individual bin(i) in the integral histogram is the sum of the integral bin i-1 plus the bin i from the regular histogram.
 void ElementFit::genIntegralSingleHistos()
 {
     TH1D* tempIntegralHisto, *tempBatemanHisto;
@@ -627,9 +633,10 @@ void ElementFit::genIntegralSingleHistos()
     }
 }
 
-/// \brief the constructor
+/// \brief Generates the total and single Bateman histograms
 ///
-/// More detaied
+/// Generates the total and single Bateman histograms. Has different methods of generation for different program execution types.
+/// Still not sure why generation works. This is the single most important function in the entire program.
 void ElementFit::genBatemanHistograms()
 {
     TH1D* tempHisto;
@@ -647,7 +654,7 @@ void ElementFit::genBatemanHistograms()
 
         changeSeed();
 
-        for(int i = 0; i < events; i++)
+        for(int i = 0; i < numEvents; i++)
         {
             for(int j = 0; j < numElements; j++)
             {
@@ -684,7 +691,7 @@ void ElementFit::genBatemanHistograms()
                     singleTempHisto[i] = singleBatemanHisto->GetAHisto(cycleIndex, runIndex, i);
                 } 
                 changeSeed();
-                for(int i = 0; i < events; i++)
+                for(int i = 0; i < numEvents; i++)
                 {
                     for(int j = 0; j < numElements; j++)
                     {
@@ -712,7 +719,7 @@ void ElementFit::genBatemanHistograms()
             //change seed for generation between each run
             changeSeed();
             //data generated as normal
-            for(int i = 0; i < events; i++)
+            for(int i = 0; i < numEvents; i++)
             {
                 for(int j = 0; j < numElements; j++)
                 {
@@ -739,9 +746,9 @@ void ElementFit::genBatemanHistograms()
     delete [] singleTempHisto;
 }
 
-/// \brief the constructor
+/// \brief Sets the parameters for the total fit functions
 ///
-/// More detaied
+/// Sets the parameters for the total fit functions. Must do this with a TF1 or else it will not do the fit. Just set the initial values to the accepted values.
 void ElementFit::setFunctionParametersTotal()
 {
     DisplayTotalFunctionParameters();
@@ -767,9 +774,7 @@ void ElementFit::setFunctionParametersTotal()
     }
 }
 
-/// \brief the constructor
-///
-/// More detaied
+/// \brief Displays the parameters used to set the fit functions
 void ElementFit::DisplayTotalFunctionParameters()
 {
     cout << "INITIAL FIT FUNCTION PARAMETERS" << endl;
@@ -782,9 +787,9 @@ void ElementFit::DisplayTotalFunctionParameters()
     cout << endl;
 }
 
-/// \brief the constructor
+/// \brief Sets the parameters for the single fit functions
 ///
-/// More detaied
+/// Sets the parameters for the single fit functions. Must do this with a TF1 or else it will not do the fit. Just set the initial values to the accepted values.
 void ElementFit::setFunctionParamersSingle()
 {
     for(int i = 0; i < numElements; i++)
@@ -812,9 +817,10 @@ void ElementFit::setFunctionParamersSingle()
     }
 }
 
-/// \brief the constructor
+/// \brief Sets the limits in which the parameters can fit in the fit function.
 ///
-/// More detaied
+/// Sets the limits in which the parameters can fit in the fit function. If they are too large the program will not fit correctly but too large then its like cheating.
+/// I just use scalar multiples of the accepted values in the range.
 void ElementFit::setParaLimits()
 {
     DisplayParameterLimits();
@@ -823,8 +829,8 @@ void ElementFit::setParaLimits()
     {
         if(paraVals[i]->getIsValueInitValue())
         {
-            batemanFunction->SetParLimits((i*2), 0., doubleEvents*10000);
-            integralFunction->SetParLimits((i*2), 0., doubleEvents*10000);
+            batemanFunction->SetParLimits((i*2), 0., doubleNumEvents*10000);
+            integralFunction->SetParLimits((i*2), 0., doubleNumEvents*10000);
         }else{
             batemanFunction->SetParLimits((i*2), paraVals[i]->getLowerRangeInitValue(), paraVals[i]->getUpperRangeInitValue());
             integralFunction->SetParLimits((i*2), paraVals[i]->getLowerRangeInitValue(), paraVals[i]->getUpperRangeInitValue());
@@ -850,8 +856,8 @@ void ElementFit::setParaLimits()
         {
             if(paraVals[i]->getIsValueInitValue())
             {
-                (singleFitFunctions[(i*2)])->SetParLimits((k*2), 0., doubleEvents*10000);
-                (singleFitFunctions[(i*2)+1])->SetParLimits((k*2), 0., doubleEvents*10000);
+                (singleFitFunctions[(i*2)])->SetParLimits((k*2), 0., doubleNumEvents*10000);
+                (singleFitFunctions[(i*2)+1])->SetParLimits((k*2), 0., doubleNumEvents*10000);
             }else{
                 (singleFitFunctions[(i*2)])->SetParLimits((k*2), paraVals[i]->getLowerRangeInitValue(), paraVals[i]->getUpperRangeInitValue());
                 (singleFitFunctions[(i*2)+1])->SetParLimits((k*2), paraVals[i]->getLowerRangeInitValue(), paraVals[i]->getUpperRangeInitValue());
@@ -875,9 +881,7 @@ void ElementFit::setParaLimits()
     }
 }
 
-/// \brief the constructor
-///
-/// More detaied
+/// \brief Displays parameter limits set
 void ElementFit::DisplayParameterLimits()
 {
     cout << "PARAMETER FIT RANGE" << endl;
@@ -885,7 +889,7 @@ void ElementFit::DisplayParameterLimits()
     {
         cout << elementNames[i] << ":" << endl;
         cout << "\tInitial Lower Range: 0" << endl;
-        cout << "\tInitial Lower Range: " << doubleEvents*10000 << endl;
+        cout << "\tInitial Lower Range: " << doubleNumEvents*10000 << endl;
         cout << "\tHalf Life Lower Range: " << paraVals[i]->getValueHalfLife() * .01 << endl;
         cout << "\tHalf Life Upper Range: " << paraVals[i]->getValueHalfLife() * 100. << endl;
         cout << endl;

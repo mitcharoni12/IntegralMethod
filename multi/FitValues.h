@@ -1,11 +1,12 @@
-/*
-    PURPOSE: All Fits have N0, N0Error, halfLife, halfLifeError. Class provides a SINGLE FIT OPERATION FOR ONE ELEMENT.
-*/
 #ifndef FITVALUES_H
 #define FITVALUES_H
 
 #include "TMath.h"
 
+/// Used for storing fitted values for a single element componet in a decay chain.
+/// EX: Decay chain 144Cs->144Ba->144La, each element componet in that chain have parameters values for N0, N0Error, half life, and half life error.
+/// Lets look at the values extracted in the single La histogram, the bateman equation for La also has parameters for N0, and half life of Cs and Ba.
+/// So this class would for example store the N0, N0Error, half life, and half life error of Ba in the single La histogram.
 class FitValues{
 private:
     Double_t N0;

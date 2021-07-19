@@ -11,6 +11,10 @@
 #include "ChainRunFitValues.h"
 #include "TMath.h"
 
+/// Used to store all the fit values for each element in the Bateman/integral histograms
+/// EX: in the chain 144Cs->144Ba->144La there are single Bateman histograms for deacys of Cs, Ba and La. However, the Bateman equation for Ba contains componets for Ba and Cs and the Bateman equation or La contains componsets for Cs, Ba, and La.
+/// Each componet in each element of the chain each has values fitted values for N0, N0 error, half life, and half life error.
+/// This class stores the fitted values for Cs which just has fitted values for Cs, the fitted values Ba which has fitted values for Cs and Ba, and the fitted values for La which has Cs, Ba and La.
 class SingleChainRunFitValues{
 private:
     Int_t numChainElements;

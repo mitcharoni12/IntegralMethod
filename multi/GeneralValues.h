@@ -1,12 +1,10 @@
-/*
-    PURPOSE: Basically just a glorified array, used to store array of values like N0 and half life for the entire durration of a run
-    EX: 20x will need to store 20 different half life values
-*/
 #ifndef GENERALVALUES_H
 #define GENERALVALUES_H
 
 #include "TMath.h"
 
+/// Like a glorified array, purpose is to store values extracted from multiple runs.
+/// Ex: if we do 20x runs, we want a way to store each half life in an array life format. To graph the fitted values for the 20x runs we have to have it in this array life format.
 class GeneralValues{
 private:
     Double_t* fitValues;
@@ -31,13 +29,13 @@ GeneralValues::~GeneralValues()
     delete [] fitValues;
 }
 
-//sets values in array fitValues
+/// sets an array value
 void GeneralValues::SetVal(Int_t index, Double_t val)
 {
     fitValues[index] = val;
 }
 
-//gets values in array fitValues
+/// gets an array value
 Double_t GeneralValues::GetVal(Int_t index)
 {
     return fitValues[index];

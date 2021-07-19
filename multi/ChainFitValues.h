@@ -1,7 +1,3 @@
-/*
-    PURPOSE: way to store fitted values for a decay chain fit.
-        EX: decay chain fit of CS144->BA144->LA144 has N0, N0Error, HalfLife, HalfLifeError for each element ion decay chain
-*/
 #ifndef CHAINFITVALUES_H
 #define CHAINFITVALUES_H
 
@@ -9,6 +5,9 @@
 
 using namespace std;
 
+/// Used for storing the the fitted values for either the values of a total Bateman/integral histogram or one element of a single Bateman/integral histogram.
+/// EX: If we look at decay chain 144Cs->144Ba->144La and we look at the total Bateman histogram, the total bateman equation is going to have values for N0, N0Error, half life, and half life error for each element in that chain.
+// This class stores that type of data.
 class ChainFitValues{
 private:
     FitValues** chainFitVals;
@@ -41,51 +40,59 @@ ChainFitValues::ChainFitValues(Int_t numElements)
     } 
 }
 
+/// Sets an N0 for a specified element
 void ChainFitValues::SetAnN0(Int_t elementNum, Double_t N0)
 {
     chainFitVals[elementNum]->SetN0(N0);
 }
 
+/// Sets an N0 error for a specified element
 void ChainFitValues::SetAnN0Error(Int_t elementNum, Double_t N0Error)
 {
     chainFitVals[elementNum]->SetN0Error(N0Error);
 }
 
+/// Sets an half life for a specified element
 void ChainFitValues::SetAnHalfLife(Int_t elementNum, Double_t halfLife)
 {
     chainFitVals[elementNum]->SetHalfLife(halfLife);
 }
 
+/// Sets an half life error for a specified element
 void ChainFitValues::SetAnHalfLifeError(Int_t elementNum, Double_t halfLifeError)
 {
     chainFitVals[elementNum]->SetHalfLifeError(halfLifeError);
 }
 
+/// Gets an N0 for a specified element
 Double_t ChainFitValues::GetAnN0(Int_t elementNum)
 {
     Double_t N0 = chainFitVals[elementNum]->GetN0();
     return N0;
 }
 
+/// Gets an N0 error for a specified element
 Double_t ChainFitValues::GetAnN0Error(Int_t elementNum)
 {
     Double_t N0Error = chainFitVals[elementNum]->GetN0Error();
     return N0Error;
 }
 
+/// Gets an half life for a specified element
 Double_t ChainFitValues::GetAnHalfLife(Int_t elementNum)
 {
     Double_t halfLife = chainFitVals[elementNum]->GetHalfLife();
     return halfLife;
 }
 
+/// Gets an half life error for a specified element
 Double_t ChainFitValues::GetAnHalfLifeError(Int_t elementNum)
 {
     Double_t halfLifeError = chainFitVals[elementNum]->GetHalfLifeError();
     return halfLifeError;
 }
 
-//returns certain element fit values in chain
+/// returns certain element fit values in chain
 FitValues* ChainFitValues::GetSingleElementFitValues(Int_t elementIndex)
 {
     if(elementIndex < numElements && elementIndex > -1)
