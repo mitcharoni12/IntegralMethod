@@ -26,33 +26,37 @@
 
 using namespace std;
 
+/// Class will handle multiple runs of the program. Used extensively in the Cycle class.
 class Run{
 private:
-    Int_t runs, numElements, eventDecrement;
-    FitOption* fitOptions;
-    ElementFit* element;
-    ChainRunFitValues* batemanFitValues, *integralFitValues;
-    SingleChainRunFitValues* singleBatemanFitValues, *singleIntegralFitValues;
-    Double_t* eventsXAxis, *runsXAxis, *zero;
-    string* elementNameStrs;
-    TH3D* correlationHisto;
-    TH1D** multiRunResultHistograms;
-    TGraphErrors** totalBatemanGraphs, **totalIntegralGraphs, **singleBatemanGraphs, **singleIntegralGraphs;
-    TCanvas* testCan;
-    TCanvas** multiRunResultCanvas;
+    Int_t numRuns, numElements, eventDecrement;
+    FitOption* fitOptions;                                  ///< Contains fit options for program.
+    ElementFit* element;                                    ///< Element fit object. Used to do individual runs.
+    ChainRunFitValues* batemanFitValues;                    ///< Stores fit values different runs of the total Bateman histograms.
+    ChainRunFitValues* integralFitValues;                   ///< Stores fit values different runs of the total integral histograms.
+    SingleChainRunFitValues* singleBatemanFitValues;        ///< Stores fit values different runs of the single Bateman histograms.
+    SingleChainRunFitValues* singleIntegralFitValues;       ///< Stores fit values different runs of the single integral histograms.
+    Double_t* eventsXAxis;                                  
+    Double_t* runsXAxis;                                    ///< Array containing the runs indexes.
+    Double_t *zero;                                         ///< Array of 0's, used for setting 0 error in the x values.
+    string* elementNameStrs;                                ///< Contains element names for each element in the decay chain.
+    TH1D** multiRunResultHistograms;                        ///< Histograms used to store the fit values
+    TGraphErrors** totalBatemanGraphs;                      ///<
+    TGraphErrors** totalIntegralGraphs;                     ///<
+    TGraphErrors** singleBatemanGraphs;                     ///<
+    TGraphErrors** singleIntegralGraphs;                    ///<
+    TCanvas* testCan;                                       ///<
+    TCanvas** multiRunResultCanvas;                         ///<
     //helper functions
-    void createCorrelationHistoEventChange();
-    void createCorrelationHistoNoChange();
     Double_t getMaxElement(Double_t* arr);
     Double_t getMinElement(Double_t* arr);
-    void runEventChange();
     void genIntegralMeanGraphs();
     void genBatemanMeanGraphs();
 public:
     Run(ElementFit* element);
     ~Run();
     void runNoChangeGenOnce(Int_t cycleIndex, Int_t runIndex);
-    void genGraphsEventChange();
+    //void genGraphsEventChange();
     void genGraphsNoChange();
     void genGraphsNoChangeSingleElement();
     TH1D** createRunResultHistos();
@@ -60,7 +64,6 @@ public:
     TH1D** fillRunResultHistos(TH1D** multiRunResultHistograms);
     TH1D** fillRunResultHistosSingleElement(TH1D** multiRunResultHistogramsSingleElement);
     void displayMultiRunResultGraphs(TCanvas** canvasArray);
-    void displayCorrelationHisto(TCanvas* canvas);
     void displayMultiRunResultHistos(TCanvas** canvasArray, TH1D** multiRunResultHistograms);
     void runNoChange(Int_t cycleIndex);
     //getter function
@@ -70,43 +73,48 @@ public:
     SingleChainRunFitValues* getSingleIntegralFitValues(){return singleIntegralFitValues;}
     TH1D** getMultiRunResultHistos(){return multiRunResultHistograms;}
     string* getElementStringNames(){return elementNameStrs;}
-    Int_t getNumRuns(){return runs;}
+    Int_t getNumRuns(){return numRuns;}
     //setter function
-    void setNumRuns(Int_t numRuns){this->runs = numRuns;}
+    void setNumRuns(Int_t numRuns){this->numRuns = numRuns;}
 };
 
+/// \brief Constructor for Run.
+///
+/// Constructor for the run class. Dynamical allocation for the data storage objects for the fit values of the runs happens here.
 Run::Run(ElementFit* element)
 {
-    //variable parameter setting
+    //getting parameters for the program execution type
     this->fitOptions = element->getFitOptions();
-    this->runs = fitOptions->GetNumRuns();
+    this->numRuns = fitOptions->GetNumRuns();
     this->eventDecrement = fitOptions->GetEventDecrement();
     this->element = element;
     this->elementNameStrs = fitOptions->GetElementNames();
     numElements = fitOptions->GetNumElements();
 
-    //dynamically allocating required arrays and root variables
-    //dynamic array
-    eventsXAxis = new Double_t [runs];
-    runsXAxis = new Double_t [runs];
-    zero = new Double_t [runs];
-    for(int i = 0; i < runs; i++)
+    //dynamical allocation for arrays containing events of generafor(int i = 0; i < runs; i++)
+    {
+        runsXAxis[i] = i+1;
+    }
+    zero = new Double_t [numRuns];
+    for(int i = 0; i < numRuns; i++)
     {
         zero[i] = 0.0f;
     }
-    batemanFitValues = new ChainRunFitValues(numElements, runs);
-    integralFitValues = new ChainRunFitValues(numElements, runs);
-    singleBatemanFitValues = new SingleChainRunFitValues(numElements, runs);
-    singleIntegralFitValues = new SingleChainRunFitValues(numElements, runs);
+    for(int i = 0; i < numRuns; i++)
+    {
+        runsXAxis[i] = i+1;
+    }
+    //used to store fit values for the different runs
+    batemanFitValues = new ChainRunFitValues(numElements, numRuns);
+    integralFitValues = new ChainRunFitValues(numElements, numRuns);
+    singleBatemanFitValues = new SingleChainRunFitValues(numElements, numRuns);
+    singleIntegralFitValues = new SingleChainRunFitValues(numElements, numRuns);
+    //used to plot fit values for different runs
     totalBatemanGraphs = new TGraphErrors* [numElements];
     totalIntegralGraphs = new TGraphErrors* [numElements];
     singleBatemanGraphs = new TGraphErrors* [numElements];
     singleIntegralGraphs = new TGraphErrors* [numElements];
-    //testCan = new TCanvas("testCan", "testCan", 500, 500);
-    for(int i = 0; i < runs; i++)
-    {
-        runsXAxis[i] = i+1;
-    }
+    //testCan = new TCanvas("testCanvas", "testCanvas", 500, 500);
 }
 
 Run::~Run()
@@ -123,7 +131,10 @@ Run::~Run()
     delete [] singleIntegralGraphs;
 }
 
-//creates histograms for the run result of the total functions
+/// \brief Dynamically allocates histograms for the storage of the fit values
+///
+/// Dynamically allocates histograms to store fit values of total histograms for multiple runs of the program.
+/// Main use if for getting average fit values for x amount of runs.
 TH1D** Run::createRunResultHistos()
 {
     TH1D** multiRunResultHistograms = new TH1D* [numElements*2];
@@ -140,7 +151,10 @@ TH1D** Run::createRunResultHistos()
     return multiRunResultHistograms;
 }
 
-//creates histograms for the run result of the single element functions
+/// \brief Dynamically allocates histograms for the storage of the fit values
+///
+/// Dynamically allocates histograms to store fit values of single histograms for multiple runs of the program.
+/// Main use if for getting average fit values for x amount of runs.
 TH1D** Run::createRunResultHistosSingleElements()
 {
     TH1D** multiRunResultHistosSingleElement = new TH1D* [numElements*2];
@@ -157,14 +171,10 @@ TH1D** Run::createRunResultHistosSingleElements()
     return multiRunResultHistosSingleElement;
 }
 
-//display the correlation histogram
-void Run::displayCorrelationHisto(TCanvas* canvas)
-{
-    canvas->cd();
-    correlationHisto->Draw("lego");
-}
-
-//displays the graphs for the multiple runs
+/// \brief Displays graphs for the fit values of the multiple runs.
+///
+/// Displays graphs for the fit values of multiple runs. Will display each fit values individually in a graph like format.
+/// Useful for seeing if fitting is conistent. Graphs displayed grouped by element. Displays data for the 4 different fit types.
 void Run::displayMultiRunResultGraphs(TCanvas** canvasArray)
 {
     for(int i = 0; i < numElements; i++)
@@ -180,7 +190,10 @@ void Run::displayMultiRunResultGraphs(TCanvas** canvasArray)
     }
 }
 
-//displays the histograms for the multiple runs
+/// \brief Displays histogram for the fit values of multiple runs.
+///
+/// Displays the histograms for the fit values of multile runs. Displays the fit values for each element in a histogram.
+/// Useful for seeing the average fitted value. Histogram displayed grouped by element. Display data for 4 different fit types.
 void Run::displayMultiRunResultHistos(TCanvas** canvasArray, TH1D** multiRunResultHistograms)
 {
     for(int i = 0; i < numElements; i++)
@@ -196,14 +209,16 @@ void Run::displayMultiRunResultHistos(TCanvas** canvasArray, TH1D** multiRunResu
     }
 }
 
-//fills the histograms, first resets histograms then fills the array with the lambda value fitted at run j
+/// \brief Fills the data storage histograms with fitted data from the runs.
+///
+/// Fills the data storage histograms with fitted data from the runs. Only retreives half lives values and retreives the fit data for the total histograms.
 TH1D** Run::fillRunResultHistos(TH1D** multiRunResultHistograms)
 {
     for(int i = 0; i < numElements; i++)
     {
         multiRunResultHistograms[(i*2)]->Reset("ICES");
         multiRunResultHistograms[(i*2)+1]->Reset("ICES");
-        for(int j = 0; j < runs; j++)
+        for(int j = 0; j < numRuns; j++)
         {
             multiRunResultHistograms[(i*2)]->Fill(batemanFitValues->GetAnHalfLife(j, i));
             multiRunResultHistograms[(i*2)+1]->Fill(integralFitValues->GetAnHalfLife(j, i));
@@ -213,14 +228,16 @@ TH1D** Run::fillRunResultHistos(TH1D** multiRunResultHistograms)
     return multiRunResultHistograms;
 }
 
-//newB fills the single element histogram
+/// \brief Fills the data storage histograms with fitted data from the runs.
+///
+/// Fills the data storage histograms with fitted data from the runs. Only retreives half lives values and retreives the fit data for the single histograms.
 TH1D** Run::fillRunResultHistosSingleElement(TH1D** multiRunResultHistogramsSingleElement)
 {
     for(int i = 0; i < numElements; i++)
     {
         multiRunResultHistogramsSingleElement[(i*2)]->Reset("ICES");
         multiRunResultHistogramsSingleElement[(i*2)+1]->Reset("ICES");
-        for(int j = 0; j < runs; j++)
+        for(int j = 0; j < numRuns; j++)
         {
             multiRunResultHistogramsSingleElement[(i*2)]->Fill(singleBatemanFitValues->GetAnHalfLife(j, i, i));
             multiRunResultHistogramsSingleElement[(i*2)+1]->Fill(singleIntegralFitValues->GetAnHalfLife(j, i, i));
@@ -230,7 +247,7 @@ TH1D** Run::fillRunResultHistosSingleElement(TH1D** multiRunResultHistogramsSing
     return multiRunResultHistogramsSingleElement;
 }
 
-//fill graphs for the result of the multiple runs, used for events changing between runs (dynamic)
+/*
 void Run::genGraphsEventChange()
 {
     for(int j = 0; j < numElements; j++)
@@ -248,19 +265,23 @@ void Run::genGraphsEventChange()
         totalIntegralGraphs[j]->SetName((elementNameStrs[j] + " Integral_Fit(S)").c_str());
     }
 }
+*/
 
-//fill graphs for the result of the multiple runs, used for no change between runs (dynamic)
+/// \brief Dynamically allocates the graphs to display the fit values of the total histograms for the different runs.
+///
+/// Dynamically allocates the graphs to display the fit values of the total histograms for the different runs. Retreives the array of fit values and creates the graphs.
+/// Then do things like set graph name. Only do this for half lives. Graphs are generated in the conideration nothing is chaning between the runs.
 void Run::genGraphsNoChange() 
 {
     for(int j = 0; j < numElements; j++)
     {
-        totalBatemanGraphs[j]= new TGraphErrors(runs, runsXAxis, batemanFitValues->GetHalfLifeArr(j), zero, batemanFitValues->GetHalfLifeErrorArr(j));
+        totalBatemanGraphs[j]= new TGraphErrors(numRuns, runsXAxis, batemanFitValues->GetHalfLifeArr(j), zero, batemanFitValues->GetHalfLifeErrorArr(j));
         totalBatemanGraphs[j]->GetXaxis()->SetTitle("Runs");
         totalBatemanGraphs[j]->GetYaxis()->SetTitle("Bateman Fit(S)");
-        totalBatemanGraphs[j]->SetTitle((elementNameStrs[j] + " bateman Fit(S)").c_str());
+        totalBatemanGraphs[j]->SetTitle((elementNameStrs[j] + " Bateman Fit(S)").c_str());
         totalBatemanGraphs[j]->SetName((elementNameStrs[j] + " bateman_Fit(S)").c_str());
 
-        totalIntegralGraphs[j] = new TGraphErrors(runs, runsXAxis, integralFitValues->GetHalfLifeArr(j), zero, integralFitValues->GetHalfLifeErrorArr(j));
+        totalIntegralGraphs[j] = new TGraphErrors(numRuns, runsXAxis, integralFitValues->GetHalfLifeArr(j), zero, integralFitValues->GetHalfLifeErrorArr(j));
         totalIntegralGraphs[j]->GetXaxis()->SetTitle("Runs");
         totalIntegralGraphs[j]->GetYaxis()->SetTitle("Integral Fit(S)");
         totalIntegralGraphs[j]->SetTitle((elementNameStrs[j] + " Integral Fit(S)").c_str());
@@ -268,18 +289,21 @@ void Run::genGraphsNoChange()
     }
 }
 
-//newB generates the graphs for the single fit function data (dynamic)
+/// \brief Dynamically allocates the graphs to display the fit values of the single histograms for the different runs.
+///
+/// Dynamically allocates the graphs to display the fit values of the single histograms for the different runs. Retreives the array of fit values and creates the graphs.
+/// Then do things like set graph name. Only do this for half lives. Graphs are generated in the conideration nothing is chaning between the runs.
 void Run::genGraphsNoChangeSingleElement()
 {
     for(int j = 0; j < numElements; j++)
     {
-        singleBatemanGraphs[j]= new TGraphErrors(runs, runsXAxis, singleBatemanFitValues->GetHalfLifeArr(j, j), zero, singleBatemanFitValues->GetHalfLifeErrorArr(j, j));
+        singleBatemanGraphs[j]= new TGraphErrors(numRuns, runsXAxis, singleBatemanFitValues->GetHalfLifeArr(j, j), zero, singleBatemanFitValues->GetHalfLifeErrorArr(j, j));
         singleBatemanGraphs[j]->GetXaxis()->SetTitle("Runs");
         singleBatemanGraphs[j]->GetYaxis()->SetTitle("Bateman Fit(S)");
         singleBatemanGraphs[j]->SetTitle((elementNameStrs[j] + " bateman Fit Single Element(S)").c_str());
         singleBatemanGraphs[j]->SetName((elementNameStrs[j] + " bateman_Fit_Single_Element(S)").c_str());
 
-        singleIntegralGraphs[j] = new TGraphErrors(runs, runsXAxis, singleIntegralFitValues->GetHalfLifeArr(j, j), zero, singleIntegralFitValues->GetHalfLifeErrorArr(j, j));
+        singleIntegralGraphs[j] = new TGraphErrors(numRuns, runsXAxis, singleIntegralFitValues->GetHalfLifeArr(j, j), zero, singleIntegralFitValues->GetHalfLifeErrorArr(j, j));
         singleIntegralGraphs[j]->GetXaxis()->SetTitle("Runs");
         singleIntegralGraphs[j]->GetYaxis()->SetTitle("Integral Fit Single Element(S)");
         singleIntegralGraphs[j]->SetTitle((elementNameStrs[j] + " Integral Fit Single Element(S)").c_str());
@@ -287,11 +311,11 @@ void Run::genGraphsNoChangeSingleElement()
     }
 }
 
-//returns maximum value in array
+/// \brief Gets max value out of array
 Double_t Run::getMaxElement(Double_t* arr)
 {
     Double_t hold = arr[0];
-    for(int i = 1; i < runs; i++)
+    for(int i = 1; i < numRuns; i++)
     {
         if(hold < arr[i])
         {
@@ -301,11 +325,11 @@ Double_t Run::getMaxElement(Double_t* arr)
     return hold;
 }
 
-//returns minimum value in array
+/// \brief Gets minimum value out of array
 Double_t Run::getMinElement(Double_t* arr)
 {
     Double_t hold = arr[0];
-    for(int i = 1; i < runs; i++)
+    for(int i = 1; i < numRuns; i++)
     {
         if(hold > arr[i])
         {
@@ -315,7 +339,10 @@ Double_t Run::getMinElement(Double_t* arr)
     return hold;
 }
 
-//does run for no change and puts data in respective array
+/// \brief Preforms the multiple runs of the program not changing anything setting between runs.
+///
+/// Preforms the multiple runs of the program not changing anything setting between runs. The function first fits a histogram at a specific run and cycle index.
+/// It then stores that data in the repsective data objects.
 void Run::runNoChange(Int_t cycleIndex)
 {
     //dynamic array
@@ -326,7 +353,7 @@ void Run::runNoChange(Int_t cycleIndex)
     Double_t tempHalfLife;
     Double_t tempHalfLifeError;
 
-    for(int j = 0; j < runs; j++)
+    for(int j = 0; j < numRuns; j++)
     {
         //generates random data and fits it. Then extract the fit parametes
         element->fitHistos(cycleIndex, j);
@@ -405,7 +432,10 @@ void Run::runNoChange(Int_t cycleIndex)
 }
 
 
-//fits the singular histogram and puts the data of the singlular fit into the arrays (dynamic)
+/// \brief Preforms the multiple runs of the program not changing anything setting between runs and only generating a single set of histograms to fit with for each cycle.
+///
+/// Preforms the multiple runs of the program not changing anything setting between runs and only generating a single set of histograms to fit with for each cycle.
+/// Only used with the cycle program execution type. It would not make sense to do this with the run program execution type becuase then it would be the same as just generating and fitting a single histogram.
 void Run::runNoChangeGenOnce(Int_t cycleIndex, Int_t runIndex)
 {
     ChainFitValues* tempFitParameters;

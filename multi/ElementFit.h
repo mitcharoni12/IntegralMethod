@@ -40,12 +40,12 @@ class ElementFit{
                    ParameterValue** paraVals, FitOption* fitOptions);
         ~ElementFit();
         //getter function
-        Double_t getElementParameters(int i){return paraVals[i]->getValueDecayConst();} ///< Returns decay constant values used to set starting point for fit functions
-        FitOption* getFitOptions(){return fitOptions;} ///< Returns options the user chose to fit with
-        ChainFitValues* getBatemanFitParameters(){return totalBatemanFitParameters;} ///< Returns fitted values for the fit of the total Bateman histogram
-        ChainFitValues* getIntegralFitParameters(){return totalIntegralFitParameters;}///< Returns fitted values for the fit of the total Integral histogram
-        SingleElementFitValues* getSingleBatemanFitParameters(){return singleBatemanFitParameters;}///< Returns fitted values for the fit of all the single Bateman histograms
-        SingleElementFitValues* getSingleIntegralFitParameters(){return singleIntegralFitParameters;}///< Returns fitted values for the fit of all the single Integral histograms
+        Double_t getElementParameters(int i){return paraVals[i]->getValueDecayConst();}                 ///< Returns decay constant values used to set starting point for fit functions
+        FitOption* getFitOptions(){return fitOptions;}                                                  ///< Returns options the user chose to fit with
+        ChainFitValues* getBatemanFitParameters(){return totalBatemanFitParameters;}                    ///< Returns fitted values for the fit of the total Bateman histogram
+        ChainFitValues* getIntegralFitParameters(){return totalIntegralFitParameters;}                  ///< Returns fitted values for the fit of the total Integral histogram
+        SingleElementFitValues* getSingleBatemanFitParameters(){return singleBatemanFitParameters;}     ///< Returns fitted values for the fit of all the single Bateman histograms
+        SingleElementFitValues* getSingleIntegralFitParameters(){return singleIntegralFitParameters;}   ///< Returns fitted values for the fit of all the single Integral histograms
         //setter function
         void setNumRuns(Int_t numRuns){this->numRuns = numRuns;}
         void setNumCycles(Int_t numCycles){this->numCycles = numCycles;}
@@ -59,27 +59,37 @@ class ElementFit{
         void genAndFillHistos();
     private:
         //private variables
-        FitOption* fitOptions;
-        string* elementNames;
-        Int_t numEvents, numElements, numBins, numParameters, numRuns, numCycles;
-        bool multiSourceChoice, rebinChoice;
-        Int_t* binNumArr;
+        FitOption* fitOptions;                                                      ///< Contains fit options for program
+        string* elementNames;                                                       ///< Contains element names for every element in the decay chain
+        Int_t numEvents, numElements, numParameters, numRuns, numCycles;
+        bool multiSourceChoice;                                                     ///< True = generate multiple sets of histograms for the different cyles. False = generate a single set of histograms for the diiferent cyles.
+        bool rebinChoice;                                                           ///< True = Have program execute with changing bin number between cylces and keeping time fit constant. False = Dont do rebin
+        Int_t* binNumArr;                                                           ///< Contains an array of number of bins the histogram have between cycles.
         TF1* integralFunction, *batemanFunction;
         TF1** singleFitFunctions;
-        CycleHistoHolder* batemanHisto, *integralHisto;
-        SingleCycleHistoHolder* singleBatemanHisto, *singleIntegralHisto;
-        CycleGraphHolder* integralGraph;
-        SingleCycleGraphHolder* singleIntegralGraph;
+        CycleHistoHolder* batemanHisto;                                             ///< Contains every total Bateman histogram for the entire program.
+        CycleHistoHolder* integralHisto;                                            ///< Contains every total integral histogram for the entire program.
+        SingleCycleHistoHolder* singleBatemanHisto;                                 ///< Contains every single Bateman histogram for the entire program.
+        SingleCycleHistoHolder* singleIntegralHisto;                                ///< Contains every single integral histogram for the entire program.
+        CycleGraphHolder* integralGraph;                                            ///< Contains every total integral graph for the entire program.
+        SingleCycleGraphHolder* singleIntegralGraph;                                ///< Contains every single integral graph for the entire program.
         //passed fit functions used to make the TF1 for fitting
         decayFunction* batemanFitFunctions, *integralFitFunctions;
         decayFunction passedBatemanFunction, passedIntegralFunction;
-        TRandom3 rand;
-        Double_t timeRunStart, timeRunEnd, leaveOutStartBinNumber, leaveOutEndBinNumber, doubleNumEvents;
-        Double_t* randArr, *binWidth, *timeEndArr, *timeStartArr;
+        TRandom3 rand;                                                              ///< Used for random number generation.
+        Double_t timeRunStart;                                                      ///< Inital value for the start of fit time, can change between cycle.
+        Double_t timeRunEnd;                                                        ///< Inital value for the end of fit time, can change between cycle.
+        Double_t leaveOutStartBinNumber;                                            ///< How many bins to leave out of the start of the fit.
+        Double_t leaveOutEndBinNumber;                                              ///< How many bins to leave out of the end of the fit.
+        Double_t doubleNumEvents;                                                   ///< Number of events except its of data type Double_t.
+        Double_t* randArr;                                                          ///< Array used for storing random values for event generation.
+        Double_t* binWidth;                                                         ///< Holds bin widths between cycles.
+        Double_t* timeEndArr;                                                       ///< Holds the time of fit end between cycles.
+        Double_t* timeStartArr;                                                     ///< Holds the time of fit start between cycles.
         ChainFitValues* totalBatemanFitParameters, *totalIntegralFitParameters;
         SingleElementFitValues* singleBatemanFitParameters, *singleIntegralFitParameters;
-        ParameterValue** paraVals; ///< Accepted values for all parameters in all the fit functions
-        Int_t globalSeedChanger = 0;
+        ParameterValue** paraVals;                                                  ///< Accepted values for all parameters in all the fit functions.
+        Int_t globalSeedChanger = 0;                                                ///< Used for assigning in changing the seed.
         //helper functions
         void changeSeed();
         void createIntegralGraph();
@@ -119,7 +129,6 @@ ElementFit::ElementFit(Double_t (*batemanFunc)(Double_t*, Double_t*), Double_t (
     this->integralFitFunctions = integralFitFunctions;
     this->numElements = fitOptions->GetNumElements();
     this->numParameters = numElements*2;
-    this->numBins = fitOptions->GetNumBins();
     this->passedBatemanFunction = batemanFunc;
     this->passedIntegralFunction = integralFunc;
     this->timeRunEnd = fitOptions->GetTimeRunEnd();
@@ -361,8 +370,6 @@ void ElementFit::displaySingleHistos(TCanvas** can)
 
         can[(i*2)+1]->cd();
         singleIntegralGraph->GetAGraph(0, 0, i)->Draw();
-        //singleIntegralHisto->GetAHisto(0, 0, i)->Draw();
-
     }
 }
 
@@ -644,24 +651,26 @@ void ElementFit::genBatemanHistograms()
     singleTempHisto = new TH1D* [numElements];
     Double_t hold = 0;
     Double_t stack = 0;
-    //case for generating single histogram
+    //case for generating the single histogram for the single source histogram choice
     if(!rebinChoice && !multiSourceChoice)
-    {   //generate the single histogram
-    cout << "PATH 1" << endl;
+    {
         TH1D* tempHisto;
         TH1D** tempSingleHisto;
         tempSingleHisto = new TH1D* [numElements];
 
         changeSeed();
 
+        //generates events for the single and total histograms symotaniously
         for(int i = 0; i < numEvents; i++)
         {
+            //generating the times the events occured
             for(int j = 0; j < numElements; j++)
             {
                 hold = rand.Uniform();
                 randArr[j] = (-TMath::Log(hold)) / (paraVals[j]->getValueDecayConst());
             }
             
+            //putting events in repsective histograms
             for(int elementIndex = 0; elementIndex < numElements; elementIndex++)
             {
                 stack += randArr[elementIndex];
@@ -677,28 +686,32 @@ void ElementFit::genBatemanHistograms()
         }
 
         delete [] tempSingleHisto;
-    //case for multiple histogram generation
+    //case for multiple histogram for the multiple source histogram choice.
     }else if(!rebinChoice && multiSourceChoice)
     {
-        cout << "PATH 2" << endl;
         for(int cycleIndex = 0; cycleIndex < numCycles; cycleIndex++)
         {
             for(int runIndex = 0; runIndex < numRuns; runIndex++)
             {
+                //getting histograms to generate events for
                 tempHisto = batemanHisto->GetAHisto(cycleIndex, runIndex);
                 for(int i = 0; i < numElements; i++)
                 {
                     singleTempHisto[i] = singleBatemanHisto->GetAHisto(cycleIndex, runIndex, i);
-                } 
+                }
+
                 changeSeed();
+                //generates events for the single and total histograms symotaniously
                 for(int i = 0; i < numEvents; i++)
                 {
+                    //generating the times the events occured
                     for(int j = 0; j < numElements; j++)
                     {
                         hold = rand.Uniform();
                         randArr[j] = (-TMath::Log(hold)) / (paraVals[j]->getValueDecayConst());
                     }
-                
+
+                    //putting events in repsective histograms
                     for(int k = 0; k < numElements; k++)
                     {
                         stack += randArr[k];
@@ -712,24 +725,27 @@ void ElementFit::genBatemanHistograms()
     //case for generating data with rebinning
     }else if(rebinChoice)
     {
-        cout << "PATH 3" << endl;
-        //numbers generated same but data fed in differently. We want all the events in each cycle to be identical so we can see the effects of rebinning, therefore data generated in run index 0 of cycle 1 must be identical to run index 0 of cycle 2
+        //numbers generated same but data fed in differently. We want all the events in every run of each cycle to be identical so we can see the effects of rebinning. 
+        //therefore data generated in run index 0 of cycle 0 must be identical to run index 0 of cycle 1 and so on.
         for(int runIndex = 0; runIndex < numRuns; runIndex++)
         {
             //change seed for generation between each run
             changeSeed();
-            //data generated as normal
+            //generates events for the single and total histograms symotaniously
             for(int i = 0; i < numEvents; i++)
             {
+                //generating the times the events occured
                 for(int j = 0; j < numElements; j++)
                 {
                     hold = rand.Uniform();
                     randArr[j] = (-TMath::Log(hold)) / (paraVals[j]->getValueDecayConst());
                 }
+                //putting events in repsective histograms
                 for(int k = 0; k < numElements; k++)
                 {
                     stack += randArr[k];
-                    //must itterate over cycles because and fill
+                    //puts same events in all the cycles
+                    //Ex: if we have 10 cycles, all the run 0's of all the cycles will have the same exact events.
                     for(int cycleIndex = 0; cycleIndex < numCycles; cycleIndex++)
                     {
                         tempHisto = batemanHisto->GetAHisto(cycleIndex, runIndex);
