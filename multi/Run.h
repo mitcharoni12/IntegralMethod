@@ -41,12 +41,11 @@ private:
     Double_t *zero;                                         ///< Array of 0's, used for setting 0 error in the x values.
     string* elementNameStrs;                                ///< Contains element names for each element in the decay chain.
     TH1D** multiRunResultHistograms;                        ///< Histograms used to store the fit values
-    TGraphErrors** totalBatemanGraphs;                      ///<
-    TGraphErrors** totalIntegralGraphs;                     ///<
-    TGraphErrors** singleBatemanGraphs;                     ///<
-    TGraphErrors** singleIntegralGraphs;                    ///<
-    TCanvas* testCan;                                       ///<
-    TCanvas** multiRunResultCanvas;                         ///<
+    TGraphErrors** totalBatemanGraphs;                      ///< Stores graphs of fit values for the total Bateman histograms
+    TGraphErrors** totalIntegralGraphs;                     ///< Stores graphs of fit values for the total integral histograms
+    TGraphErrors** singleBatemanGraphs;                     ///< Stores graphs of fit values for the single Bateman histograms
+    TGraphErrors** singleIntegralGraphs;                    ///< Stores graphs of fit values for the single integral histograms
+    TCanvas* testCan;
     //helper functions
     Double_t getMaxElement(Double_t* arr);
     Double_t getMinElement(Double_t* arr);
