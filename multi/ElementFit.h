@@ -158,8 +158,8 @@ ElementFit::ElementFit(Double_t (*batemanFunc)(Double_t*, Double_t*), Double_t (
     //generates all the histo objects and 
     genAndFillHistos();
     //removes restrictions on fitting function calls and itterations
-    //ROOT::Math::MinimizerOptions::SetDefaultMaxIterations(100000000);
-    //ROOT::Math::MinimizerOptions::SetDefaultMaxFunctionCalls(100000000);
+    ROOT::Math::MinimizerOptions::SetDefaultMaxIterations(100000000);
+    ROOT::Math::MinimizerOptions::SetDefaultMaxFunctionCalls(100000000);
 }
 
 ElementFit::~ElementFit()

@@ -90,7 +90,9 @@ Run::Run(ElementFit* element)
     this->elementNameStrs = fitOptions->GetElementNames();
     numElements = fitOptions->GetNumElements();
 
-    //dynamical allocation for arrays containing events of generafor(int i = 0; i < runs; i++)
+    //dynamical allocation for arrays containing events of general
+    runsXAxis = new Double_t [numRuns];
+    for(int i = 0; i < numRuns; i++)
     {
         runsXAxis[i] = i+1;
     }
@@ -122,7 +124,6 @@ Run::~Run()
     delete integralFitValues;
     delete singleBatemanFitValues;
     delete singleIntegralFitValues;
-    delete [] eventsXAxis;
     delete [] runsXAxis;
     delete [] totalBatemanGraphs;
     delete [] totalIntegralGraphs;

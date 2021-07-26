@@ -1,6 +1,6 @@
-Number of elements in decay chain:6
+Number of elements in decay chain:3
 ENTER INFO EACH ELEMENT IN THE FORMAT
-element 1 Name:CA
+element 1 Name:CS
 
 element 1 N0 have value(1) or range(2):1
 element 1 N0 value:10000
@@ -8,11 +8,11 @@ element 1 N0 lower;0
 element 1 N0 upper;10000
 
 element 1 half life value(1) or range(2):1
-element 1 half life value:.00092
+element 1 half life value:.994
 element 1 half life lower;0
 element 1 half life upper;1.8
 
-element 2 Name:SC
+element 2 Name:BA
 
 element 2 N0 have value(1) or range(2):1
 element 2 N0 value:0
@@ -20,11 +20,11 @@ element 2 N0 lower;0
 element 2 N0 upper;0
 
 element 2 half life value(1) or range(2):1
-element 2 half life value:.012
+element 2 half life value:11.5
 element 2 half life lower;0
 element 2 half life upper;23
 
-element 3 Name:TI
+element 3 Name:LA
 
 element 3 N0 have value(1) or range(2):1
 element 3 N0 value:0
@@ -32,45 +32,9 @@ element 3 N0 lower;0
 element 3 N0 upper;0
 
 element 3 half life value(1) or range(2):1
-element 3 half life value:.058
+element 3 half life value:40.8
 element 3 half life lower;0
 element 3 half life upper;80
-
-element 4 Name:V
-
-element 4 N0 have value(1) or range(2):1
-element 4 N0 value:0
-element 4 N0 lower;0
-element 4 N0 upper;0
-
-element 4 half life value(1) or range(2):1
-element 4 half life value:.191
-element 4 half life lower;0
-element 4 half life upper;80
-
-element 5 Name:Cr
-
-element 5 N0 have value(1) or range(2):1
-element 5 N0 value:0
-element 5 N0 lower;0
-element 5 N0 upper;0
-
-element 5 half life value(1) or range(2):1
-element 5 half life value:7.0
-element 5 half life lower;0
-element 5 half life upper;80
-
-element 6 Name:Mn
-
-element 6 N0 have value(1) or range(2):1
-element 6 N0 value:0
-element 6 N0 lower;0
-element 6 N0 upper;0
-
-element 6 half life value(1) or range(2):1
-element 6 half life value:3.0
-element 6 half life lower;0
-element 6 half life upper;80
 HISTO SIMULATE CHOICES
 Simulate(1) or load(2) in histogram:1
 Create Fit Functions(1) Dont Create Fit Function(2):2
