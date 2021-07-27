@@ -84,8 +84,8 @@ Double_t FitFunction::BADecayByActivityIntegral(Double_t *x, Double_t *par)
 
 	Double_t f = BA0 * (1.0 - TMath::Exp(-lambdaBA * timeVar));
 
-	f += CS0 * lambdaBA * (1.0 - TMath::Exp(-lambdaCS * timeVar)) / (lambdaBA-lambdaCS);
-	f += CS0 * lambdaCS * (1.0 - TMath::Exp(-lambdaBA * timeVar)) / (lambdaCS-lambdaBA);
+	f += CS0 * lambdaBA * (1.0 - TMath::Exp(-lambdaCS * timeVar)) / ((lambdaBA-lambdaCS));
+	f += CS0 * lambdaCS * (1.0 - TMath::Exp(-lambdaBA * timeVar)) / ((lambdaCS-lambdaBA));
 
 	return f;
 }
@@ -124,12 +124,12 @@ Double_t FitFunction::LADecayByActivityIntegral(Double_t *x, Double_t *par)
 
 	Double_t f = LA0 * (1.0 - TMath::Exp(-lambdaLA * timeVar));
 
-	f += CS0 * lambdaBA * lambdaLA * (1.0 - TMath::Exp(-lambdaCS * timeVar)) / (lambdaBA-lambdaCS)*(lambdaLA-lambdaCS);
-	f += CS0 * lambdaCS * lambdaLA * (1.0 - TMath::Exp(-lambdaBA * timeVar)) / (lambdaCS-lambdaBA)*(lambdaLA-lambdaBA);
-	f += CS0 * lambdaCS * lambdaBA * (1.0 - TMath::Exp(-lambdaLA * timeVar)) / (lambdaCS-lambdaLA)*(lambdaBA-lambdaLA);
+	f += CS0 * lambdaBA * lambdaLA * (1.0 - TMath::Exp(-lambdaCS * timeVar)) / ((lambdaBA-lambdaCS)*(lambdaLA-lambdaCS));
+	f += CS0 * lambdaCS * lambdaLA * (1.0 - TMath::Exp(-lambdaBA * timeVar)) / ((lambdaCS-lambdaBA)*(lambdaLA-lambdaBA));
+	f += CS0 * lambdaCS * lambdaBA * (1.0 - TMath::Exp(-lambdaLA * timeVar)) / ((lambdaCS-lambdaLA)*(lambdaBA-lambdaLA));
 
-	f += BA0 * lambdaLA * (1.0 - TMath::Exp(-lambdaBA * timeVar)) / (lambdaLA-lambdaBA);
-	f += BA0 * lambdaBA * (1.0 - TMath::Exp(-lambdaLA * timeVar)) / (lambdaBA-lambdaLA);
+	f += BA0 * lambdaLA * (1.0 - TMath::Exp(-lambdaBA * timeVar)) / ((lambdaLA-lambdaBA));
+	f += BA0 * lambdaBA * (1.0 - TMath::Exp(-lambdaLA * timeVar)) / ((lambdaBA-lambdaLA));
 
 	return f;
 }

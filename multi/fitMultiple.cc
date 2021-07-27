@@ -682,7 +682,7 @@ void CreateFitFunctions(string* elementNames)
                         outFile << " * " << lambdaNames[q];
                     }
                 }
-                outFile << " * (1.0 - TMath::Exp(-" << lambdaNames[k] << " * timeVar)) / ";
+                outFile << " * (1.0 - TMath::Exp(-" << lambdaNames[k] << " * timeVar)) / (";
                 if(m != k)
                 {
                     outFile << "(" << lambdaNames[m] << "-" << lambdaNames[k] << ")";
@@ -698,7 +698,7 @@ void CreateFitFunctions(string* elementNames)
                         outFile << "(" << lambdaNames[j] << "-" << lambdaNames[k] << ")";
                     }
                 }
-                outFile << ";" << endl;
+                outFile << ");" << endl;
             }
             outFile << endl;
         }

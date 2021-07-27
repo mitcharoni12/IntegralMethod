@@ -32,10 +32,10 @@ private:
     Int_t numRuns, numElements, eventDecrement;
     FitOption* fitOptions;                                  ///< Contains fit options for program.
     ElementFit* element;                                    ///< Element fit object. Used to do individual runs.
-    ChainRunFitValues* batemanFitValues;                    ///< Stores fit values different runs of the total Bateman histograms.
-    ChainRunFitValues* integralFitValues;                   ///< Stores fit values different runs of the total integral histograms.
-    SingleChainRunFitValues* singleBatemanFitValues;        ///< Stores fit values different runs of the single Bateman histograms.
-    SingleChainRunFitValues* singleIntegralFitValues;       ///< Stores fit values different runs of the single integral histograms.
+    ChainRunFitValues* batemanFitValues;                    ///< Stores fit values of different runs of the total Bateman histograms.
+    ChainRunFitValues* integralFitValues;                   ///< Stores fit values of different runs of the total integral histograms.
+    SingleChainRunFitValues* singleBatemanFitValues;        ///< Stores fit values of different runs of the single Bateman histograms.
+    SingleChainRunFitValues* singleIntegralFitValues;       ///< Stores fit values of different runs of the single integral histograms.
     Double_t* eventsXAxis;                                  
     Double_t* runsXAxis;                                    ///< Array containing the runs indexes.
     Double_t *zero;                                         ///< Array of 0's, used for setting 0 error in the x values.
