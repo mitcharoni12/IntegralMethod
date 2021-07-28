@@ -1,6 +1,3 @@
-/*
-    PURPOSE: used to group together some of the fit options used in the program
-*/
 #ifndef FITOPTION_H
 #define FITOPTION_H
 
@@ -8,6 +5,7 @@
 
 using namespace std;
 
+/// Used to hold all the fit options for the program. Holds these options reguarless of program execution type chosen.
 class FitOption{
 private:
     Int_t numRuns = 1, numCycles = 1, numElements, numBins, binRebinInc = 0, startBinLeaveOut = 0, endBinLeaveOut = 0, programExecutionType = 1
@@ -66,9 +64,8 @@ public:
     ~FitOption();
 };
 
-/*
-    work in bin width for changing end fit time becuase that is what will be kept conistent thought changing time fit.
-*/
+/// Creates any required data set such as bin number array, time fit end array, time fit start array, and bin width array.
+/// These data sets are needed to be generated so that the things like the histograms can be generated.
 void FitOption::CreateRequiredDataSets()
 {
     binNumArr = new Int_t [numCycles];
@@ -79,7 +76,6 @@ void FitOption::CreateRequiredDataSets()
     //need to calculate bin width initally
     if(rebin)
     {
-
         Double_t rebinSize = (Double_t) numBins;
         Double_t tempWidth;
 

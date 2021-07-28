@@ -6,6 +6,9 @@
 
 using namespace std;
 
+/// Used to store the canvases which will display each individual histogram if the user wishes to display each individual histogram.
+/// This class stores the canvases of each run in one cycle for a single element.
+/// EX: if we do 20 cycles of 20 runs of the decay chain 144Cs->144Ba->144 La there are 20 histograms per cycle. This class would store the canvases for one cycle of La.
 class RunCanvasHolder{
 private:
     TCanvas** canvasArr;
@@ -38,6 +41,7 @@ RunCanvasHolder::~RunCanvasHolder()
     delete [] canvasArr;
 }
 
+/// Gets a canvas at a specific run index.
 //need - lowerRunIndex because if we want to display index 4 through 7, that is a array of size 4
 //however, the index of the array is only 0-3, not 4-7, so we have to index a bit weird
 //EX: if we want to get canvas 4, that is the 0th element in the array, so for canvas index we get 4 but need 0, so we subtract lower run index

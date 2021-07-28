@@ -3,25 +3,28 @@
 
 using namespace std;
 
+/// Holds N0, Half-life, and Decay constant taken from the user for a single element in the decay chain.
+/// These values are the inital parameters for the fit functions are the values used to generate the simulated data.
+/// Can also take a range for these values if a user wants to set a specific range on the fit values. Currently in the program the fit parameter boundries are just multiples of these values.
 class ParameterValue{
     private:
         Double_t lowerRangeHalfLife;
         Double_t upperRangeHalfLife;
         Double_t rangeAverageHalfLife;
         Double_t valueHalfLife;
-        bool isValueHalfLife;
+        bool isValueHalfLife; ///< True = Half-life is a direct value rather than a value range.
 
         Double_t lowerRangeDecayConst;
         Double_t upperRangeDecayConst;
         Double_t rangeAverageDecayConst;
         Double_t valueDecayConst;
-        bool isValueDecayConst;
+        bool isValueDecayConst; ///< True = Decay constant is a direct value rather than a value range.
 
         Double_t lowerRangeInitValue;
         Double_t upperRangeInitValue;
         Double_t rangeAverageInitValue;
         Double_t initValue;
-        bool isValueInitValue;
+        bool isValueInitValue; ///< True = Inital value is a direct value rather than a value range.
     public:
         void setLowerRangeHalfLife(Double_t lower){lowerRangeHalfLife = lower;}
         void setUpperRangeHalfLife(Double_t upper){upperRangeHalfLife = upper;}

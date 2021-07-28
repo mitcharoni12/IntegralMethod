@@ -1,6 +1,3 @@
-/*
-    PURPOSE: used to store the graphs for the integral histograms
-*/
 #ifndef RUNGRAPHHOLDER_H
 #define RUNGRAPHHOLDER_H
 
@@ -8,6 +5,8 @@
 
 using namespace std;
 
+/// Used to store all the graphs for the multiple runs in a single cycle for a single element. These graphs are derived from a coresponding integral histogram.
+/// EX: If we are doing 20 cycles and 20 runs per cycles of the decay chain 144Cs->144Ba->144La. This would hold the 20 graphs of a single cycle for the element La.
 class RunGraphHolder{
 private:
     TGraph** graphArr;
@@ -18,6 +17,7 @@ public:
     void SetAGraph(Int_t runIndex, TGraph* Graph);
 };
 
+/// Constructor for class. Dynaically allocates graphs and names them properly.
 RunGraphHolder::RunGraphHolder(Int_t cycleNum, Int_t numRuns, string graphName, Int_t numPoints)
 {
     string tempGraphName;
@@ -36,12 +36,14 @@ RunGraphHolder::~RunGraphHolder()
     delete [] graphArr;
 }
 
+/// Gets a graph at a specific run index.
 TGraph* RunGraphHolder::GetAGraph(Int_t runIndex)
 {
     TGraph* tempGraph = graphArr[runIndex];
     return tempGraph;
 }
 
+/// Sets a graph at a specific run index.
 void RunGraphHolder::SetAGraph(Int_t runIndex, TGraph* Graph)
 {
     graphArr[runIndex] = Graph;

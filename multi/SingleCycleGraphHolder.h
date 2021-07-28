@@ -1,6 +1,3 @@
-/*
-    PURPOSE: used to store the single element integral graphs
-*/
 #ifndef SINGLECYCLEGRAPHHOLDER_H
 #define SINGLECYCLEGRAPHHOLDER_H
 
@@ -9,10 +6,13 @@
 
 using namespace std;
 
+/// Holds all the graphs for all the single histograms of the program.
+/// EX: If we are doing 20 cycles of 20 runs for the decay chain 144Cs->144Ba->144La we have single graphs for each element in the decay chain and a total integral graph.
+/// The total integral graph for the 20 cycles of 20 runs are held by the CylceGraphHolder class but the single graphs for Cs, Ba, and La are all held by this class.
 class SingleCycleGraphHolder{
 private:
     Int_t numElements;
-    CycleGraphHolder** GraphArr;
+    CycleGraphHolder** GraphArr; ///< array of size numElements of CycleHistoHolder objects.
 public:
     SingleCycleGraphHolder(Int_t numCycles, Int_t numElements, Int_t numRuns, string GraphName, Int_t* numPoints, string* elementNames);
     ~SingleCycleGraphHolder();
@@ -43,11 +43,13 @@ SingleCycleGraphHolder::~SingleCycleGraphHolder()
     delete [] GraphArr;
 }
 
+/// Gets a graph for a specific run, cycle, and element index.
 TGraph* SingleCycleGraphHolder::GetAGraph(Int_t cycleIndex, Int_t runIndex, Int_t elementIndex)
 {
     return GraphArr[elementIndex]->GetAGraph(cycleIndex, runIndex);
 }
 
+/// Sets a graph for a specific run, cycle, and element index.
 void SingleCycleGraphHolder::SetAGraph(Int_t cycleIndex, Int_t runIndex, Int_t elementIndex, TGraph* Graph)
 {
     GraphArr[elementIndex]->SetAGraph(cycleIndex, runIndex, Graph);

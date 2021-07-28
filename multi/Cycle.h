@@ -543,8 +543,6 @@ void Cycle::runSeperateMeanTimeDifference()
     delete [] multiRunHistoSingle;
 }
 
-
-//does runs cycle for the single histogram (dynamic)
 /// \brief Runs the cycles for the generation and fitting of a single histogram.
 ///
 /// Runs the cycles for the generation of a single histogram, changing whatever variable(time fit) between each cycle.
