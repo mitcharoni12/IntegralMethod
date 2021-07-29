@@ -1,7 +1,9 @@
+Num Elements:3
 Histo events:10
 Histo Bins(only if rebin):1000
 Bin Width:.4
 Inital Time Fit:400
 single run(1) multi run(2) multiple cycle(3):2
+Input histogram(1) Simulate histogram(2):1
 leave out x first bins:0
 leave out x last bins:0

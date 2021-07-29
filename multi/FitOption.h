@@ -9,7 +9,7 @@ using namespace std;
 class FitOption{
 private:
     Int_t numRuns = 1, numCycles = 1, numElements, numBins, binRebinInc = 0, startBinLeaveOut = 0, endBinLeaveOut = 0, programExecutionType = 1
-         ,eventDecrement = 0, timeShiftType = 1, rebinDifference = 0, binTimeFitInc = 0;
+         ,eventDecrement = 0, timeShiftType = 1, rebinDifference = 0, binTimeFitInc = 0, inputHistogramChoice = 2;
     Double_t timeRunEnd, events, binWidth;
     Double_t* timeFitEndArr, *timeFitStartArr, *binWidthArr;
     string* elementNames;
@@ -28,6 +28,7 @@ public:
     void SetEventDecrement(Int_t eventDecrement){this->eventDecrement = eventDecrement;}
     void SetTimeShiftType(Int_t timeShiftType){this->timeShiftType = timeShiftType;}
     void SetRebinDifference(Int_t rebinDifference){this->rebinDifference = rebinDifference;}
+    void SetInputHistogramChoice(Int_t inputHistogramChoice){this->inputHistogramChoice = inputHistogramChoice;}
     void SetTimeRunEnd(Double_t timeRunEnd){this->timeRunEnd = timeRunEnd;}
     void SetTimeFitBinInc(Double_t binTimeFitInc){this->binTimeFitInc = binTimeFitInc;}
     void SetNumEvents(Double_t events){this->events = events;}
@@ -47,6 +48,7 @@ public:
     Int_t GetEventDecrement(){return eventDecrement;}
     Int_t GetTimeShiftType(){return timeShiftType;}
     Int_t GetRebinDifference(){return rebinDifference;}
+    Int_t GetInputHistogramChoice(){return inputHistogramChoice;}
     Int_t* GetBinNumArr(){return binNumArr;}
     Double_t GetTimeRunEnd(){return timeRunEnd;}
     Double_t GetTimeFitBinInc(){return binTimeFitInc;}

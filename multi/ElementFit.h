@@ -117,7 +117,7 @@ class ElementFit{
 /// Will take the fit fuctions for the program and the fit options for both the Run class and Cycle class. Dynamically allocates the fit parameter storages here.
 /// Creates data required for creating the histograms between runs and cycles. Runs the call for creating all the histograms.
 ElementFit::ElementFit(Double_t (*batemanFunc)(Double_t*, Double_t*), Double_t (*integralFunc)(Double_t*, Double_t*), Double_t (**batemanFitFunctions)(Double_t*, Double_t*), Double_t (**integralFitFunctions)(Double_t*, Double_t*),
-                   ParameterValue** paraVals, FitOption* fitOptions)
+                   ParameterValue** paraVals, FitOption* fitOptions, TH1D* inputHistogram)
 {
     //setting variables
     this->fitOptions = fitOptions;
@@ -812,19 +812,23 @@ void ElementFit::setFunctionParamersSingle()
     {
         for(int k = 0; k <= i; k++)
         {
-            //need if statments to account for the fact that the value could be range
-            if(paraVals[k]->getIsValueInitValue())
+            //2 = setting from user values
+            if(fitOptions->GetInputHistogramChoice() == 2)
             {
                 singleFitFunctions[(i*2)]->SetParameter((k*2), paraVals[k]->getInitValue());
                 singleFitFunctions[(i*2)+1]->SetParameter((k*2), paraVals[k]->getInitValue());
+            //1 = setting from fit parameters of fitted input histogram
             }else{
                 singleFitFunctions[(i*2)]->SetParameter((k*2), paraVals[k]->getRangeAverageInitValue());
                 singleFitFunctions[(i*2)+1]->SetParameter((k*2), paraVals[k]->getRangeAverageInitValue());
             }
-            if(paraVals[k]->getIsValueDecayConst())
+
+            //2 = setting from user values
+            if(fitOptions->GetInputHistogramChoice() == 2)
             {
                 singleFitFunctions[(i*2)]->SetParameter(((k*2)+1), paraVals[k]->getValueDecayConst());
                 singleFitFunctions[(i*2)+1]->SetParameter(((k*2)+1), paraVals[k]->getValueDecayConst());
+            //1 = setting from fit parameters of fitted input histogram
             }else{
                 singleFitFunctions[(i*2)]->SetParameter(((k*2)+1), paraVals[k]->getRangeAverageDecayConst());
                 singleFitFunctions[(i*2)+1]->SetParameter(((k*2)+1), paraVals[k]->getRangeAverageDecayConst());
@@ -843,10 +847,12 @@ void ElementFit::setParaLimits()
     //sets limits for N0 of the total function
     for(int i = 0; i < numElements; i++)
     {
-        if(paraVals[i]->getIsValueInitValue())
+        //2 = setting from user values
+        if(fitOptions->GetInputHistogramChoice() == 2)
         {
             batemanFunction->SetParLimits((i*2), 0., doubleNumEvents*10000);
             integralFunction->SetParLimits((i*2), 0., doubleNumEvents*10000);
+        //1 = setting from fit parameters of fitted input histogram
         }else{
             batemanFunction->SetParLimits((i*2), paraVals[i]->getLowerRangeInitValue(), paraVals[i]->getUpperRangeInitValue());
             integralFunction->SetParLimits((i*2), paraVals[i]->getLowerRangeInitValue(), paraVals[i]->getUpperRangeInitValue());
@@ -855,10 +861,12 @@ void ElementFit::setParaLimits()
     //sets limits for lambda value of total function
     for(int i = 0; i < numElements; i++)
     {
-        if(paraVals[i]->getIsValueDecayConst())
+        //2 = setting from user values
+        if(fitOptions->GetInputHistogramChoice() == 2)
         {
             batemanFunction->SetParLimits((i*2)+1, (paraVals[i]->getValueDecayConst() * .01), (paraVals[i]->getValueDecayConst() * 100.));
             integralFunction->SetParLimits((i*2)+1, (paraVals[i]->getValueDecayConst() * .01), (paraVals[i]->getValueDecayConst() * 100.));
+        //1 = setting from fit parameters of fitted input histogram
         }else{
             batemanFunction->SetParLimits((i*2)+1, (paraVals[i]->getLowerRangeDecayConst()), (paraVals[i]->getUpperRangeDecayConst()));
             integralFunction->SetParLimits((i*2)+1, (paraVals[i]->getLowerRangeDecayConst()), (paraVals[i]->getUpperRangeDecayConst()));
@@ -870,10 +878,12 @@ void ElementFit::setParaLimits()
     {
         for(int k = 0; k < i+1; k++)
         {
-            if(paraVals[i]->getIsValueInitValue())
+            //2 = setting from user values
+            if(fitOptions->GetInputHistogramChoice() == 2)
             {
                 (singleFitFunctions[(i*2)])->SetParLimits((k*2), 0., doubleNumEvents*10000);
                 (singleFitFunctions[(i*2)+1])->SetParLimits((k*2), 0., doubleNumEvents*10000);
+            //1 = setting from fit parameters of fitted input histogram
             }else{
                 (singleFitFunctions[(i*2)])->SetParLimits((k*2), paraVals[i]->getLowerRangeInitValue(), paraVals[i]->getUpperRangeInitValue());
                 (singleFitFunctions[(i*2)+1])->SetParLimits((k*2), paraVals[i]->getLowerRangeInitValue(), paraVals[i]->getUpperRangeInitValue());
@@ -885,10 +895,12 @@ void ElementFit::setParaLimits()
     {
         for(int k = 0; k <= i; k++)
         {
-            if(paraVals[i]->getIsValueDecayConst())
+            //2 = setting from user values
+            if(fitOptions->GetInputHistogramChoice() == 2)
             {
                 (singleFitFunctions[(i*2)])->SetParLimits((k*2)+1, (paraVals[k]->getValueDecayConst() * .01), (paraVals[k]->getValueDecayConst() * 100.));
                 (singleFitFunctions[(i*2)+1])->SetParLimits((k*2)+1, (paraVals[k]->getValueDecayConst() * .01), (paraVals[k]->getValueDecayConst() * 100.));
+            //1 = setting from fit parameters of fitted input histogram
             }else{
                 (singleFitFunctions[(i*2)])->SetParLimits((k*2)+1, (paraVals[i]->getLowerRangeDecayConst()), (paraVals[i]->getUpperRangeDecayConst()));
                 (singleFitFunctions[(i*2)+1])->SetParLimits((k*2)+1, (paraVals[i]->getLowerRangeDecayConst()), (paraVals[i]->getUpperRangeDecayConst()));

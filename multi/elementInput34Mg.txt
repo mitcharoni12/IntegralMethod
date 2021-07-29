@@ -1,52 +1,41 @@
-Number of elements in decay chain:4
-ENTER INFO EACH ELEMENT IN THE FORMAT
 element 1 Name:MG
 
-element 1 N0 have value(1) or range(2):1
 element 1 N0 value:10000
 element 1 N0 lower;0
 element 1 N0 upper;10000
 
-element 1 half life value(1) or range(2):1
 element 1 half life value:.0200
 element 1 half life lower;0
 element 1 half life upper;1.8
 
 element 2 Name:AL
 
-element 2 N0 have value(1) or range(2):1
 element 2 N0 value:0
 element 2 N0 lower;0
 element 2 N0 upper;0
 
-element 2 half life value(1) or range(2):1
 element 2 half life value:.563
 element 2 half life lower;0
 element 2 half life upper;23
 
 element 3 Name:SI
 
-element 3 N0 have value(1) or range(2):1
 element 3 N0 value:0
 element 3 N0 lower;0
 element 3 N0 upper;0
 
-element 3 half life value(1) or range(2):1
 element 3 half life value:2.77
 element 3 half life lower;0
 element 3 half life upper;80
 
 element 4 Name:P
 
-element 4 N0 have value(1) or range(2):1
 element 4 N0 value:0
 element 4 N0 lower;0
 element 4 N0 upper;0
 
-element 4 half life value(1) or range(2):1
 element 4 half life value:12.43
 element 4 half life lower;0
 element 4 half life upper;80
-HISTO SIMULATE CHOICES
-Simulate(1) or load(2) in histogram:1
+
 Create Fit Functions(1) Dont Create Fit Function(2):2
