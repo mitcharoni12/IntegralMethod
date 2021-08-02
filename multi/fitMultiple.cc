@@ -37,11 +37,14 @@ int main()
 
 void fitMultiple()
 {
-    Int_t eventDecrement, numBins, rebinDifference, createFitFunctionsChoice, events, programExecutionType, histoSimulateChoice, rangeValueChoice, displayIndividualFitsChoice, rebinChoice, inputHistogramChoice;
-    Double_t timeRunEnd, valueHolder, leaveOutStartBinNumber, leaveOutEndBinNumber, binWidth;
+    Int_t eventDecrement, numBins, rebinDifference, createFitFunctionsChoice, events, programExecutionType, histoSimulateChoice, rangeValueChoice, displayIndividualFitsChoice, rebinChoice, inputHistoExecutionType, inputHistoBinNum;
+    Double_t timeRunEndSimulated, timeRunEndInput, timeRunStartInput, inputHistoTimeEnd, valueHolder, leaveOutStartBinsSim, leaveOutEndBinsSim, binWidth, leaveOutStartBinsInput, leaveOutEndBinsInput;
     FitOption* fitOptions = new FitOption();
     ElementFit* element;
     ifstream inFile;
+    string rootFilePath, histogramName;
+    TFile* inputRootFile;
+    TH1D* inputHistogram;
 
     //fitFunctions array passed in and used in element object
     /*
@@ -73,30 +76,51 @@ void fitMultiple()
     inFile.ignore(256,':');
     inFile >> numBins;
     inFile.ignore(256,':');
+    inFile >> inputHistoBinNum;
+    inFile.ignore(256,':');
     inFile >> binWidth;
     inFile.ignore(256,':');
-    inFile >> timeRunEnd;
+    inFile >> timeRunEndSimulated;
+    inFile.ignore(256,':');
+    inFile >> timeRunStartInput;
+    inFile.ignore(256,':');
+    inFile >> timeRunEndInput;
+    inFile.ignore(256,':');
+    inFile >> inputHistoTimeEnd;
     //gets the fit generation choice
     inFile.ignore(256,':');
     inFile >> programExecutionType;
     inFile.ignore(256,':');
-    inFile >> inputHistogramChoice;
+    inFile >> inputHistoExecutionType;
     inFile.ignore(256,':');
-    inFile >> leaveOutStartBinNumber;
+    inFile >> leaveOutStartBinsSim;
     inFile.ignore(256,':');
-    inFile >> leaveOutEndBinNumber;
+    inFile >> leaveOutEndBinsSim;
+    inFile.ignore(256,':');
+    inFile >> leaveOutStartBinsInput;
+    inFile.ignore(256,':');
+    inFile >> leaveOutEndBinsInput;
+    inFile.ignore(256,':');
+    inFile >> rootFilePath;
+    inFile.ignore(256,':');
+    inFile >> histogramName;
     inFile.close();
 
     fitOptions->SetNumEvents(events);
     fitOptions->SetNumBins(numBins);
     fitOptions->SetBinWidth(binWidth);
-    fitOptions->SetTimeRunEnd(timeRunEnd);
+    fitOptions->SetTimeRunEndSimulated(timeRunEndSimulated);
+    fitOptions->SetTimeRunEndInput(timeRunEndInput);
+    fitOptions->SetTimeRunStartInput(timeRunStartInput);
     fitOptions->SetProgramExecutionType(programExecutionType);
-    fitOptions->SetLeaveOutStartBinNumber(leaveOutStartBinNumber);
-    fitOptions->SetLeaveOutEndBinNumber(leaveOutEndBinNumber);
-    fitOptions->SetElementNames(elementNames);
+    fitOptions->SetLeaveOutStartBinsSim(leaveOutStartBinsSim);
+    fitOptions->SetLeaveOutEndBinsSim(leaveOutEndBinsSim);
+    fitOptions->SetInputHistoBinNum(inputHistoBinNum);
+    fitOptions->SetLeaveOutStartBinsInput(leaveOutStartBinsInput);
+    fitOptions->SetLeaveOutEndBinsInput(leaveOutEndBinsInput);
     fitOptions->SetNumElements(numElements);
-    fitOptions->SetInputHistogramChoice(inputHistogramChoice);
+    fitOptions->SetInputHistoExecutionType(inputHistoExecutionType);
+    fitOptions->SetInputHistoTimeEnd(inputHistoTimeEnd);
     Int_t numFitFunction = numElements*2;
 
     //open first option file
@@ -119,10 +143,10 @@ void fitMultiple()
         inFile.ignore(256,':');
         inFile >> valueHolder;
         paraVals[i]->setInitValue(valueHolder);
-        inFile.ignore(256,';');
+        inFile.ignore(256,':');
         inFile >> valueHolder;
         paraVals[i]->setLowerRangeInitValue(valueHolder);
-        inFile.ignore(256,';');
+        inFile.ignore(256,':');
         inFile >> valueHolder;
         paraVals[i]->setUpperRangeInitValue(valueHolder);
 
@@ -142,6 +166,7 @@ void fitMultiple()
     inFile >> histoSimulateChoice;
     inFile.ignore(256,':');
     inFile >> createFitFunctionsChoice;
+    fitOptions->SetElementNames(elementNames);
     inFile.close();
 
     if(createFitFunctionsChoice == 1)
@@ -171,13 +196,70 @@ void fitMultiple()
         paraVals[i]->setValueDecayConst(valueHolder);
     }
 
-    //input a histogram
-    if(inputHistogramChoice == 1)
-    {
+    //switch statement for dealing with an input histogram
+    switch(inputHistoExecutionType)
+    {   //Case for pure histogram simulation.
+        case 1:
+        {
+            break;
+        }
+        //Case for inputting histogram to do a Monte Carlo analysis
+        case 2:
+        {
+            TH1D* inputHistogram;
+            FitOption* inputHistoMonteFitOptions = fitOptions;
+            inputRootFile = new TFile(rootFilePath.c_str(), "READ");
 
-        fitOptions->SetMultiSourceChoice(true);
-        element = new ElementFit(BatemanDecaybyActivity, IntegralDecaybyActivity, batemanFitFunctions, integralFitFunctions, paraVals, fitOptions);
-        element->fitHistos(0, 0);
+            if(inputRootFile->IsZombie())
+            {
+                cout << "Error reading file." << endl;
+                return;
+            }
+            inputRootFile->GetObject(histogramName.c_str(), inputHistogram);
+
+            inputHistoMonteFitOptions->SetNumRuns(1);
+            inputHistoMonteFitOptions->SetNumCycles(1);
+            element = new ElementFit(BatemanDecaybyActivity, IntegralDecaybyActivity, batemanFitFunctions, integralFitFunctions, paraVals, inputHistoMonteFitOptions, inputHistogram);
+            delete element;
+            return;
+            break;
+        }
+        //Case for changing fit time on input histogram.
+        case 3:
+        {
+            Int_t numCycles, timeShiftType, displayIndividualFitsChoice, lowerRunHistoIndex, upperRunHistoIndex;
+            Double_t timeInc;
+            TH1D* inputHistogram;
+            FitOption* inputHistoFitOptions = new FitOption();
+            inputRootFile = new TFile(rootFilePath.c_str(), "READ");
+
+            if(inputRootFile->IsZombie())
+            {
+                cout << "Error reading file." << endl;
+                return;
+            }
+            inputRootFile->GetObject(histogramName.c_str(), inputHistogram);
+
+            inFile.open("inputHistoTimeChange.txt");
+            inFile.ignore(256,':');
+            inFile >> numCycles;
+            inFile.ignore(256,':');
+            inFile >> timeShiftType;
+            inFile.ignore(256,':');
+            inFile >> timeInc;
+            inFile.ignore(256,':');
+            inFile >> displayIndividualFitsChoice;
+            inFile.ignore(256,':');
+            inFile >> lowerRunHistoIndex;
+            inFile.ignore(256,':');
+            inFile >> upperRunHistoIndex;
+            inFile.close();
+
+            inputHistoFitOptions->SetNumCycles(numCycles);
+            inputHistoFitOptions->SetTimeShiftType(timeShiftType);
+            inputHistoFitOptions->SetInputTimeInc(timeInc);
+
+        }
     }
 
     //SWITCH FOR PROGRAM EXECUTION TYPE
@@ -210,12 +292,12 @@ void fitMultiple()
         //multi run of histogram
         case 2:
         {
-            Int_t runs;
+            Int_t numRuns;
             int graphOrHistoChoice, lowerRunHistoIndex, upperRunHistoIndex;
 
             inFile.open("simulated_single_cycle.txt");
             inFile.ignore(256,':');
-            inFile >> runs;
+            inFile >> numRuns;
             inFile.ignore(256,':');
             inFile >> eventDecrement;
             inFile.ignore(256,':');
@@ -227,7 +309,7 @@ void fitMultiple()
             inFile.ignore(256, ':');
             inFile >> upperRunHistoIndex;
 
-            fitOptions->SetNumRuns(runs);
+            fitOptions->SetNumRuns(numRuns);
             fitOptions->SetEventDecrement(eventDecrement);
             fitOptions->SetMultiSourceChoice(true);
             
@@ -311,8 +393,7 @@ void fitMultiple()
         //multiple runs of histogram
         case 3:
         {
-            Int_t numRuns, numCycles, singleSourceHistoChoice, timeShiftType,
-                    lowerRunHistoIndex, upperRunHistoIndex, lowerCycleHistoIndex, upperCycleHistoIndex;
+            Int_t numRuns, numCycles, singleSourceHistoChoice, timeShiftType, lowerRunHistoIndex, upperRunHistoIndex, lowerCycleHistoIndex, upperCycleHistoIndex;
             Double_t binTimeFitInc, runMeanDifference;
 
             inFile.open("simulated_multi_cycle.txt");
@@ -492,6 +573,7 @@ void fitMultiple()
     }
     delete [] paraVals;
     delete [] elementNames;
+    delete fitOptions;
 }
 
 Double_t BatemanDecaybyActivity(Double_t *x, Double_t *par)
