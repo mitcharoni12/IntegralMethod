@@ -1,6 +1,6 @@
 Number of Cycles:10
 X Axis Range, Start = Constant, End = Changing (1) X Axis Range, Start = Changing, End = Constant(2):1
-Time Increment per Cycle(10^-8s):1
-Display Individual Fits(1) Dont Display Individual Fits(2):2
-Lower Run Histo Index(0 based):0
-Upper Run Histo Index(0 based):0
+Time Increment per Cycle(10^-8s):10000000
+Display Individual Fits(1) Dont Display Individual Fits(2):1
+Lower Cycle Histo Index(0 based):0
+Upper Cycle Histo Index(0 based):3

@@ -149,6 +149,7 @@ void fitMultiple()
         inFile.ignore(256,':');
         inFile >> valueHolder;
         paraVals[i]->setUpperRangeInitValue(valueHolder);
+        paraVals[i]->calculateRangeAverageInitValue();
 
         //Gets Half life value and range
         inFile.ignore(256,':');
@@ -160,10 +161,9 @@ void fitMultiple()
         inFile.ignore(256,':');
         inFile >> valueHolder;
         paraVals[i]->setUpperRangeHalfLife(valueHolder);
+        paraVals[i]->calculateRangeAverageHalfLife();
     }
     //gets histogram choice
-    inFile.ignore(256,':');
-    inFile >> histoSimulateChoice;
     inFile.ignore(256,':');
     inFile >> createFitFunctionsChoice;
     fitOptions->SetElementNames(elementNames);
@@ -184,7 +184,7 @@ void fitMultiple()
     FitFunction* fitFunctions = new FitFunction(numElements);
     batemanFitFunctions = fitFunctions->GetBatemanFitFunctions();
     integralFitFunctions = fitFunctions->GetIntegralFitFunctions();
-    
+
     //calculates the decay constant values
     for(int i = 0; i < numElements; i++)
     {
@@ -194,8 +194,20 @@ void fitMultiple()
         paraVals[i]->setUpperRangeDecayConst(valueHolder);
         valueHolder = (log(2)/paraVals[i]->getValueHalfLife());
         paraVals[i]->setValueDecayConst(valueHolder);
+        paraVals[i]->calculateRangeAverageDecayConst();
     }
 
+    TCanvas* test2 = new TCanvas("test2", "test2", 500, 500);
+    TCanvas* test1 = new TCanvas("test1", "test1", 500, 500);
+    TF1* a = new TF1("TotalIntegralFunction", BatemanDecaybyActivity, 0., 100, 6);
+    for(int i = 0; i < numElements; i++)
+    {
+        a->SetParameter((i*2), paraVals[i]->getInitValue());
+        a->SetParameter((i*2)+1, paraVals[i]->getValueDecayConst());
+    }
+    test2->cd();
+    a->Draw();
+    test1->cd();
     //switch statement for dealing with an input histogram
     switch(inputHistoExecutionType)
     {   //Case for pure histogram simulation.
@@ -209,33 +221,70 @@ void fitMultiple()
             TH1D* inputHistogram;
             FitOption* inputHistoMonteFitOptions = fitOptions;
             inputRootFile = new TFile(rootFilePath.c_str(), "READ");
-
+            Double_t timeFitEnd, fitLength;
+            /*
+            TCanvas* test2 = new TCanvas("test2", "test2", 500, 500);
+            TF1* a = new TF1("TotalIntegralFunction", BatemanDecaybyActivity, 0., 100, 6);
+            for(int i = 0; i < numElements; i++)
+            {
+                a->SetParameter((i*2), 1);
+                a->SetParameter((i*2)+1, 2);
+            }
+            test2->cd();
+            a->Draw();
+            */
+            //if program cannot open root file
             if(inputRootFile->IsZombie())
             {
                 cout << "Error reading file." << endl;
+                delete fitOptions;
+                for(int i = 0; i < numElements; i++)
+                {
+                    delete paraVals[i];
+                }
+                delete [] paraVals;
+                delete [] elementNames;
+                delete fitFunctions;
                 return;
             }
             inputRootFile->GetObject(histogramName.c_str(), inputHistogram);
 
             inputHistoMonteFitOptions->SetNumRuns(1);
             inputHistoMonteFitOptions->SetNumCycles(1);
+            /*
             element = new ElementFit(BatemanDecaybyActivity, IntegralDecaybyActivity, batemanFitFunctions, integralFitFunctions, paraVals, inputHistoMonteFitOptions, inputHistogram);
+
+            timeFitEnd = inputHistoMonteFitOptions->GetTimeLengthArr()[0];
+            element->createTotalFitFunctions(timeFitEnd);
+            element->fitBatemanHisto(0, 0, 0.0, timeFitEnd);
+            element->fitIntegralHisto(0, 0, 0.0, timeFitEnd);
+            element->displayParameters();
             delete element;
+            */
             return;
             break;
         }
         //Case for changing fit time on input histogram.
         case 3:
         {
-            Int_t numCycles, timeShiftType, displayIndividualFitsChoice, lowerRunHistoIndex, upperRunHistoIndex;
+            Int_t numCycles, timeShiftType, displayIndividualFitsChoice, lowerCycleHistoIndex, upperCycleHistoIndex;
             Double_t timeInc;
             TH1D* inputHistogram;
             FitOption* inputHistoFitOptions = new FitOption();
             inputRootFile = new TFile(rootFilePath.c_str(), "READ");
 
+            //if program cannot open root file
             if(inputRootFile->IsZombie())
             {
                 cout << "Error reading file." << endl;
+                delete fitOptions;
+                for(int i = 0; i < numElements; i++)
+                {
+                    delete paraVals[i];
+                }
+                delete [] paraVals;
+                delete [] elementNames;
+                delete fitFunctions;
                 return;
             }
             inputRootFile->GetObject(histogramName.c_str(), inputHistogram);
@@ -250,15 +299,40 @@ void fitMultiple()
             inFile.ignore(256,':');
             inFile >> displayIndividualFitsChoice;
             inFile.ignore(256,':');
-            inFile >> lowerRunHistoIndex;
+            inFile >> lowerCycleHistoIndex;
             inFile.ignore(256,':');
-            inFile >> upperRunHistoIndex;
+            inFile >> upperCycleHistoIndex;
             inFile.close();
 
+            inputHistoFitOptions->SetNumRuns(1);
             inputHistoFitOptions->SetNumCycles(numCycles);
             inputHistoFitOptions->SetTimeShiftType(timeShiftType);
             inputHistoFitOptions->SetInputTimeInc(timeInc);
+            inputHistoFitOptions->SetTimeRunEndInput(timeRunEndInput);
+            inputHistoFitOptions->SetTimeRunStartInput(timeRunStartInput);
+            inputHistoFitOptions->SetInputHistoBinNum(inputHistoBinNum);
+            inputHistoFitOptions->SetLeaveOutStartBinsInput(leaveOutStartBinsInput);
+            inputHistoFitOptions->SetLeaveOutEndBinsInput(leaveOutEndBinsInput);
+            inputHistoFitOptions->SetNumElements(numElements);
+            inputHistoFitOptions->SetInputHistoExecutionType(inputHistoExecutionType);
+            inputHistoFitOptions->SetInputHistoTimeEnd(inputHistoTimeEnd);
+            inputHistoFitOptions->SetElementNames(elementNames);
 
+            element = new ElementFit(BatemanDecaybyActivity, IntegralDecaybyActivity, batemanFitFunctions, integralFitFunctions, paraVals, inputHistoFitOptions, inputHistogram);
+
+            if(displayIndividualFitsChoice == 1)
+            {
+                CycleCanvasHolder* batemanInputHistoCanvas = new CycleCanvasHolder(0, 0, lowerCycleHistoIndex, upperCycleHistoIndex, "Bateman Input Histogram");
+                CycleCanvasHolder* integralInputHistoCanvas = new CycleCanvasHolder(0, 0, lowerCycleHistoIndex, upperCycleHistoIndex, "Integral Input Histogram");
+
+                element->DrawInputIndividualHistos(batemanInputHistoCanvas, integralInputHistoCanvas, 0, 0, lowerCycleHistoIndex, upperCycleHistoIndex);
+
+                delete batemanInputHistoCanvas;
+                delete integralInputHistoCanvas;
+            }
+
+            delete inputHistoFitOptions;
+            return;
         }
     }
 

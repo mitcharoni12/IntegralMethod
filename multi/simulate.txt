@@ -8,7 +8,7 @@ Inital Time Fit Start Input Histogram(10^-8s):350000000
 Inital Time Fit End Input Histograms(10^-8s):400000000
 Input Histogram Time End(10^-8s):500000000
 single run(1) multi run(2) multiple cycle(3):1
-No Input Histogram(1) Input Histogram Monte Carlo(2) Input histogram change fit time(3):2
+No Input Histogram(1) Input Histogram Monte Carlo(2) Input histogram change fit time(3):1
 leave out x first bins of simulated histograms:0
 leave out x last bins of simulated histograms:0
 leave out x first bins of input histograms:0

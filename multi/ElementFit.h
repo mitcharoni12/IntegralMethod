@@ -52,11 +52,17 @@ class ElementFit{
         void setNumRuns(Int_t numRuns){this->numRuns = numRuns;}
         void setNumCycles(Int_t numCycles){this->numCycles = numCycles;}
         //public functions
+        void createTotalFitFunctions(Int_t timeEnd);
         void displayIntegralGraph(TCanvas* can);
         void displayBatemanHisto(TCanvas* can);
         void displaySingleHistos(TCanvas** can);
         void displayParameters();
         void DrawIndividualHistos(CycleCanvasHolder* batemanTotalCanvases, CycleCanvasHolder* integralTotalCanvases, SingleCycleCanvasHolder* singleBatemanCanvases, SingleCycleCanvasHolder* singleIntegralCanvases, Int_t lowerRunIndex, Int_t upperRunIndex, Int_t lowerCycleIndex, Int_t upperCycleIndex);
+        void DrawSingleIndividualHistos(SingleCycleCanvasHolder* singleBatemanCanvases, SingleCycleCanvasHolder* singleIntegralCanvases, Int_t lowerRunIndex, Int_t upperRunIndex, Int_t lowerCycleIndex, Int_t upperCycleIndex);
+        void DrawTotalIndividualHistos(CycleCanvasHolder* batemanTotalCanvases, CycleCanvasHolder* integralTotalCanvases, Int_t lowerRunIndex, Int_t upperRunIndex, Int_t lowerCycleIndex, Int_t upperCycleIndex);
+        void DrawInputIndividualHistos(CycleCanvasHolder* inputBatemanCanvases, CycleCanvasHolder* inputIntegralCanvases, Int_t lowerRunIndex, Int_t upperRunIndex, Int_t lowerCycleIndex, Int_t upperCycleIndex);
+        void fitBatemanHisto(Int_t cycleIndex, Int_t runIndex, Double_t startFit, Double_t endFit);
+        void fitIntegralHisto(Int_t cycleIndex, Int_t runIndex, Double_t startFit, Double_t endFit);
         void fitHistos(Int_t cycleIndex, Int_t runIndex);
     private:
         //private variables
@@ -67,7 +73,7 @@ class ElementFit{
         bool rebinChoice;                                                           ///< True = Have program execute with changing bin number between cylces and keeping time fit constant. False = Dont do rebin
         bool inputHistogramChoice;                                                  ///< True = dealing with input histogram.
         Int_t* binNumArr;                                                           ///< Contains an array of number of bins the histogram have between cycles.
-        TF1* integralFunction, *batemanFunction;
+        TF1* integralFunction, *batemanFunction, *a;
         TF1** singleFitFunctions;
         CycleHistoHolder* batemanHisto;                                             ///< Contains every total Bateman histogram for the entire program.
         CycleHistoHolder* integralHisto;                                            ///< Contains every total integral histogram for the entire program.
@@ -104,10 +110,7 @@ class ElementFit{
         void createIntegralGraph();
         void createHistoHolders();
         void createSingleFitFunctions(Int_t timeEnd);
-        void createTotalFitFunctions(Int_t timeEnd);
         void cutInputHistos();
-        void fitIntegralHisto(Int_t cycleIndex, Int_t runIndex, Double_t startFit, Double_t endFit);
-        void fitBatemanHisto(Int_t cycleIndex, Int_t runIndex, Double_t startFit, Double_t endFit);
         void fitSingleHistos(Int_t cycleIndex, Int_t runIndex, Double_t startFit, Double_t endFits);
         void DisplayParameterLimits();
         void DisplayTotalFunctionParameters();
@@ -118,8 +121,10 @@ class ElementFit{
         void genIntegralHistoSimulated();
         void setFunctionParametersTotal();
         void setFunctionParamersSingle();
-        void setParaLimits();
+        void setTotalParaLimits();
+        void setSingleParaLimits();
         TCanvas* test = new TCanvas("test", "test", 500, 500);
+        TCanvas* test2 = new TCanvas("test2", "test2", 500, 500);
         clock_t Tclock;
 };  
 
@@ -178,7 +183,6 @@ ElementFit::ElementFit(Double_t (*batemanFunc)(Double_t*, Double_t*), Double_t (
 ElementFit::ElementFit(Double_t (*batemanFunc)(Double_t*, Double_t*), Double_t (*integralFunc)(Double_t*, Double_t*), Double_t (**batemanFitFunctions)(Double_t*, Double_t*), Double_t (**integralFitFunctions)(Double_t*, Double_t*),
                    ParameterValue** paraVals, FitOption* fitOptions, TH1D* inputHistogram)
 {
-    TCanvas* test2 = new TCanvas("Test2", "Test2", 500, 500);
     //setting variables
     this->fitOptions = fitOptions;
     this->numRuns = fitOptions->GetNumRuns();
@@ -207,6 +211,19 @@ ElementFit::ElementFit(Double_t (*batemanFunc)(Double_t*, Double_t*), Double_t (
     totalBatemanFitParameters = new ChainFitValues(numElements);
     totalIntegralFitParameters = new ChainFitValues(numElements);
 
+    test->cd();
+    /*
+    a = new TF1("TotalIntegralFunction", passedBatemanFunction, 0., 100, 8);
+    for(int i = 0; i < numElements; i++)
+    {
+        a->SetParameter((i*2), 1);
+        a->SetParameter((i*2)+1, 2);
+    }
+    test2->cd();
+    a->Draw();
+    test->cd();
+    */
+
     singleFitFunctions = new TF1* [numElements*2];
     //setting values for randomization
     randArr = new Double_t [numElements];
@@ -220,9 +237,6 @@ ElementFit::ElementFit(Double_t (*batemanFunc)(Double_t*, Double_t*), Double_t (
     createInputHistoHolders();
     cutInputHistos();
     createInputIntegralGraph();
-    test2->cd();
-    batemanInputHisto->GetAHisto(0,0)->Draw();
-    //integralInputGraph->GetAGraph(0,0)->Draw();
     //removes restrictions on fitting function calls and itterations
     ROOT::Math::MinimizerOptions::SetDefaultMaxIterations(100000000);
     ROOT::Math::MinimizerOptions::SetDefaultMaxFunctionCalls(100000000);
@@ -243,8 +257,6 @@ ElementFit::~ElementFit()
         }
         delete [] singleFitFunctions;
         delete [] randArr;
-        delete batemanFunction;
-        delete integralFunction;
         delete batemanHisto;
         delete integralHisto;
         delete singleBatemanHisto;
@@ -257,14 +269,8 @@ ElementFit::~ElementFit()
         delete singleIntegralFitParameters;
         delete totalBatemanFitParameters;
         delete totalIntegralFitParameters;
-        for(int i = 0; i < numElements*2; i++)
-        {
-            //delete singleFitFunctions[i];
-        }
         delete [] singleFitFunctions;
         delete [] randArr;
-        //delete batemanFunction;
-        //delete integralFunction;
     }
 }
 
@@ -290,7 +296,6 @@ void ElementFit::createInputHistoHolders()
     Double_t* timeLengthArr = fitOptions->GetTimeLengthArr();
     string histoName;
     histoName = "Total Input Bateman Histo";
-    cout << "num cycle: " << numCycles << " num runs: " << numRuns << " bin num: " << binNumArr[0] << " time length: " << timeLengthArr[0]; 
     batemanInputHisto = new CycleHistoHolder(numCycles, numRuns, histoName, binNumArr, timeLengthArr);
 }
 
@@ -315,7 +320,7 @@ void ElementFit::createInputIntegralGraph()
         tempIntegralGraph = integralInputGraph->GetAGraph(cycleIndex, 0);
 
         tempIntegralGraph->SetPoint(1, 0.0, 0.0);
-        for(int binIndex = 1; binIndex < binNumArr[cycleIndex]; cycleIndex++)
+        for(int binIndex = 1; binIndex < binNumArr[cycleIndex]; binIndex++)
         {
             tempXPoint = binWidth[cycleIndex] * binIndex;
             tempYPoint = tempBatemanHisto->GetBinContent(binIndex);
@@ -418,6 +423,7 @@ void ElementFit::createTotalFitFunctions(Int_t timeEnd)
 {
     batemanFunction = new TF1("TotalBatemanFunction", passedBatemanFunction, 0., timeEnd, numParameters);
     integralFunction = new TF1("TotalIntegralFunction", passedIntegralFunction, 0., timeEnd, numParameters);
+    //a = new TF1("TotalIntegralFunction", passedIntegralFunction, 0., 100, 4);
 }
 
 /// \brief Displays total integral histogram for the single fit option for the program
@@ -450,30 +456,34 @@ void ElementFit::displayParameters()
         cout << "\tN0: " << totalIntegralFitParameters->GetAnN0(i) << "" << endl << 
         "\tError: " << totalIntegralFitParameters->GetAnN0Error(i) << "" << endl << endl;
     }
-    cout << "BATEMAN SINGLE FIT PARAMETERS/ERRORS" << endl << endl;
-    for(int i = 0; i < numElements; i++)
+    //only want to display if doing simulation
+    if(fitOptions->GetInputHistoExecutionType() == 1)
     {
-        cout << elementNames[i] << " Single Fit Values" << endl;
-        for(int k = 0; k < i+1; k++)
+        cout << "BATEMAN SINGLE FIT PARAMETERS/ERRORS" << endl << endl;
+        for(int i = 0; i < numElements; i++)
         {
-            cout << elementNames[k] << ": \tHalf Life: " << singleBatemanFitParameters->GetAnHalfLife(i, k) << "s" << endl << 
-            "\tHalf Life Error: " << singleBatemanFitParameters->GetAnHalfLifeError(i,k) << "s" << endl;
-            cout << "\tN0: " << singleBatemanFitParameters->GetAnN0(i, k) << "" << endl << 
-            "\tN0 Error: " << singleBatemanFitParameters->GetAnN0Error(i,k) << "" << endl;
-            cout << endl;
+            cout << elementNames[i] << " Single Fit Values" << endl;
+            for(int k = 0; k < i+1; k++)
+            {
+                cout << elementNames[k] << ": \tHalf Life: " << singleBatemanFitParameters->GetAnHalfLife(i, k) << "s" << endl << 
+                "\tHalf Life Error: " << singleBatemanFitParameters->GetAnHalfLifeError(i,k) << "s" << endl;
+                cout << "\tN0: " << singleBatemanFitParameters->GetAnN0(i, k) << "" << endl << 
+                "\tN0 Error: " << singleBatemanFitParameters->GetAnN0Error(i,k) << "" << endl;
+                cout << endl;
+            }
         }
-    }
-    cout << endl << "INTEGRAL SINGLE FIT PARAMETERS/ERRORS" << endl << endl;
-    for(int i = 0; i < numElements; i++)
-    {
-        cout << elementNames[i] << " Single Fit Values" << endl;
-        for(int k = 0; k < i+1; k++)
+        cout << endl << "INTEGRAL SINGLE FIT PARAMETERS/ERRORS" << endl << endl;
+        for(int i = 0; i < numElements; i++)
         {
-            cout << elementNames[k] << ": \tHalf Life: " << singleIntegralFitParameters->GetAnHalfLife(i, k) << "s" << endl << 
-            "\tHalf Life Error: " << singleIntegralFitParameters->GetAnHalfLifeError(i,k) << "s" << endl;
-            cout << "\tN0: " << singleIntegralFitParameters->GetAnN0(i, k) << "" << endl << 
-            "\tN0 Error: " << singleIntegralFitParameters->GetAnN0Error(i,k) << "" << endl;
-            cout << endl;
+            cout << elementNames[i] << " Single Fit Values" << endl;
+            for(int k = 0; k < i+1; k++)
+            {
+                cout << elementNames[k] << ": \tHalf Life: " << singleIntegralFitParameters->GetAnHalfLife(i, k) << "s" << endl << 
+                "\tHalf Life Error: " << singleIntegralFitParameters->GetAnHalfLifeError(i,k) << "s" << endl;
+                cout << "\tN0: " << singleIntegralFitParameters->GetAnN0(i, k) << "" << endl << 
+                "\tN0 Error: " << singleIntegralFitParameters->GetAnN0Error(i,k) << "" << endl;
+                cout << endl;
+            }
         }
     }
 }
@@ -485,6 +495,25 @@ void ElementFit::displayBatemanHisto(TCanvas* can)
 {
     can->cd();
     batemanHisto->GetAHisto(0, 0)->Draw();
+}
+
+/// \brief Displays the input individual histogram.
+void ElementFit::DrawInputIndividualHistos(CycleCanvasHolder* inputBatemanCanvases, CycleCanvasHolder* inputIntegralCanvases, Int_t lowerRunIndex, Int_t upperRunIndex, Int_t lowerCycleIndex, Int_t upperCycleIndex)
+{
+    upperRunIndex = upperRunIndex + 1;
+    upperCycleIndex = upperCycleIndex + 1;
+
+    for(int cycleIndex = lowerCycleIndex; cycleIndex < upperCycleIndex; cycleIndex++)
+    {
+        for(int runIndex = lowerRunIndex; runIndex < upperRunIndex; runIndex++)
+        {
+            inputBatemanCanvases->GetACanvas(cycleIndex, runIndex)->cd();
+            batemanInputHisto->GetAHisto(cycleIndex, runIndex)->Draw();
+
+            inputIntegralCanvases->GetACanvas(cycleIndex, runIndex)->cd();
+            integralInputGraph->GetAGraph(cycleIndex, runIndex)->Draw();
+        }
+    }
 }
 
 /// \brief Displays single histograms for the single fit option for the program
@@ -502,11 +531,10 @@ void ElementFit::displaySingleHistos(TCanvas** can)
     }
 }
 
-/// \brief Displays the individual histogram for any execution type of the program
+/// \brief Displays the total individual histogram for any execution type of the program
 ///
-/// Draws the invidivual histograms for the program within the range set by the user
-void ElementFit::DrawIndividualHistos(CycleCanvasHolder* batemanTotalCanvases, CycleCanvasHolder* integralTotalCanvases, SingleCycleCanvasHolder* singleBatemanCanvases, SingleCycleCanvasHolder* singleIntegralCanvases,
-                                      Int_t lowerRunIndex, Int_t upperRunIndex, Int_t lowerCycleIndex, Int_t upperCycleIndex)
+/// Draws the total individual histograms for the program within the range set by the user
+void ElementFit::DrawTotalIndividualHistos(CycleCanvasHolder* batemanTotalCanvases, CycleCanvasHolder* integralTotalCanvases, Int_t lowerRunIndex, Int_t upperRunIndex, Int_t lowerCycleIndex, Int_t upperCycleIndex)
 {
     upperRunIndex = upperRunIndex + 1;
     upperCycleIndex = upperCycleIndex + 1;
@@ -520,7 +548,22 @@ void ElementFit::DrawIndividualHistos(CycleCanvasHolder* batemanTotalCanvases, C
 
             integralTotalCanvases->GetACanvas(cycleIndex, runIndex)->cd();
             integralGraph->GetAGraph(cycleIndex, runIndex)->Draw();
+        }
+    }
+}
 
+/// \brief Displays the single individual histogram for any execution type of the program
+///
+/// Draws the single individual histograms for the program within the range set by the user
+void ElementFit::DrawSingleIndividualHistos(SingleCycleCanvasHolder* singleBatemanCanvases, SingleCycleCanvasHolder* singleIntegralCanvases, Int_t lowerRunIndex, Int_t upperRunIndex, Int_t lowerCycleIndex, Int_t upperCycleIndex)
+{
+    upperRunIndex = upperRunIndex + 1;
+    upperCycleIndex = upperCycleIndex + 1;
+
+    for(int cycleIndex = lowerCycleIndex; cycleIndex < upperCycleIndex; cycleIndex++)
+    {
+        for(int runIndex = lowerRunIndex; runIndex < upperRunIndex; runIndex++)
+        {
             for(int elementIndex = 0; elementIndex < numElements; elementIndex++)
             {
                 singleBatemanCanvases->GetACanvas(cycleIndex, runIndex, elementIndex)->cd();
@@ -531,6 +574,15 @@ void ElementFit::DrawIndividualHistos(CycleCanvasHolder* batemanTotalCanvases, C
             }
         }
     }
+}
+
+/// \brief Displays the individual histogram for any execution type of the program
+///
+/// Draws the individual histograms for the program within the range set by the user
+void ElementFit::DrawIndividualHistos(CycleCanvasHolder* batemanTotalCanvases, CycleCanvasHolder* integralTotalCanvases, SingleCycleCanvasHolder* singleBatemanCanvases, SingleCycleCanvasHolder* singleIntegralCanvases, Int_t lowerRunIndex, Int_t upperRunIndex, Int_t lowerCycleIndex, Int_t upperCycleIndex)
+{
+    DrawTotalIndividualHistos(batemanTotalCanvases, integralTotalCanvases, lowerRunIndex, upperRunIndex, lowerCycleIndex, upperCycleIndex);
+    DrawSingleIndividualHistos(singleBatemanCanvases, singleIntegralCanvases, lowerRunIndex, upperRunIndex, lowerCycleIndex, upperCycleIndex);
 }
 
 /// \brief Cuts the original input histogram bins and puts them in a new histogram.
@@ -546,14 +598,10 @@ void ElementFit::cutInputHistos()
         tempStartBin = tempBinStartArr[cycleIndex];
         for(int binIndex = 1; binIndex <= binNumArr[cycleIndex]; binIndex++)
         {
-            cout << "Bin Num: " << tempStartBin + binIndex - 2 << endl;
             tempBinValue = inputHistogram->GetBinContent(tempStartBin + binIndex - 2);
-            cout << "Bin Content: " << tempBinValue << endl << endl;
             tempHisto->SetBinContent(binIndex, tempBinValue);
         }
     }
-    test->cd();
-    inputHistogram->Draw();
 }
 
 /// \brief Calls fit methods to fit histograms at specific run and cycle index
@@ -568,7 +616,8 @@ void ElementFit::fitHistos(Int_t cycleIndex, Int_t runIndex)
     createTotalFitFunctions(timeEndArr[cycleIndex]);
     setFunctionParametersTotal();
     setFunctionParamersSingle();
-    setParaLimits();
+    setTotalParaLimits();
+    setSingleParaLimits();
 
     Double_t startFitOffset;
     Double_t startFit;
@@ -603,17 +652,29 @@ void ElementFit::fitIntegralHisto(Int_t cycleIndex, Int_t runIndex, Double_t sta
 
     cout << "FITTING TOTAL INTEGRAL CYCLE: " << cycleIndex << " RUN: " << runIndex << endl;
 
-    tempGraph = integralGraph->GetAGraph(cycleIndex, runIndex);
+    //non input histogram
+    if(fitOptions->GetInputHistoExecutionType() == 1)
+    {
+        tempGraph = integralGraph->GetAGraph(cycleIndex, runIndex);
+    //input histogram
+    }else if(fitOptions->GetInputHistoExecutionType() == 2 || fitOptions->GetInputHistoExecutionType() == 3)
+    {
+        tempGraph = integralInputGraph->GetAGraph(cycleIndex, runIndex);
+    }
     tempGraph->Fit(integralFunction, "", "", startFit, endFit);
 
     for(int i = 0; i < numElements; i++)
     {   
         valueN0 = integralFunction->GetParameter((i*2));
+        cout << "valueN0: " << valueN0 << endl;
         errorN0 = integralFunction->GetParError((i*2));
+        cout << "errorN0: " << errorN0 << endl;
         valueDecayConst = integralFunction->GetParameter((i*2)+1);
         errorDecayConst = integralFunction->GetParError((i*2)+1);
         valueHalfLife = log(2)/(valueDecayConst);
+        cout << "valueHalfLife: " << valueHalfLife << endl;
         errorHalfLife = ((log(2)/valueDecayConst)*(errorDecayConst/valueDecayConst));
+        cout << "errorHalfLife: " << errorHalfLife << endl;
         //used to get either the N0 value or half life value
         totalIntegralFitParameters->SetAnN0(i, valueN0);
         totalIntegralFitParameters->SetAnN0Error(i, errorN0);
@@ -637,18 +698,33 @@ void ElementFit::fitBatemanHisto(Int_t cycleIndex, Int_t runIndex, Double_t star
     Double_t errorHalfLife;
     TH1D* tempHisto;
 
-    cout << "FITTING TOTAL BATEMAN CYCLE: " << cycleIndex << " RUN: " << runIndex << endl;
+    //non input histogram
+    if(fitOptions->GetInputHistoExecutionType() == 1)
+    {
+        tempHisto = batemanHisto->GetAHisto(cycleIndex, runIndex);
+    //input histogram
+    }else if(fitOptions->GetInputHistoExecutionType() == 2 || fitOptions->GetInputHistoExecutionType() == 3)
+    {
+        setFunctionParametersTotal();
+        setTotalParaLimits();
+        tempHisto = batemanInputHisto->GetAHisto(cycleIndex, runIndex);
+    }
 
-    tempHisto = batemanHisto->GetAHisto(cycleIndex, runIndex);
-    tempHisto->Fit(this->batemanFunction, "L", "", timeRunStart, endFit);
+    cout << "FITTING TOTAL BATEMAN CYCLE: " << cycleIndex << " RUN: " << runIndex << endl;
+    cout << "start: " << startFit << " end: " << endFit << endl;
+    tempHisto->Fit(batemanFunction, "L", "", startFit, endFit);
     for(int i = 0; i < numElements; i++)
     {   
         valueN0 = batemanFunction->GetParameter((i*2));
+        cout << "valueN0: " << valueN0 << endl;
         errorN0 = batemanFunction->GetParError((i*2));
+        cout << "errorN0: " << errorN0 << endl;
         valueDecayConst = batemanFunction->GetParameter((i*2)+1);
         errorDecayConst = batemanFunction->GetParError((i*2)+1);
         valueHalfLife = log(2)/(valueDecayConst);
+        cout << "valueHalfLife: " << valueHalfLife << endl;
         errorHalfLife = ((log(2)/valueDecayConst)*(errorDecayConst/valueDecayConst));
+        cout << "errorHalfLife: " << errorHalfLife << endl;
         //used to get either the N0 value or half life value
         totalBatemanFitParameters->SetAnN0(i, valueN0);
         totalBatemanFitParameters->SetAnN0Error(i, errorN0);
@@ -923,27 +999,16 @@ void ElementFit::setFunctionParametersTotal()
     for(int i = 0; i < numElements; i++)
     {
         //have to have the if statments to account for the fact that the value could be a range
-        //1 = setting from user values
-        if(fitOptions->GetInputHistoExecutionType() == 1)
-        {
-            integralFunction->SetParameter((i*2), paraVals[i]->getInitValue());
-            batemanFunction->SetParameter((i*2), paraVals[i]->getInitValue());
-        //2 = setting from fit parameters of fitted input histogram
-        }else{
-            integralFunction->SetParameter((i*2), paraVals[i]->getRangeAverageInitValue());
-            batemanFunction->SetParameter((i*2), paraVals[i]->getRangeAverageInitValue());
-        }
-        //1 = setting from user values
-        if(fitOptions->GetInputHistoExecutionType() == 1)
-        {
-            integralFunction->SetParameter((i*2)+1, paraVals[i]->getValueDecayConst());
-            batemanFunction->SetParameter((i*2)+1, paraVals[i]->getValueDecayConst());
-        //2 = setting from fit parameters of fitted input histogram
-        }else{
-            integralFunction->SetParameter((i*2)+1, paraVals[i]->getRangeAverageDecayConst());
-            batemanFunction->SetParameter((i*2)+1, paraVals[i]->getRangeAverageDecayConst());
-        }
+        integralFunction->SetParameter((i*2), paraVals[i]->getInitValue());
+        batemanFunction->SetParameter((i*2), paraVals[i]->getInitValue());
+        integralFunction->SetParameter((i*2)+1, paraVals[i]->getValueDecayConst());
+        batemanFunction->SetParameter((i*2)+1, paraVals[i]->getValueDecayConst());
+        //a->SetParameter((i*2), paraVals[i]->getInitValue());
+        //a->SetParameter((i*2)+1, paraVals[i]->getInitValue());
     }
+    //test2->cd();
+    //a->Draw();
+    //test->cd();
 }
 
 /// \brief Displays the parameters used to set the fit functions
@@ -968,27 +1033,10 @@ void ElementFit::setFunctionParamersSingle()
     {
         for(int k = 0; k <= i; k++)
         {
-            //1 = setting from user values
-            if(fitOptions->GetInputHistoExecutionType() == 1)
-            {
-                singleFitFunctions[(i*2)]->SetParameter((k*2), paraVals[k]->getInitValue());
-                singleFitFunctions[(i*2)+1]->SetParameter((k*2), paraVals[k]->getInitValue());
-            //2 = setting from fit parameters of fitted input histogram
-            }else{
-                singleFitFunctions[(i*2)]->SetParameter((k*2), paraVals[k]->getRangeAverageInitValue());
-                singleFitFunctions[(i*2)+1]->SetParameter((k*2), paraVals[k]->getRangeAverageInitValue());
-            }
-
-            //1 = setting from user values
-            if(fitOptions->GetInputHistoExecutionType() == 1)
-            {
-                singleFitFunctions[(i*2)]->SetParameter(((k*2)+1), paraVals[k]->getValueDecayConst());
-                singleFitFunctions[(i*2)+1]->SetParameter(((k*2)+1), paraVals[k]->getValueDecayConst());
-            //2 = setting from fit parameters of fitted input histogram
-            }else{
-                singleFitFunctions[(i*2)]->SetParameter(((k*2)+1), paraVals[k]->getRangeAverageDecayConst());
-                singleFitFunctions[(i*2)+1]->SetParameter(((k*2)+1), paraVals[k]->getRangeAverageDecayConst());
-            }
+            singleFitFunctions[(i*2)]->SetParameter((k*2), paraVals[k]->getInitValue());
+            singleFitFunctions[(i*2)+1]->SetParameter((k*2), paraVals[k]->getInitValue());
+            singleFitFunctions[(i*2)]->SetParameter(((k*2)+1), paraVals[k]->getValueDecayConst());
+            singleFitFunctions[(i*2)+1]->SetParameter(((k*2)+1), paraVals[k]->getValueDecayConst());
         }
     }
 }
@@ -997,7 +1045,7 @@ void ElementFit::setFunctionParamersSingle()
 ///
 /// Sets the limits in which the parameters can fit in the fit function. If they are too large the program will not fit correctly but too large then its like cheating.
 /// I just use scalar multiples of the accepted values in the range.
-void ElementFit::setParaLimits()
+void ElementFit::setTotalParaLimits()
 {
     DisplayParameterLimits();
     //sets limits for N0 of the total function
@@ -1028,7 +1076,14 @@ void ElementFit::setParaLimits()
             integralFunction->SetParLimits((i*2)+1, (paraVals[i]->getLowerRangeDecayConst()), (paraVals[i]->getUpperRangeDecayConst()));
         }
     }
+}
 
+/// \brief Sets the limits in which the parameters can fit in the fit function.
+///
+/// Sets the limits in which the parameters can fit in the fit function. If they are too large the program will not fit correctly but too large then its like cheating.
+/// I just use scalar multiples of the accepted values in the range.
+void ElementFit::setSingleParaLimits()
+{
     //sets limits for N0 of the single functions
     for(int i = 0; i < numElements; i++)
     {
@@ -1069,13 +1124,31 @@ void ElementFit::setParaLimits()
 void ElementFit::DisplayParameterLimits()
 {
     cout << "PARAMETER FIT RANGE" << endl;
-    for(int i = 0; i < numElements; i++)
+    //non input histo
+    if(fitOptions->GetInputHistoExecutionType() == 1)
     {
-        cout << elementNames[i] << ":" << endl;
-        cout << "\tInitial Lower Range: 0" << endl;
-        cout << "\tInitial Lower Range: " << doubleNumEvents*10000 << endl;
-        cout << "\tHalf Life Lower Range: " << paraVals[i]->getValueHalfLife() * .01 << endl;
-        cout << "\tHalf Life Upper Range: " << paraVals[i]->getValueHalfLife() * 100. << endl;
+        for(int i = 0; i < numElements; i++)
+        {
+            cout << elementNames[i] << ":" << endl;
+            cout << "\tInitial Lower Range: 0" << endl;
+            cout << "\tInitial Upper Range: " << doubleNumEvents*10000 << endl;
+            cout << "\tHalf Life Lower Range: " << paraVals[i]->getValueHalfLife() * .01 << endl;
+            cout << "\tHalf Life Upper Range: " << paraVals[i]->getValueHalfLife() * 100. << endl;
+            cout << endl;
+        }
+        cout << endl;
+    //input histo
+    }else if(fitOptions->GetInputHistoExecutionType() == 2 || fitOptions->GetInputHistoExecutionType() == 3)
+    {
+        for(int i = 0; i < numElements; i++)
+        {
+            cout << elementNames[i] << ":" << endl;
+            cout << "\tInitial Lower Range: 0" << endl;
+            cout << "\tInitial Upper Range: " << paraVals[i]->getUpperRangeInitValue() << endl;
+            cout << "\tHalf Life Lower Range: " << paraVals[i]->getLowerRangeHalfLife() << endl;
+            cout << "\tHalf Life Upper Range: " << paraVals[i]->getUpperRangeHalfLife() << endl;
+            cout << endl;
+        }
         cout << endl;
     }
 }
