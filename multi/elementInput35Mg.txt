@@ -4,9 +4,9 @@ element 1 N0 value:10000
 element 1 N0 lower:0
 element 1 N0 upper:10000
 
-element 1 half life value:.0113
-element 1 half life lower:0
-element 1 half life upper:1.8
+element 1 half life value(s):.0113
+element 1 half life lower(s):0
+element 1 half life upper(s):1.8
 
 element 2 Name:AL
 
@@ -14,9 +14,9 @@ element 2 N0 value:0
 element 2 N0 lower:0
 element 2 N0 upper:0
 
-element 2 half life value:.563
-element 2 half life lower:0
-element 2 half life upper:23
+element 2 half life value(s):.563
+element 2 half life lower(s):0
+element 2 half life upper(s):23
 
 element 3 Name:SI
 
@@ -24,9 +24,9 @@ element 3 N0 value:0
 element 3 N0 lower:0
 element 3 N0 upper:0
 
-element 3 half life value:2.77
-element 3 half life lower:0
-element 3 half life upper:80
+element 3 half life value(s):2.77
+element 3 half life lower(s):0
+element 3 half life upper(s):80
 
 element 4 Name:P
 
@@ -34,8 +34,8 @@ element 4 N0 value:0
 element 4 N0 lower:0
 element 4 N0 upper:0
 
-element 4 half life value:12.43
-element 4 half life lower:0
-element 4 half life upper:80
+element 4 half life value(s):12.43
+element 4 half life lower(s):0
+element 4 half life upper(s):80
 
 Create Fit Functions(1) Dont Create Fit Function(2):2

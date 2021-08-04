@@ -67,6 +67,7 @@ void fitMultiple()
     integralFitFunctions[2] = LADecaybyActivityIntegral;
     */
 
+    //READ IN DATA FROM SIMULATE.TXT
     inFile.open("simulate.txt");
     //gets numElements, events, bins, and timeRun
     inFile.ignore(256,':');
@@ -106,6 +107,7 @@ void fitMultiple()
     inFile >> histogramName;
     inFile.close();
 
+    //setting data read in from simulate.txt to the fitOption object.
     fitOptions->SetNumEvents(events);
     fitOptions->SetNumBins(numBins);
     fitOptions->SetBinWidth(binWidth);
@@ -149,7 +151,6 @@ void fitMultiple()
         inFile.ignore(256,':');
         inFile >> valueHolder;
         paraVals[i]->setUpperRangeInitValue(valueHolder);
-        paraVals[i]->calculateRangeAverageInitValue();
 
         //Gets Half life value and range
         inFile.ignore(256,':');
@@ -161,14 +162,14 @@ void fitMultiple()
         inFile.ignore(256,':');
         inFile >> valueHolder;
         paraVals[i]->setUpperRangeHalfLife(valueHolder);
-        paraVals[i]->calculateRangeAverageHalfLife();
     }
-    //gets histogram choice
+    //gets option to create the fit functions if need be
     inFile.ignore(256,':');
     inFile >> createFitFunctionsChoice;
     fitOptions->SetElementNames(elementNames);
     inFile.close();
 
+    //creates the fit functions in FitFunction.h
     if(createFitFunctionsChoice == 1)
     {
         CreateFitFunctions(elementNames);
@@ -186,28 +187,17 @@ void fitMultiple()
     integralFitFunctions = fitFunctions->GetIntegralFitFunctions();
 
     //calculates the decay constant values
+    //note: lower range half life will produce upper range decay constant becuase of the formula for conversion
     for(int i = 0; i < numElements; i++)
     {
         valueHolder = (log(2)/paraVals[i]->getLowerRangeHalfLife());
-        paraVals[i]->setLowerRangeDecayConst(valueHolder);
-        valueHolder = (log(2)/paraVals[i]->getUpperRangeHalfLife());
         paraVals[i]->setUpperRangeDecayConst(valueHolder);
+        valueHolder = (log(2)/paraVals[i]->getUpperRangeHalfLife());
+        paraVals[i]->setLowerRangeDecayConst(valueHolder);
         valueHolder = (log(2)/paraVals[i]->getValueHalfLife());
         paraVals[i]->setValueDecayConst(valueHolder);
-        paraVals[i]->calculateRangeAverageDecayConst();
     }
-
-    TCanvas* test2 = new TCanvas("test2", "test2", 500, 500);
-    TCanvas* test1 = new TCanvas("test1", "test1", 500, 500);
-    TF1* a = new TF1("TotalIntegralFunction", BatemanDecaybyActivity, 0., 100, 6);
-    for(int i = 0; i < numElements; i++)
-    {
-        a->SetParameter((i*2), paraVals[i]->getInitValue());
-        a->SetParameter((i*2)+1, paraVals[i]->getValueDecayConst());
-    }
-    test2->cd();
-    a->Draw();
-    test1->cd();
+    
     //switch statement for dealing with an input histogram
     switch(inputHistoExecutionType)
     {   //Case for pure histogram simulation.
@@ -220,19 +210,10 @@ void fitMultiple()
         {
             TH1D* inputHistogram;
             FitOption* inputHistoMonteFitOptions = fitOptions;
+            ChainFitValues* integralFitValues;
             inputRootFile = new TFile(rootFilePath.c_str(), "READ");
-            Double_t timeFitEnd, fitLength;
-            /*
-            TCanvas* test2 = new TCanvas("test2", "test2", 500, 500);
-            TF1* a = new TF1("TotalIntegralFunction", BatemanDecaybyActivity, 0., 100, 6);
-            for(int i = 0; i < numElements; i++)
-            {
-                a->SetParameter((i*2), 1);
-                a->SetParameter((i*2)+1, 2);
-            }
-            test2->cd();
-            a->Draw();
-            */
+            Double_t timeFitEnd, tempHalfLife;
+
             //if program cannot open root file
             if(inputRootFile->IsZombie())
             {
@@ -251,17 +232,24 @@ void fitMultiple()
 
             inputHistoMonteFitOptions->SetNumRuns(1);
             inputHistoMonteFitOptions->SetNumCycles(1);
-            /*
+            
             element = new ElementFit(BatemanDecaybyActivity, IntegralDecaybyActivity, batemanFitFunctions, integralFitFunctions, paraVals, inputHistoMonteFitOptions, inputHistogram);
 
             timeFitEnd = inputHistoMonteFitOptions->GetTimeLengthArr()[0];
             element->createTotalFitFunctions(timeFitEnd);
             element->fitBatemanHisto(0, 0, 0.0, timeFitEnd);
-            element->fitIntegralHisto(0, 0, 0.0, timeFitEnd);
+            element->fitIntegralGraph(0, 0, 0.0, timeFitEnd);
             element->displayParameters();
+            integralFitValues = element->getIntegralFitParameters();
+
+            for(int i = 0; i < numElements; i++)
+            {
+                tempHalfLife = integralFitValues->GetAnHalfLife(i);
+                paraVals[i]->setValueHalfLife(tempHalfLife);
+            }
+
             delete element;
-            */
-            return;
+            
             break;
         }
         //Case for changing fit time on input histogram.
@@ -271,6 +259,7 @@ void fitMultiple()
             Double_t timeInc;
             TH1D* inputHistogram;
             FitOption* inputHistoFitOptions = new FitOption();
+            Double_t timeFitEnd;
             inputRootFile = new TFile(rootFilePath.c_str(), "READ");
 
             //if program cannot open root file
@@ -319,6 +308,22 @@ void fitMultiple()
             inputHistoFitOptions->SetElementNames(elementNames);
 
             element = new ElementFit(BatemanDecaybyActivity, IntegralDecaybyActivity, batemanFitFunctions, integralFitFunctions, paraVals, inputHistoFitOptions, inputHistogram);
+            Run* run = new Run(element);
+            Cycle* cycle = new Cycle(run, element);
+
+            timeFitEnd = inputHistoFitOptions->GetTimeLengthArr()[0];
+            element->createTotalFitFunctions(timeFitEnd);
+
+            cycle->runSeperateSingleGen();
+            cycle->genSeperateMeanGraphsTimeDifference();
+            TCanvas** canvasArr = new TCanvas* [numElements];
+            for(int i = 0; i < numElements; i++)
+            {
+                canvasArr[i] = new TCanvas((elementNames[i] + " Single Source Seperate Mean").c_str(), (elementNames[i] + " Single Source Seperate Mean").c_str(), 1100, 1100);
+                canvasArr[i]->Divide(2,1,.02,.02);
+            }
+            cycle->displayMeanSeperateGraphs(canvasArr);
+            delete [] canvasArr;
 
             if(displayIndividualFitsChoice == 1)
             {
@@ -332,9 +337,14 @@ void fitMultiple()
             }
 
             delete inputHistoFitOptions;
+            delete element;
+            delete run;
+            delete cycle;
             return;
         }
     }
+    //switching program to simulate data now
+    fitOptions->SetInputHistoExecutionType(1);
 
     //SWITCH FOR PROGRAM EXECUTION TYPE
     switch(programExecutionType)
@@ -342,6 +352,11 @@ void fitMultiple()
         //single run of histogam
         case 1:
         {
+            for(int i = 0; i < fitOptions->GetNumElements(); i++)
+            {
+                cout << "INIT: " << paraVals[i]->getInitValue() << endl;
+                cout << "Half-life: " << paraVals[i]->getValueHalfLife() << endl << endl;
+            }
             fitOptions->SetMultiSourceChoice(true);
             element = new ElementFit(BatemanDecaybyActivity, IntegralDecaybyActivity, batemanFitFunctions, integralFitFunctions, paraVals, fitOptions);
             element->fitHistos(0, 0);

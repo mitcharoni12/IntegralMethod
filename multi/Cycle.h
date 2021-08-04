@@ -18,7 +18,7 @@ using namespace std;
 class Cycle{
     private:
         FitOption* fitOptions;                                  ///< Contains fit options for program.
-        Int_t numCycles, numElements;
+        Int_t numCycles, numElements, inputHistoExecutionType;
         Int_t* binNumArr;                                       ///< Contains the bin number between cycles.
         Double_t* timeArr;                                      ///< Contains the time run end between cycles
         Run* decayChainRun;                                     ///< Run objects, used for doing the multiple runs of a cycle
@@ -66,6 +66,7 @@ Cycle::Cycle(Run* decayChainRun, ElementFit* element)
     this->numCycles = fitOptions->GetNumCycles();
     this->element = element;
     this->decayChainRun = decayChainRun;
+    this->inputHistoExecutionType = fitOptions->GetInputHistoExecutionType();
     numElements = fitOptions->GetNumElements();
     binNumArr = fitOptions->GetBinNumArr();
     elementStrNames = fitOptions->GetElementNames();
@@ -136,10 +137,13 @@ void Cycle::displayMeanSeperateGraphs(TCanvas** canvasArr)
         batemanFitMeanGraphs[i]->Draw();
         canvasArr[i]->cd(2);
         integralFitMeanGraphs[i]->Draw();
-        canvasArr[i]->cd(3);
-        singleBatemanFitMeanGraphs[i]->Draw();
-        canvasArr[i]->cd(4);
-        singleIntegralFitMeanGraphs[i]->Draw();
+        if(inputHistoExecutionType == 1)
+        {
+            canvasArr[i]->cd(3);
+            singleBatemanFitMeanGraphs[i]->Draw();
+            canvasArr[i]->cd(4);
+            singleIntegralFitMeanGraphs[i]->Draw();
+        }
     }
 }
 
@@ -303,13 +307,6 @@ void Cycle::genSeperateMeanGraphsTimeDifference()
         batemanFitMeanGraphs[i]->GetYaxis()->SetTitle("Fit Value(s)");
         batemanFitMeanGraphs[i]->SetTitle((elementStrNames[i] + " Bateman Graph Mean").c_str());
 
-        tempFitVals = singleBatemanFitValues->GetHalfLifeArr(i, i);
-        tempFitErrors = singleBatemanFitValues->GetHalfLifeErrorArr(i, i);
-        singleBatemanFitMeanGraphs[i] = new TGraphErrors(numCycles, timeArr, tempFitVals, zero, tempFitErrors);
-        singleBatemanFitMeanGraphs[i]->GetXaxis()->SetTitle("Time(s)");
-        singleBatemanFitMeanGraphs[i]->GetYaxis()->SetTitle("Fit Value(s)");
-        singleBatemanFitMeanGraphs[i]->SetTitle((elementStrNames[i] + " Single Bateman Graph Mean").c_str());
-
         tempFitVals = integralFitValues->GetHalfLifeArr(i);
         tempFitErrors = integralFitValues->GetHalfLifeErrorArr(i);
         integralFitMeanGraphs[i] = new TGraphErrors(numCycles, timeArr, tempFitVals, zero, tempFitErrors);
@@ -317,12 +314,22 @@ void Cycle::genSeperateMeanGraphsTimeDifference()
         integralFitMeanGraphs[i]->GetYaxis()->SetTitle("Fit Value(s)");
         integralFitMeanGraphs[i]->SetTitle((elementStrNames[i] + " Integral Graph Mean").c_str());
 
-        tempFitVals = singleIntegralFitValues->GetHalfLifeArr(i, i);
-        tempFitErrors = singleIntegralFitValues->GetHalfLifeErrorArr(i, i);
-        singleIntegralFitMeanGraphs[i] = new TGraphErrors(numCycles, timeArr, tempFitVals, zero, tempFitErrors);
-        singleIntegralFitMeanGraphs[i]->GetXaxis()->SetTitle("Time(s)");
-        singleIntegralFitMeanGraphs[i]->GetYaxis()->SetTitle("Fit Value(s)");
-        singleIntegralFitMeanGraphs[i]->SetTitle((elementStrNames[i] + " Single Integral Graph Mean").c_str());
+        if(inputHistoExecutionType == 1)
+        {
+            tempFitVals = singleBatemanFitValues->GetHalfLifeArr(i, i);
+            tempFitErrors = singleBatemanFitValues->GetHalfLifeErrorArr(i, i);
+            singleBatemanFitMeanGraphs[i] = new TGraphErrors(numCycles, timeArr, tempFitVals, zero, tempFitErrors);
+            singleBatemanFitMeanGraphs[i]->GetXaxis()->SetTitle("Time(s)");
+            singleBatemanFitMeanGraphs[i]->GetYaxis()->SetTitle("Fit Value(s)");
+            singleBatemanFitMeanGraphs[i]->SetTitle((elementStrNames[i] + " Single Bateman Graph Mean").c_str());
+
+            tempFitVals = singleIntegralFitValues->GetHalfLifeArr(i, i);
+            tempFitErrors = singleIntegralFitValues->GetHalfLifeErrorArr(i, i);
+            singleIntegralFitMeanGraphs[i] = new TGraphErrors(numCycles, timeArr, tempFitVals, zero, tempFitErrors);
+            singleIntegralFitMeanGraphs[i]->GetXaxis()->SetTitle("Time(s)");
+            singleIntegralFitMeanGraphs[i]->GetYaxis()->SetTitle("Fit Value(s)");
+            singleIntegralFitMeanGraphs[i]->SetTitle((elementStrNames[i] + " Single Integral Graph Mean").c_str());
+        }
     }
 
     delete [] zero;
