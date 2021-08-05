@@ -51,36 +51,58 @@ class ElementFit{
         //setter function
         void setNumRuns(Int_t numRuns){this->numRuns = numRuns;}
         void setNumCycles(Int_t numCycles){this->numCycles = numCycles;}
-        //public functions
-        void createTotalFitFunctions(Int_t timeEnd);
-        void displayIntegralGraph(TCanvas* can);
-        void displayBatemanHisto(TCanvas* can);
-        void displaySingleHistos(TCanvas** can);
-        void displayParameters();
-        void DrawIndividualHistos(CycleCanvasHolder* batemanTotalCanvases, CycleCanvasHolder* integralTotalCanvases, SingleCycleCanvasHolder* singleBatemanCanvases, SingleCycleCanvasHolder* singleIntegralCanvases, Int_t lowerRunIndex, Int_t upperRunIndex, Int_t lowerCycleIndex, Int_t upperCycleIndex);
-        void DrawSingleIndividualHistos(SingleCycleCanvasHolder* singleBatemanCanvases, SingleCycleCanvasHolder* singleIntegralCanvases, Int_t lowerRunIndex, Int_t upperRunIndex, Int_t lowerCycleIndex, Int_t upperCycleIndex);
-        void DrawTotalIndividualHistos(CycleCanvasHolder* batemanTotalCanvases, CycleCanvasHolder* integralTotalCanvases, Int_t lowerRunIndex, Int_t upperRunIndex, Int_t lowerCycleIndex, Int_t upperCycleIndex);
-        void DrawInputIndividualHistos(CycleCanvasHolder* inputBatemanCanvases, CycleCanvasHolder* inputIntegralCanvases, Int_t lowerRunIndex, Int_t upperRunIndex, Int_t lowerCycleIndex, Int_t upperCycleIndex);
-        void fitBatemanHisto(Int_t cycleIndex, Int_t runIndex, Double_t startFit, Double_t endFit);
-        void fitIntegralGraph(Int_t cycleIndex, Int_t runIndex, Double_t startFit, Double_t endFit);
-        void fitHistos(Int_t cycleIndex, Int_t runIndex);
+        //new public
+        void ChangeSeed()
+        void createInputIntegralGraph();
+        void CutInputHistos();
+
+        void CreateSingleBatemanFitFunctions();
+        void CreateSingleBatemanHistoHolders();
+        void DisplaySingleBatemanHistos(TCanvas** can);
+        void DisplaySingleBatemanParameters();
+        void DrawSingleBatemanIndividualHistos(SingleCycleCanvasHolder* singleBatemanCanvases, SingleCycleCanvasHolder* singleIntegralCanvases, Int_t lowerRunIndex, Int_t upperRunIndex, Int_t lowerCycleIndex, Int_t upperCycleIndex);
+        void FitSingleBatemanHistos(Int_t cycleIndex, Int_t runIndex);
+
+        void CreateSingleIntegralFitFunctions();
+        void CreateSingleIntegralGraph();
+        void CreateSingleIntegralHistoHolders();
+        void DisplaySingleIntegralGraph(TCanvas** can);
+        void DisplaySingleIntegralParameters();
+        void DrawSingleIntegralIndividualHistos(SingleCycleCanvasHolder* singleBatemanCanvases, SingleCycleCanvasHolder* singleIntegralCanvases, Int_t lowerRunIndex, Int_t upperRunIndex, Int_t lowerCycleIndex, Int_t upperCycleIndex);
+
+        void CreateTotalBatemanFitFunctions();
+        void CreateTotalBatemanHistoHolders();
+        void DisplayTotalBatemanHisto(TCanvas* can);
+        void DisplayTotalBatemanParameters();
+        void DrawTotalBatemanIndividualHistos(CycleCanvasHolder* batemanTotalCanvases, CycleCanvasHolder* integralTotalCanvases, Int_t lowerRunIndex, Int_t upperRunIndex, Int_t lowerCycleIndex, Int_t upperCycleIndex);
+        void FitTotalBatemanHisto(Int_t cycleIndex, Int_t runIndex);
+        void FitSingleIntegralGraphs(Int_t cycleIndex, Int_t runIndex);
+
+        void CreateTotalIntegralFitFunctions();
+        void CreateTotalIntegralGraph();
+        void CreateTotalIntegralHistoHolders();
+        void DisplayTotalIntegralGraph(TCanvas* can);
+        void DisplayTotalIntegralParameters();
+        void DrawTotalIntegralIndividualHistos(CycleCanvasHolder* batemanTotalCanvases, CycleCanvasHolder* integralTotalCanvases, Int_t lowerRunIndex, Int_t upperRunIndex, Int_t lowerCycleIndex, Int_t upperCycleIndex);
+        void FitTotalIntegralGraph(Int_t cycleIndex, Int_t runIndex);
+        //new private
+        
+
     private:
         //private variables
         FitOption* fitOptions;                                                      ///< Contains fit options for program
         string* elementNames;                                                       ///< Contains element names for every element in the decay chain
-        Int_t numEvents, numElements, numParameters, numRuns, numCycles, inputHistoExecutionType;
+        Int_t numEvents, numElements, numParameters, numRuns, numCycles, inputHistoExecutionType, singleElementDataChoice;
         bool multiSourceChoice;                                                     ///< True = generate multiple sets of histograms for the different cyles. False = generate a single set of histograms for the diiferent cyles.
         bool rebinChoice;                                                           ///< True = Have program execute with changing bin number between cylces and keeping time fit constant. False = Dont do rebin
         bool inputHistogramChoice;                                                  ///< True = dealing with input histogram.
         Int_t* binNumArr;                                                           ///< Contains an array of number of bins the histogram have between cycles.
-        TF1* integralFunction, *batemanFunction, *a;
-        TF1** singleFitFunctions;
+        TF1* integralFunction, *batemanFunction;
+        TF1** singleIntegralFitFunctions, **singleBatemanFitFunctions;
         CycleHistoHolder* batemanHisto;                                             ///< Contains every total Bateman histogram for the entire program.
         CycleHistoHolder* integralHisto;                                            ///< Contains every total integral histogram for the entire program.
         SingleCycleHistoHolder* singleBatemanHisto;                                 ///< Contains every single Bateman histogram for the entire program.
         SingleCycleHistoHolder* singleIntegralHisto;                                ///< Contains every single integral histogram for the entire program.
-        CycleHistoHolder* batemanInputHisto;                                        ///< Contains the cut Bateman input histograms.
-        CycleGraphHolder* integralInputGraph;                                       ///< Contains the cut integral input graphs.
         TH1D* inputHistogram;                                                       ///< Contains the raw input histogram.
         CycleGraphHolder* integralGraph;                                            ///< Contains every total integral graph for the entire program.
         SingleCycleGraphHolder* singleIntegralGraph;                                ///< Contains every single integral graph for the entire program.
@@ -103,26 +125,6 @@ class ElementFit{
         SingleElementFitValues* singleBatemanFitParameters, *singleIntegralFitParameters;
         ParameterValue** paraVals;                                                  ///< Accepted values for all parameters in all the fit functions.
         Int_t globalSeedChanger = 0;                                                ///< Used for assigning in changing the seed.
-        //helper functions
-        void changeSeed();
-        void createInputIntegralGraph();
-        void createInputHistoHolders();
-        void createIntegralGraph();
-        void createHistoHolders();
-        void createSingleFitFunctions(Int_t timeEnd);
-        void cutInputHistos();
-        void fitSingleHistos(Int_t cycleIndex, Int_t runIndex, Double_t startFit, Double_t endFits);
-        void DisplayParameterLimits();
-        void DisplayTotalFunctionParameters();
-        void genBatemanHistograms();
-        void genAndFillHistos();
-        void genIntegralHisto();
-        void genIntegralSingleHistos();
-        void genIntegralHistoSimulated();
-        void setFunctionParametersTotal();
-        void setFunctionParamersSingle();
-        void setTotalParaLimits();
-        void setSingleParaLimits();
         //TCanvas* test = new TCanvas("test", "test", 500, 500);
         //TCanvas* test2 = new TCanvas("test2", "test2", 500, 500);
         clock_t Tclock;
@@ -156,6 +158,7 @@ ElementFit::ElementFit(Double_t (*batemanFunc)(Double_t*, Double_t*), Double_t (
     this->leaveOutStartBinsInput = fitOptions->GetLeaveOutStartBinsInput();
     this->leaveOutEndBinsInput = fitOptions->GetLeaveOutEndBinsInput();
     this->inputHistoExecutionType = fitOptions->GetInputHistoExecutionType();
+    this->singleElementDataChoice = fitOptions->GetSingleElementDataChoice();
     doubleNumEvents = (Double_t) numEvents;
 
     //creating fit parameter holders
@@ -164,7 +167,8 @@ ElementFit::ElementFit(Double_t (*batemanFunc)(Double_t*, Double_t*), Double_t (
     totalBatemanFitParameters = new ChainFitValues(numElements);
     totalIntegralFitParameters = new ChainFitValues(numElements);
 
-    singleFitFunctions = new TF1* [numElements*2];
+    singleBatemanFitFunctions = new TF1* [numElements];
+    singleIntegralFitFunctions = new TF1* [numElements];
     //setting values for randomization
     randArr = new Double_t [numElements];
     Tclock = clock();
@@ -205,6 +209,7 @@ ElementFit::ElementFit(Double_t (*batemanFunc)(Double_t*, Double_t*), Double_t (
     this->leaveOutEndBinsInput = fitOptions->GetLeaveOutEndBinsInput();
     this->inputHistogram = inputHistogram;
     this->inputHistoExecutionType = fitOptions->GetInputHistoExecutionType();
+    this->singleElementDataChoice = fitOptions->GetSingleElementDataChoice();
     doubleNumEvents = (Double_t) numEvents;
 
     //creating fit parameter holders
@@ -213,7 +218,8 @@ ElementFit::ElementFit(Double_t (*batemanFunc)(Double_t*, Double_t*), Double_t (
     totalBatemanFitParameters = new ChainFitValues(numElements);
     totalIntegralFitParameters = new ChainFitValues(numElements);
 
-    singleFitFunctions = new TF1* [numElements*2];
+    singleBatemanFitFunctions = new TF1* [numElements];
+    singleIntegralFitFunctions = new TF1* [numElements];
     //setting values for randomization
     randArr = new Double_t [numElements];
     Tclock = clock();
@@ -239,11 +245,8 @@ ElementFit::~ElementFit()
         delete singleIntegralFitParameters;
         delete totalBatemanFitParameters;
         delete totalIntegralFitParameters;
-        for(int i = 0; i < numElements*2; i++)
-        {
-            delete singleFitFunctions[i];
-        }
-        delete [] singleFitFunctions;
+        delete [] singleBatemanFitFunctions;
+        delete [] singleIntegralFitFunctions;
         delete [] randArr;
         delete batemanHisto;
         delete integralHisto;
@@ -257,38 +260,86 @@ ElementFit::~ElementFit()
         delete singleIntegralFitParameters;
         delete totalBatemanFitParameters;
         delete totalIntegralFitParameters;
-        delete [] singleFitFunctions;
+        delete [] singleBatemanFitFunctions;
+        delete [] singleIntegralFitFunctions;
         delete [] randArr;
     }
 }
 
-/// \brief Creates required histograms for the ENTIRE program.
-///
-/// Creates all the histogram objects that will be required for the program. When doing things like changing binning and time run the histograms are required to be different.
-void ElementFit::createHistoHolders()
+/// \brief changes seed for random number generator
+void ElementFit::ChangeSeed()
+{
+    Double_t seederSeed;
+    Double_t randNumber;
+
+    randNumber = rand.Uniform();
+    seederSeed = Tclock + globalSeedChanger + randNumber;
+
+    rand.SetSeed(Tclock + globalSeedChanger + seederSeed);
+    globalSeedChanger++;
+}
+
+/// \brief Cuts the original input histogram bins and puts them in a new histogram.
+void ElementFit::CutInputHistos()
+{
+    TH1D* tempHisto;
+    Double_t* tempBinStartArr = fitOptions->GetFitStartBinArr();
+    Double_t* tempBinEndArr = fitOptions->GetFitEndBinArr();
+    Double_t tempStartBin, tempBinEnd, tempBinValue;
+    for(int cycleIndex = 0; cycleIndex < numCycles; cycleIndex++)
+    {
+        tempHisto = batemanHisto->GetAHisto(cycleIndex, 0);
+        tempStartBin = tempBinStartArr[cycleIndex];
+        for(int binIndex = 1; binIndex <= binNumArr[cycleIndex]; binIndex++)
+        {
+            tempBinValue = inputHistogram->GetBinContent(tempStartBin + binIndex - 2);
+            tempHisto->SetBinContent(binIndex, tempBinValue);
+        }
+    }
+}
+
+/// \brief Creates all total bateman histograms for the entre program.
+void ElementFit::CreateTotalBatemanHistoHolders()
 {
     string histoName;
-    histoName = "Total Bateman Histo";
-    batemanHisto = new CycleHistoHolder(numCycles, numRuns, histoName, binNumArr, timeEndArr);
+    if(inputHistoExecutionType == 1)
+    {
+        histoName = "Total Bateman Histo";
+        batemanHisto = new CycleHistoHolder(numCycles, numRuns, histoName, binNumArr, timeEndArr);
+    }else if(inputHistoExecutionType == 2 || inputHistoExecutionType == 3)
+    {
+        Double_t* timeLengthArr = fitOptions->GetTimeLengthArr();
+        histoName = "Total Input Bateman Histo";
+        batemanHisto = new CycleHistoHolder(numCycles, numRuns, histoName, binNumArr, timeLengthArr);
+    }
+}
+
+/// \brief Creates all total integral histograms for the entre program.
+void ElementFit::CreateTotalIntegralHistoHolders()
+{
+    string histoName;
     histoName = "Total Integral Histo";
     integralHisto = new CycleHistoHolder(numCycles, numRuns, histoName, binNumArr, timeEndArr);
+}
+
+/// \brief Creates all single bateman histograms for the entre program.
+void ElementFit::CreateSingleBatemanHistoHolders()
+{
+    string histoName;
     histoName = "Single Bateman Histo";
     singleBatemanHisto = new SingleCycleHistoHolder(numCycles, numElements, numRuns, histoName, binNumArr, timeEndArr, elementNames);
+}
+
+/// \brief Creates all single integral histograms for the entre program.
+void ElementFit::CreateSingleIntegralHistoHolders()
+{
+    string histoName;
     histoName = "Single Integral Histo";
     singleIntegralHisto = new SingleCycleHistoHolder(numCycles, numElements, numRuns, histoName, binNumArr, timeEndArr, elementNames);
 }
 
-/// \brief Creates required histograms for the input histograms.
-void ElementFit::createInputHistoHolders()
-{
-    Double_t* timeLengthArr = fitOptions->GetTimeLengthArr();
-    string histoName;
-    histoName = "Total Input Bateman Histo";
-    batemanInputHisto = new CycleHistoHolder(numCycles, numRuns, histoName, binNumArr, timeLengthArr);
-}
-
 /// \brief Creates the integral graphs for the input histogram.
-void ElementFit::createInputIntegralGraph()
+void ElementFit::CreateInputIntegralGraph()
 {
     string graphName = "Total Input Integral Graph";
     Int_t* numPointsArr = new Int_t[numCycles];
@@ -300,12 +351,12 @@ void ElementFit::createInputIntegralGraph()
     {
         numPointsArr[i] = binNumArr[i] + 1;
     }
-    integralInputGraph = new CycleGraphHolder(numCycles, numRuns, graphName, numPointsArr);
+    integralGraph = new CycleGraphHolder(numCycles, numRuns, graphName, numPointsArr);
 
     for(int cycleIndex = 0; cycleIndex < numCycles; cycleIndex++)
     {
-        tempBatemanHisto = batemanInputHisto->GetAHisto(cycleIndex, 0);
-        tempIntegralGraph = integralInputGraph->GetAGraph(cycleIndex, 0);
+        tempBatemanHisto = batemanHisto->GetAHisto(cycleIndex, 0);
+        tempIntegralGraph = integralGraph->GetAGraph(cycleIndex, 0);
 
         tempIntegralGraph->SetPoint(1, 0.0, 0.0);
         for(int binIndex = 1; binIndex < binNumArr[cycleIndex]; binIndex++)
@@ -321,10 +372,8 @@ void ElementFit::createInputIntegralGraph()
     delete [] numPointsArr;
 }
 
-/// \brief creates the integral graphs from integral histogram
-///
-/// creates integral graphs from integral histogram. Does this for all integral histograms once function is called.
-void ElementFit::createIntegralGraph()
+/// \brief creates the total integral graphs from integral histogram
+void ElementFit::CreateTotalIntegralGraph()
 {
     TH1D* tempHisto;
     TGraph* tempGraph;
@@ -338,7 +387,6 @@ void ElementFit::createIntegralGraph()
 
     //creates the storage objects for in the integral graphs
     integralGraph = new CycleGraphHolder(numCycles, numRuns, "Total Integral Graph", pointsArr);
-    singleIntegralGraph = new SingleCycleGraphHolder(numCycles, numElements, numRuns, "Single Integral Graph", pointsArr, elementNames);
 
     for(int cycleIndex = 0; cycleIndex < numCycles; cycleIndex++)
     {
@@ -359,6 +407,35 @@ void ElementFit::createIntegralGraph()
                 tempBinValue = tempHisto->GetBinContent(i);
                 tempGraph->SetPoint(i+1, tempTimeValue, tempBinValue);
             }
+        }
+    }
+
+    delete [] pointsArr;
+}
+
+/// \brief creates the single integral graphs from integral histogram
+void ElementFit::CreateSingleIntegralGraph()
+{
+    TH1D* tempHisto;
+    TGraph* tempGraph;
+    Int_t* pointsArr = new Int_t [numCycles];
+    Double_t tempBinWidth, tempTimeValue, tempBinValue;
+
+    for(int i = 0; i < numCycles; i++)
+    {
+        pointsArr[i] = binNumArr[i] + 1;
+    }
+
+    //creates the storage objects for in the integral graphs
+    singleIntegralGraph = new SingleCycleGraphHolder(numCycles, numElements, numRuns, "Single Integral Graph", pointsArr, elementNames);
+
+    for(int cycleIndex = 0; cycleIndex < numCycles; cycleIndex++)
+    {
+        //bin width for cycle
+        tempBinWidth = binWidth[cycleIndex];
+
+        for(int runIndex = 0; runIndex < numRuns; runIndex++)
+        {  
             //creates the graphs for the single integral graphs
             for(int elementIndex = 0; elementIndex < numElements; elementIndex++)
             {
@@ -379,53 +456,38 @@ void ElementFit::createIntegralGraph()
     delete [] pointsArr;
 }
 
-/// \brief changes seed for random number generator
-void ElementFit::changeSeed()
-{
-    Double_t seederSeed;
-    Double_t randNumber;
-
-    randNumber = rand.Uniform();
-    seederSeed = Tclock + globalSeedChanger + randNumber;
-
-    rand.SetSeed(Tclock + globalSeedChanger + seederSeed);
-    globalSeedChanger++;
-}
-
-/// \brief creates the TF1 objects for the single Bateman and integral fit functions 
-/// creates the TF1 objects for the single Bateman and integral fit functions. Creates these from the passed fit function.
-/// Must create these because you have to fit with a TF1 function.
-void ElementFit::createSingleFitFunctions(Int_t timeEnd)
+/// \brief creates the TF1 objects for the single integral fit functions 
+void ElementFit::CreateSingleIntegralFitFunctions(Int_t timeEnd)
 {
     for(int i = 0; i < numElements; i++)
     {
-        singleFitFunctions[(i*2)] = new TF1((elementNames[i] + "RegSingFunc").c_str(), batemanFitFunctions[i], 0., timeEnd, (i+1)*2);
-        singleFitFunctions[(i*2)+1] = new TF1((elementNames[i] + "InteSingFunc").c_str(), integralFitFunctions[i], 0., timeEnd, (i+1)*2);
+        singleIntegralFitFunctions[i] = new TF1((elementNames[i] + "InteSingFunc").c_str(), integralFitFunctions[i], 0., timeEnd, (i+1)*2);
     }
 }
 
-/// \brief creates the TF1 objects for the total Bateman and integral fit functions 
-/// creates the TF1 objects for the total Bateman and integral fit functions. Creates these from the passed fit function.
-/// Must create these because you have to fit with a TF1 function.
-void ElementFit::createTotalFitFunctions(Int_t timeEnd)
+/// \brief creates the TF1 objects for the single Bateman fit functions 
+void ElementFit::CreateSingleBatemanFitFunctions(Int_t timeEnd)
+{
+    for(int i = 0; i < numElements; i++)
+    {
+        singleBatemanFitFunctions[i] = new TF1((elementNames[i] + "RegSingFunc").c_str(), batemanFitFunctions[i], 0., timeEnd, (i+1)*2);
+    }
+}
+
+/// \brief creates the TF1 objects for the total Bateman fit function
+void ElementFit::CreateTotalBatemanFitFunctions(Int_t timeEnd)
 {
     batemanFunction = new TF1("TotalBatemanFunction", passedBatemanFunction, 0., timeEnd, numParameters);
+}
+
+/// \brief creates the TF1 objects for the total integral fit function
+void ElementFit::CreateTotalIntegralFitFunctions(Int_t timeEnd)
+{
     integralFunction = new TF1("TotalIntegralFunction", passedIntegralFunction, 0., timeEnd, numParameters);
 }
 
-/// \brief Displays total integral histogram for the single fit option for the program
-///
-/// Displays the total integral graph for single run program execution type
-void ElementFit::displayIntegralGraph(TCanvas* can)
-{
-    can->cd();
-    integralGraph->GetAGraph(0, 0)->Draw();
-}
-
-/// \brief Displays fitted parameters for the single fit option for the program
-///
-/// Displays fitted parameters for the single run program execution type
-void ElementFit::displayParameters()
+/// \brief Displays fitted parameters of the total bateman for the single run option for the program
+void ElementFit::DisplayTotalBatemanParameters()
 {  
     cout << endl << "BATEMAN FIT PARAMETERS/ERRORS" << endl;
     for(int i = 0; i < numElements; i++)
@@ -435,6 +497,11 @@ void ElementFit::displayParameters()
         cout << "\tN0: " << totalBatemanFitParameters->GetAnN0(i) << "" << endl << 
         "\tError: " << totalBatemanFitParameters->GetAnN0Error(i) << "" << endl << endl;
     }
+}
+
+/// \brief Displays fitted parameters of the total integral for the single run option for the program
+void ElementFit::DisplayTotalIntegralParameters()
+{
     cout << "INTEGRAL FIT PARAMETERS/ERRORS" << endl;
     for(int i = 0; i < numElements; i++)
     {
@@ -443,85 +510,80 @@ void ElementFit::displayParameters()
         cout << "\tN0: " << totalIntegralFitParameters->GetAnN0(i) << "" << endl << 
         "\tError: " << totalIntegralFitParameters->GetAnN0Error(i) << "" << endl << endl;
     }
-    //only want to display if doing simulation
-    if(inputHistoExecutionType == 1)
+}
+
+/// \brief Displays fitted parameters of the single bateman for the single run option for the program
+void ElementFit::DisplaySingleBatemanParameters()
+{
+    cout << "BATEMAN SINGLE FIT PARAMETERS/ERRORS" << endl << endl;
+    for(int i = 0; i < numElements; i++)
     {
-        cout << "BATEMAN SINGLE FIT PARAMETERS/ERRORS" << endl << endl;
-        for(int i = 0; i < numElements; i++)
+        cout << elementNames[i] << " Single Fit Values" << endl;
+        for(int k = 0; k < i+1; k++)
         {
-            cout << elementNames[i] << " Single Fit Values" << endl;
-            for(int k = 0; k < i+1; k++)
-            {
-                cout << elementNames[k] << ": \tHalf Life: " << singleBatemanFitParameters->GetAnHalfLife(i, k) << "s" << endl << 
-                "\tHalf Life Error: " << singleBatemanFitParameters->GetAnHalfLifeError(i,k) << "s" << endl;
-                cout << "\tN0: " << singleBatemanFitParameters->GetAnN0(i, k) << "" << endl << 
-                "\tN0 Error: " << singleBatemanFitParameters->GetAnN0Error(i,k) << "" << endl;
-                cout << endl;
-            }
-        }
-        cout << endl << "INTEGRAL SINGLE FIT PARAMETERS/ERRORS" << endl << endl;
-        for(int i = 0; i < numElements; i++)
-        {
-            cout << elementNames[i] << " Single Fit Values" << endl;
-            for(int k = 0; k < i+1; k++)
-            {
-                cout << elementNames[k] << ": \tHalf Life: " << singleIntegralFitParameters->GetAnHalfLife(i, k) << "s" << endl << 
-                "\tHalf Life Error: " << singleIntegralFitParameters->GetAnHalfLifeError(i,k) << "s" << endl;
-                cout << "\tN0: " << singleIntegralFitParameters->GetAnN0(i, k) << "" << endl << 
-                "\tN0 Error: " << singleIntegralFitParameters->GetAnN0Error(i,k) << "" << endl;
-                cout << endl;
-            }
+            cout << elementNames[k] << ": \tHalf Life: " << singleBatemanFitParameters->GetAnHalfLife(i, k) << "s" << endl << 
+            "\tHalf Life Error: " << singleBatemanFitParameters->GetAnHalfLifeError(i,k) << "s" << endl;
+            cout << "\tN0: " << singleBatemanFitParameters->GetAnN0(i, k) << "" << endl << 
+            "\tN0 Error: " << singleBatemanFitParameters->GetAnN0Error(i,k) << "" << endl;
+            cout << endl;
         }
     }
 }
 
-/// \brief Displays total Bateman histogram for the single fit option for the program
-///
-/// Displays the total Bateman histogram for single run program execution type
-void ElementFit::displayBatemanHisto(TCanvas* can)
+/// \brief Displays fitted parameters of the single integral for the single run option for the program
+void ElementFit::DisplaySingleIntegralParameters()
+{
+    cout << endl << "INTEGRAL SINGLE FIT PARAMETERS/ERRORS" << endl << endl;
+    for(int i = 0; i < numElements; i++)
+    {
+        cout << elementNames[i] << " Single Fit Values" << endl;
+        for(int k = 0; k < i+1; k++)
+        {
+            cout << elementNames[k] << ": \tHalf Life: " << singleIntegralFitParameters->GetAnHalfLife(i, k) << "s" << endl << 
+            "\tHalf Life Error: " << singleIntegralFitParameters->GetAnHalfLifeError(i,k) << "s" << endl;
+            cout << "\tN0: " << singleIntegralFitParameters->GetAnN0(i, k) << "" << endl << 
+            "\tN0 Error: " << singleIntegralFitParameters->GetAnN0Error(i,k) << "" << endl;
+            cout << endl;
+        }
+    }
+}
+
+/// \brief Displays total Bateman histogram for the single run option for the program
+void ElementFit::DisplayTotalBatemanHisto(TCanvas* can)
 {
     can->cd();
     batemanHisto->GetAHisto(0, 0)->Draw();
 }
 
-/// \brief Displays the input individual histogram.
-void ElementFit::DrawInputIndividualHistos(CycleCanvasHolder* inputBatemanCanvases, CycleCanvasHolder* inputIntegralCanvases, Int_t lowerRunIndex, Int_t upperRunIndex, Int_t lowerCycleIndex, Int_t upperCycleIndex)
+/// \brief Displays total Bateman histogram for the single run option for the program
+void ElementFit::DisplayTotalIntegralGraph(TCanvas* can)
 {
-    upperRunIndex = upperRunIndex + 1;
-    upperCycleIndex = upperCycleIndex + 1;
-
-    for(int cycleIndex = lowerCycleIndex; cycleIndex < upperCycleIndex; cycleIndex++)
-    {
-        for(int runIndex = lowerRunIndex; runIndex < upperRunIndex; runIndex++)
-        {
-            inputBatemanCanvases->GetACanvas(cycleIndex, runIndex)->cd();
-            batemanInputHisto->GetAHisto(cycleIndex, runIndex)->Draw();
-
-            inputIntegralCanvases->GetACanvas(cycleIndex, runIndex)->cd();
-            integralInputGraph->GetAGraph(cycleIndex, runIndex)->Draw();
-        }
-    }
+    can->cd();
+    integralGraph->GetAGraph(0, 0)->Draw();
 }
 
-/// \brief Displays single histograms for the single fit option for the program
-///
-/// Displays the single Bateman and integral histogram/graphs for single run program execution type
-void ElementFit::displaySingleHistos(TCanvas** can)
+/// \brief Displays single Bateman histograms for the single run option for the program.
+void ElementFit::DisplaySingleBatemanHistos(TCanvas** can)
 {
     for(int i = 0; i < numElements; i++)
     {
         can[(i*2)]->cd();
         singleBatemanHisto->GetAHisto(0, 0, i)->Draw();
+    }
+}
 
+/// \brief Displays single integral histograms for the single run option for the program.
+void ElementFit::DisplaySingleIntegralGraph(TCanvas** can)
+{
+    for(int i = 0; i < numElements; i++)
+    {
         can[(i*2)+1]->cd();
         singleIntegralGraph->GetAGraph(0, 0, i)->Draw();
     }
 }
 
-/// \brief Displays the total individual histogram for any execution type of the program
-///
-/// Draws the total individual histograms for the program within the range set by the user
-void ElementFit::DrawTotalIndividualHistos(CycleCanvasHolder* batemanTotalCanvases, CycleCanvasHolder* integralTotalCanvases, Int_t lowerRunIndex, Int_t upperRunIndex, Int_t lowerCycleIndex, Int_t upperCycleIndex)
+/// \brief Displays the total Bateman individual histogram for any execution type of the program
+void ElementFit::DrawTotalBatemanIndividualHistos(CycleCanvasHolder* batemanTotalCanvases, CycleCanvasHolder* integralTotalCanvases, Int_t lowerRunIndex, Int_t upperRunIndex, Int_t lowerCycleIndex, Int_t upperCycleIndex)
 {
     upperRunIndex = upperRunIndex + 1;
     upperCycleIndex = upperCycleIndex + 1;
@@ -532,17 +594,28 @@ void ElementFit::DrawTotalIndividualHistos(CycleCanvasHolder* batemanTotalCanvas
         {
             batemanTotalCanvases->GetACanvas(cycleIndex, runIndex)->cd();
             batemanHisto->GetAHisto(cycleIndex, runIndex)->Draw();
+        }
+    }
+}
 
+/// \brief Displays the total Bateman individual histogram for any execution type of the program
+void ElementFit::DrawTotalIntegralIndividualHistos(CycleCanvasHolder* batemanTotalCanvases, CycleCanvasHolder* integralTotalCanvases, Int_t lowerRunIndex, Int_t upperRunIndex, Int_t lowerCycleIndex, Int_t upperCycleIndex)
+{
+    upperRunIndex = upperRunIndex + 1;
+    upperCycleIndex = upperCycleIndex + 1;
+
+    for(int cycleIndex = lowerCycleIndex; cycleIndex < upperCycleIndex; cycleIndex++)
+    {
+        for(int runIndex = lowerRunIndex; runIndex < upperRunIndex; runIndex++)
+        {
             integralTotalCanvases->GetACanvas(cycleIndex, runIndex)->cd();
             integralGraph->GetAGraph(cycleIndex, runIndex)->Draw();
         }
     }
 }
 
-/// \brief Displays the single individual histogram for any execution type of the program
-///
-/// Draws the single individual histograms for the program within the range set by the user
-void ElementFit::DrawSingleIndividualHistos(SingleCycleCanvasHolder* singleBatemanCanvases, SingleCycleCanvasHolder* singleIntegralCanvases, Int_t lowerRunIndex, Int_t upperRunIndex, Int_t lowerCycleIndex, Int_t upperCycleIndex)
+/// \brief Displays the single Bateman individual histogram for any execution type of the program.
+void ElementFit::DrawSingleBatemanIndividualHistos(SingleCycleCanvasHolder* singleBatemanCanvases, SingleCycleCanvasHolder* singleIntegralCanvases, Int_t lowerRunIndex, Int_t upperRunIndex, Int_t lowerCycleIndex, Int_t upperCycleIndex)
 {
     upperRunIndex = upperRunIndex + 1;
     upperCycleIndex = upperCycleIndex + 1;
@@ -555,7 +628,23 @@ void ElementFit::DrawSingleIndividualHistos(SingleCycleCanvasHolder* singleBatem
             {
                 singleBatemanCanvases->GetACanvas(cycleIndex, runIndex, elementIndex)->cd();
                 singleBatemanHisto->GetAHisto(cycleIndex, runIndex, elementIndex)->Draw();
+            }
+        }
+    }
+}
 
+/// \brief Displays the single Bateman individual histogram for any execution type of the program.
+void ElementFit::DrawSingleIntegralIndividualHistos(SingleCycleCanvasHolder* singleBatemanCanvases, SingleCycleCanvasHolder* singleIntegralCanvases, Int_t lowerRunIndex, Int_t upperRunIndex, Int_t lowerCycleIndex, Int_t upperCycleIndex)
+{
+    upperRunIndex = upperRunIndex + 1;
+    upperCycleIndex = upperCycleIndex + 1;
+
+    for(int cycleIndex = lowerCycleIndex; cycleIndex < upperCycleIndex; cycleIndex++)
+    {
+        for(int runIndex = lowerRunIndex; runIndex < upperRunIndex; runIndex++)
+        {
+            for(int elementIndex = 0; elementIndex < numElements; elementIndex++)
+            {
                 singleIntegralCanvases->GetACanvas(cycleIndex, runIndex, elementIndex)->cd();
                 singleIntegralGraph->GetAGraph(cycleIndex, runIndex, elementIndex)->Draw();
             }
@@ -563,91 +652,27 @@ void ElementFit::DrawSingleIndividualHistos(SingleCycleCanvasHolder* singleBatem
     }
 }
 
-/// \brief Displays the individual histogram for any execution type of the program
-///
-/// Draws the individual histograms for the program within the range set by the user
-void ElementFit::DrawIndividualHistos(CycleCanvasHolder* batemanTotalCanvases, CycleCanvasHolder* integralTotalCanvases, SingleCycleCanvasHolder* singleBatemanCanvases, SingleCycleCanvasHolder* singleIntegralCanvases, Int_t lowerRunIndex, Int_t upperRunIndex, Int_t lowerCycleIndex, Int_t upperCycleIndex)
-{
-    DrawTotalIndividualHistos(batemanTotalCanvases, integralTotalCanvases, lowerRunIndex, upperRunIndex, lowerCycleIndex, upperCycleIndex);
-    DrawSingleIndividualHistos(singleBatemanCanvases, singleIntegralCanvases, lowerRunIndex, upperRunIndex, lowerCycleIndex, upperCycleIndex);
-}
-
-/// \brief Cuts the original input histogram bins and puts them in a new histogram.
-void ElementFit::cutInputHistos()
-{
-    TH1D* tempHisto;
-    Double_t* tempBinStartArr = fitOptions->GetFitStartBinArr();
-    Double_t* tempBinEndArr = fitOptions->GetFitEndBinArr();
-    Double_t tempStartBin, tempBinEnd, tempBinValue;
-    for(int cycleIndex = 0; cycleIndex < numCycles; cycleIndex++)
-    {
-        tempHisto = batemanInputHisto->GetAHisto(cycleIndex, 0);
-        tempStartBin = tempBinStartArr[cycleIndex];
-        for(int binIndex = 1; binIndex <= binNumArr[cycleIndex]; binIndex++)
-        {
-            tempBinValue = inputHistogram->GetBinContent(tempStartBin + binIndex - 2);
-            tempHisto->SetBinContent(binIndex, tempBinValue);
-        }
-    }
-}
-
-/// \brief Calls fit methods to fit histograms at specific run and cycle index
-///
-/// Fits the single/total Bateman and integral histograms/graphs for a specified cycle and run index. The logic for leaving out certain bins in also included here.
-/// The fit function parameters are also reset before the fit here
-void ElementFit::fitHistos(Int_t cycleIndex, Int_t runIndex)
-{
-    timeRunStart = timeStartArr[cycleIndex];
-    timeRunEnd = timeEndArr[cycleIndex];
-    createSingleFitFunctions(timeEndArr[cycleIndex]);
-    createTotalFitFunctions(timeEndArr[cycleIndex]);
-    setFunctionParametersTotal();
-    setFunctionParamersSingle();
-    setTotalParaLimits();
-    setSingleParaLimits();
-
-    Double_t startFitOffset;
-    Double_t startFit;
-    startFitOffset = leaveOutStartBinsSim * binWidth[cycleIndex];
-    startFit = startFitOffset + timeRunStart;
-    Double_t endFitOffset;
-    Double_t endFit;
-    endFitOffset = leaveOutEndBinsSim * binWidth[cycleIndex];
-    endFit = timeRunEnd - endFitOffset;
-
-    cout << "CYCLE: " << cycleIndex << " START FIT: " << startFit << " END FIT: " << endFit << endl;
-
-    fitBatemanHisto(cycleIndex, runIndex, startFit, endFit);
-    fitIntegralGraph(cycleIndex, runIndex, startFit, endFit);
-    fitSingleHistos(cycleIndex, runIndex, startFit, endFit);
-}
-
 /// \brief Fits total integral histogram at specified cycle and run index
-///
-/// Fits the total integral histogram at a specified cycle and run index.
-/// The fit parameters are extracted afer the fit.
-void ElementFit::fitIntegralGraph(Int_t cycleIndex, Int_t runIndex, Double_t startFit, Double_t endFit)
+void ElementFit::FitTotalIntegralGraph(Int_t cycleIndex, Int_t runIndex)
 {
-    Double_t valueN0;
-    Double_t errorN0;
-    Double_t valueDecayConst;
-    Double_t errorDecayConst;
-    Double_t valueHalfLife;
-    Double_t errorHalfLife;
+    Double_t valueN0, errorN0, valueDecayConst, errorDecayConst, valueHalfLife, errorHalfLife, startFitOffset, startFit, endFitOffset, endFit;
     TH1D* tempHisto;
     TGraph* tempGraph;
 
-    cout << "FITTING TOTAL INTEGRAL CYCLE: " << cycleIndex << " RUN: " << runIndex << endl;
+    timeRunStart = timeStartArr[cycleIndex];
+    timeRunEnd = timeEndArr[cycleIndex];
+    CreateTotalIntegralFitFunctions(timeRunEnd);
+    SetTotalIntegralFunctionParameters();
+    SetTotalIntegralParameterLimits();
 
-    //non input histogram
-    if(inputHistoExecutionType == 1)
-    {
-        tempGraph = integralGraph->GetAGraph(cycleIndex, runIndex);
-    //input histogram
-    }else if(inputHistoExecutionType == 2 || inputHistoExecutionType == 3)
-    {
-        tempGraph = integralInputGraph->GetAGraph(cycleIndex, runIndex);
-    }
+    startFitOffset = leaveOutStartBinsSim * binWidth[cycleIndex];
+    startFit = startFitOffset + timeRunStart;
+    endFitOffset = leaveOutEndBinsSim * binWidth[cycleIndex];
+    endFit = timeRunEnd - endFitOffset;
+
+    tempGraph = integralGraph->GetAGraph(cycleIndex, runIndex);
+
+    cout << "FITTING TOTAL INTEGRAL CYCLE: " << cycleIndex << " RUN: " << runIndex << endl;
     tempGraph->Fit(integralFunction, "", "", startFit, endFit);
 
     for(int i = 0; i < numElements; i++)
@@ -671,36 +696,27 @@ void ElementFit::fitIntegralGraph(Int_t cycleIndex, Int_t runIndex, Double_t sta
         totalIntegralFitParameters->SetAnHalfLife(i, valueHalfLife);
         totalIntegralFitParameters->SetAnHalfLifeError(i, errorHalfLife);
     }
-    //test2->cd();
-    //tempGraph->Draw();
 }
 
 /// \brief Fits total Bateman histogram at specified cycle and run index
-///
-/// Fits total Bateman histogram at specified cycle and run index.
-/// The fit parameters are extracted afer the fit.
-void ElementFit::fitBatemanHisto(Int_t cycleIndex, Int_t runIndex, Double_t startFit, Double_t endFit)
+void ElementFit::FitTotalBatemanHisto(Int_t cycleIndex, Int_t runIndex)
 {
     //dynamic array
-    Double_t valueN0;
-    Double_t errorN0;
-    Double_t valueDecayConst;
-    Double_t errorDecayConst;
-    Double_t valueHalfLife;
-    Double_t errorHalfLife;
+    Double_t valueN0, errorN0, valueDecayConst, errorDecayConst, valueHalfLife, errorHalfLife, startFitOffset, startFit, endFitOffset, endFit;
     TH1D* tempHisto;
 
-    //non input histogram
-    if(inputHistoExecutionType == 1)
-    {
-        tempHisto = batemanHisto->GetAHisto(cycleIndex, runIndex);
-    //input histogram
-    }else if(inputHistoExecutionType == 2 || inputHistoExecutionType == 3)
-    {
-        setFunctionParametersTotal();
-        setTotalParaLimits();
-        tempHisto = batemanInputHisto->GetAHisto(cycleIndex, runIndex);
-    }
+    timeRunStart = timeStartArr[cycleIndex];
+    timeRunEnd = timeEndArr[cycleIndex];
+    CreateTotalBatemanFitFunctions(timeEndArr[cycleIndex]);
+    SetTotalBatemanFunctionParameters();
+    SetTotalBatemanParameterLimits();
+
+    startFitOffset = leaveOutStartBinsSim * binWidth[cycleIndex];
+    startFit = startFitOffset + timeRunStart;
+    endFitOffset = leaveOutEndBinsSim * binWidth[cycleIndex];
+    endFit = timeRunEnd - endFitOffset;
+
+    tempHisto = batemanHisto->GetAHisto(cycleIndex, runIndex);
 
     cout << "FITTING TOTAL BATEMAN CYCLE: " << cycleIndex << " RUN: " << runIndex << endl;
     tempHisto->Fit(batemanFunction, "L", "", startFit, endFit);
@@ -725,43 +741,40 @@ void ElementFit::fitBatemanHisto(Int_t cycleIndex, Int_t runIndex, Double_t star
         totalBatemanFitParameters->SetAnHalfLife(i, valueHalfLife);
         totalBatemanFitParameters->SetAnHalfLifeError(i, errorHalfLife);
     }
-    //test->cd();
-    //tempHisto->Draw();
 }
 
-/// \brief Fits single Histograms at specified cycle and run index
-///
-/// Fits single Histograms at specified cycle and run index.
-/// The fit parameters are extracted afer the fit.
-void ElementFit::fitSingleHistos(Int_t cycleIndex, Int_t runIndex, Double_t startFit, Double_t endFit)
+/// \brief Fits single Bateman histograms at specified cycle and run index
+void ElementFit::FitSingleBatemanHistos(Int_t cycleIndex, Int_t runIndex)
 {
-    Double_t valueN0;
-    Double_t errorN0;
-    Double_t valueDecayConst;
-    Double_t errorDecayConst;
-    Double_t valueHalfLife;
-    Double_t errorHalfLife;
+    Double_t valueN0, errorN0, valueDecayConst, errorDecayConst, valueHalfLife, errorHalfLife, startFitOffset, startFit, endFitOffset, endFit;
     TH1D* tempSingleBatemanHisto, *tempSingleIntegralHisto;
-    TGraph* tempSingleGraph;
+
+    timeRunStart = timeStartArr[cycleIndex];
+    timeRunEnd = timeEndArr[cycleIndex];
+    CreateSingleBatemanFitFunctions(timeEndArr[cycleIndex]);
+    SetSingleBatemanFunctionParameters();
+    SetSingleBatemanParameterLimits();
+
+    startFitOffset = leaveOutStartBinsSim * binWidth[cycleIndex];
+    startFit = startFitOffset + timeRunStart;
+    endFitOffset = leaveOutEndBinsSim * binWidth[cycleIndex];
+    endFit = timeRunEnd - endFitOffset;
 
     //loop for fitting and storing value for elements
     for(int i = 0; i < numElements; i++)
     {
         tempSingleBatemanHisto = singleBatemanHisto->GetAHisto(cycleIndex, runIndex, i);
-        tempSingleGraph = singleIntegralGraph->GetAGraph(cycleIndex, runIndex, i);
 
         cout << "FITTING SINGLE BATEMAN " << elementNames[i] << " CYCLE: " << cycleIndex << " RUN: " << runIndex << endl;
-        tempSingleBatemanHisto->Fit(singleFitFunctions[(i*2)], "L", "", startFit, endFit);
-        cout << "FITTING SINGLE INTEGRAL " << elementNames[i] << " CYCLE: " << cycleIndex << " RUN: " << runIndex << endl;
-        tempSingleGraph->Fit(singleFitFunctions[(i*2)+1], "", "", startFit, endFit);
+        tempSingleBatemanHisto->Fit(singleBatemanFitFunctions[i], "L", "", startFit, endFit);
 
         for(int k = 0; k < (i+1); k++)
         {
             //storing values for bateman part of function
-            valueN0 = singleFitFunctions[(i*2)]->GetParameter((k*2));
-            errorN0 = singleFitFunctions[(i*2)]->GetParError((k*2));
-            valueDecayConst = singleFitFunctions[(i*2)]->GetParameter((k*2)+1);
-            errorDecayConst = singleFitFunctions[(i*2)]->GetParError((k*2)+1);
+            valueN0 = singleBatemanFitFunctions[i]->GetParameter((k*2));
+            errorN0 = singleBatemanFitFunctions[i]->GetParError((k*2));
+            valueDecayConst = singleBatemanFitFunctions[i]->GetParameter((k*2)+1);
+            errorDecayConst = singleBatemanFitFunctions[i]->GetParError((k*2)+1);
             valueHalfLife = log(2)/(valueDecayConst);
             errorHalfLife = ((log(2)/valueDecayConst)*(errorDecayConst/valueDecayConst));
 
@@ -769,12 +782,43 @@ void ElementFit::fitSingleHistos(Int_t cycleIndex, Int_t runIndex, Double_t star
             singleBatemanFitParameters->SetAnN0Error(i, k, errorN0);
             singleBatemanFitParameters->SetAnHalfLife(i, k, valueHalfLife);
             singleBatemanFitParameters->SetAnHalfLifeError(i, k, errorHalfLife);
+        }
+    }
+}
 
+/// \brief Fits single integral graphs at specified cycle and run index
+void ElementFit::FitSingleIntegralGraphs(Int_t cycleIndex, Int_t runIndex)
+{
+    Double_t valueN0, errorN0, valueDecayConst, errorDecayConst, valueHalfLife, errorHalfLife, startFitOffset, startFit, endFitOffset, endFit;
+    TH1D* tempSingleBatemanHisto, *tempSingleIntegralHisto;
+    TGraph* tempSingleGraph;
+
+    timeRunStart = timeStartArr[cycleIndex];
+    timeRunEnd = timeEndArr[cycleIndex];
+    CreateSingleIntegralFitFunctions(timeEndArr[cycleIndex]);
+    SetSingleIntegralFunctionParameters();
+    SetSingleIntegralParameterLimits();
+
+    startFitOffset = leaveOutStartBinsSim * binWidth[cycleIndex];
+    startFit = startFitOffset + timeRunStart;
+    endFitOffset = leaveOutEndBinsSim * binWidth[cycleIndex];
+    endFit = timeRunEnd - endFitOffset;
+
+    //loop for fitting and storing value for elements
+    for(int i = 0; i < numElements; i++)
+    {
+        tempSingleGraph = singleIntegralGraph->GetAGraph(cycleIndex, runIndex, i);
+
+        cout << "FITTING SINGLE INTEGRAL " << elementNames[i] << " CYCLE: " << cycleIndex << " RUN: " << runIndex << endl;
+        tempSingleGraph->Fit(singleIntegralFitFunctions[i], "", "", startFit, endFit);
+
+        for(int k = 0; k < (i+1); k++)
+        {
             //storing values for integral part of function
-            valueN0 = singleFitFunctions[(i*2)+1]->GetParameter((k*2));
-            errorN0 = singleFitFunctions[(i*2)+1]->GetParError((k*2));
-            valueDecayConst = singleFitFunctions[(i*2)+1]->GetParameter((k*2)+1);
-            errorDecayConst = singleFitFunctions[(i*2)+1]->GetParError((k*2)+1);
+            valueN0 = singleIntegralFitFunctions[i]->GetParameter((k*2));
+            errorN0 = singleIntegralFitFunctions[i]->GetParError((k*2));
+            valueDecayConst = singleIntegralFitFunctions[i]->GetParameter((k*2)+1);
+            errorDecayConst = singleIntegralFitFunctions[i]->GetParError((k*2)+1);
             valueHalfLife = log(2)/(valueDecayConst);
             errorHalfLife = ((log(2)/valueDecayConst)*(errorDecayConst/valueDecayConst));
 
@@ -786,23 +830,11 @@ void ElementFit::fitSingleHistos(Int_t cycleIndex, Int_t runIndex, Double_t star
     }
 }
 
-/// \brief Function to call all the histograms in the program to be generated
-///
-/// Function to call all the histograms in the program to be generated.
-/// Just calls to sub functions, real code are in the indivudal sub functions.
-void ElementFit::genAndFillHistos()
-{
-    createHistoHolders();
-    genBatemanHistograms();
-    genIntegralHistoSimulated();
-    createIntegralGraph();
-}
-
 /// \brief Generates all total integral histograms for total Bateman histograms
 ///
 /// Generates all total integral histograms for total Bateman histograms.
 /// Each individual bin(i) in the integral histogram is the sum of the integral bin i-1 plus the bin i from the regular histogram.
-void ElementFit::genIntegralHisto()
+void ElementFit::GenTotalIntegralHisto()
 {
     //resets histogram so it can be used between runs
     TH1D* tempIntegralHisto, *tempBatemanHisto;
@@ -825,21 +857,11 @@ void ElementFit::genIntegralHisto()
     }
 }
 
-/// \brief Generates all integral histograms from the Bateman histograms
-///
-/// Generates all integral histograms from the Bateman histograms.
-/// Just call to sub functions.
-void ElementFit::genIntegralHistoSimulated()
-{
-    genIntegralHisto();
-    genIntegralSingleHistos();
-}
-
 /// \brief Generates all the single integral histograms from the single Bateman histograms.
 ///
 /// Generates all the single integral histograms from the single Bateman histograms.
 /// Each individual bin(i) in the integral histogram is the sum of the integral bin i-1 plus the bin i from the regular histogram.
-void ElementFit::genIntegralSingleHistos()
+void ElementFit::GenSingleIntegralHistos()
 {
     TH1D* tempIntegralHisto, *tempBatemanHisto;
     Int_t tempNumBins;
@@ -868,7 +890,7 @@ void ElementFit::genIntegralSingleHistos()
 ///
 /// Generates the total and single Bateman histograms. Has different methods of generation for different program execution types.
 /// Still not sure why generation works. This is the single most important function in the entire program.
-void ElementFit::genBatemanHistograms()
+void ElementFit::GenBatemanHistograms()
 {
     TH1D* tempHisto;
     TH1D** singleTempHisto;
@@ -882,7 +904,7 @@ void ElementFit::genBatemanHistograms()
         TH1D** tempSingleHisto;
         tempSingleHisto = new TH1D* [numElements];
 
-        changeSeed();
+        ChangeSeed();
 
         //generates events for the single and total histograms symotaniously
         for(int i = 0; i < numEvents; i++)
@@ -891,7 +913,7 @@ void ElementFit::genBatemanHistograms()
             for(int j = 0; j < numElements; j++)
             {
                 hold = rand.Uniform();
-                randArr[j] = (-TMath::Log(hold)) / (paraVals[j]->getValueDecayConst());
+                randArr[j] = (-TMath::Log(hold)) / (paraVals[j]->GetValueDecayConst());
             }
             
             //putting events in repsective histograms
@@ -901,8 +923,11 @@ void ElementFit::genBatemanHistograms()
                 for(int cycleIndex = 0; cycleIndex < numCycles; cycleIndex++)
                 {
                     tempHisto = batemanHisto->GetAHisto(cycleIndex, 0);
-                    singleTempHisto[elementIndex] = singleBatemanHisto->GetAHisto(cycleIndex, 0, elementIndex);
-                    singleTempHisto[elementIndex]->Fill(stack);
+                    if(singleElementDataChoice == 2)
+                    {
+                        singleTempHisto[elementIndex] = singleBatemanHisto->GetAHisto(cycleIndex, 0, elementIndex);
+                        singleTempHisto[elementIndex]->Fill(stack);
+                    }
                     tempHisto->Fill(stack);
                 }
             }
@@ -919,12 +944,15 @@ void ElementFit::genBatemanHistograms()
             {
                 //getting histograms to generate events for
                 tempHisto = batemanHisto->GetAHisto(cycleIndex, runIndex);
-                for(int i = 0; i < numElements; i++)
+                if(singleElementDataChoice == 2)
                 {
-                    singleTempHisto[i] = singleBatemanHisto->GetAHisto(cycleIndex, runIndex, i);
+                    for(int i = 0; i < numElements; i++)
+                    {
+                        singleTempHisto[i] = singleBatemanHisto->GetAHisto(cycleIndex, runIndex, i);
+                    }
                 }
 
-                changeSeed();
+                ChangeSeed();
                 //generates events for the single and total histograms symotaniously
                 for(int i = 0; i < numEvents; i++)
                 {
@@ -932,14 +960,17 @@ void ElementFit::genBatemanHistograms()
                     for(int j = 0; j < numElements; j++)
                     {
                         hold = rand.Uniform();
-                        randArr[j] = (-TMath::Log(hold)) / (paraVals[j]->getValueDecayConst());
+                        randArr[j] = (-TMath::Log(hold)) / (paraVals[j]->GetValueDecayConst());
                     }
 
                     //putting events in repsective histograms
                     for(int k = 0; k < numElements; k++)
                     {
                         stack += randArr[k];
-                        singleTempHisto[k]->Fill(stack);
+                        if(singleElementDataChoice == 2)
+                        {
+                            singleTempHisto[k]->Fill(stack);
+                        }
                         tempHisto->Fill(stack); 
                     }
                     stack = 0.0f;
@@ -954,7 +985,7 @@ void ElementFit::genBatemanHistograms()
         for(int runIndex = 0; runIndex < numRuns; runIndex++)
         {
             //change seed for generation between each run
-            changeSeed();
+            ChangeSeed();
             //generates events for the single and total histograms symotaniously
             for(int i = 0; i < numEvents; i++)
             {
@@ -962,7 +993,7 @@ void ElementFit::genBatemanHistograms()
                 for(int j = 0; j < numElements; j++)
                 {
                     hold = rand.Uniform();
-                    randArr[j] = (-TMath::Log(hold)) / (paraVals[j]->getValueDecayConst());
+                    randArr[j] = (-TMath::Log(hold)) / (paraVals[j]->GetValueDecayConst());
                 }
                 //putting events in repsective histograms
                 for(int k = 0; k < numElements; k++)
@@ -973,8 +1004,11 @@ void ElementFit::genBatemanHistograms()
                     for(int cycleIndex = 0; cycleIndex < numCycles; cycleIndex++)
                     {
                         tempHisto = batemanHisto->GetAHisto(cycleIndex, runIndex);
-                        singleTempHisto[k] = singleBatemanHisto->GetAHisto(cycleIndex, runIndex, k);
-                        singleTempHisto[k]->Fill(stack);
+                        if(singleElementDataChoice == 2)
+                        {
+                            singleTempHisto[k] = singleBatemanHisto->GetAHisto(cycleIndex, runIndex, k);
+                            singleTempHisto[k]->Fill(stack);
+                        }
                         tempHisto->Fill(stack);
                     }
                 }
@@ -986,27 +1020,64 @@ void ElementFit::genBatemanHistograms()
     delete [] singleTempHisto;
 }
 
-/// \brief Sets the parameters for the total fit functions
-///
-/// Sets the parameters for the total fit functions. Must do this with a TF1 or else it will not do the fit. Just set the initial values to the accepted values.
-void ElementFit::setFunctionParametersTotal()
+/// \brief sets function parameters for the total bateman function
+void ElementFit::SetTotalBatemanFunctionParameters()
 {
-    DisplayTotalFunctionParameters();
     for(int i = 0; i < numElements; i++)
     {
         //have to have the if statments to account for the fact that the value could be a range
         if(inputHistoExecutionType == 1)
         {
-            integralFunction->SetParameter((i*2), paraVals[i]->getInitValue());
-            batemanFunction->SetParameter((i*2), paraVals[i]->getInitValue());
-            integralFunction->SetParameter((i*2)+1, paraVals[i]->getValueDecayConst());
-            batemanFunction->SetParameter((i*2)+1, paraVals[i]->getValueDecayConst());
+            batemanFunction->SetParameter((i*2), paraVals[i]->GetN0());
+            batemanFunction->SetParameter((i*2)+1, paraVals[i]->GetValueDecayConst());
         }else if(inputHistoExecutionType == 2 || inputHistoExecutionType == 3)
         {
-            integralFunction->SetParameter((i*2), paraVals[i]->getInitValue());
-            batemanFunction->SetParameter((i*2), paraVals[i]->getInitValue());
+            batemanFunction->SetParameter((i*2), paraVals[i]->GetN0());
+            batemanFunction->SetParameter((i*2)+1, paraVals[i]->GetValueDecayConst10Ns());
+        }
+    }
+}
+
+/// \brief sets function parameters for total integral function
+void ElementFit::SetTotalIntegralFunctionParameters()
+{
+    for(int i = 0; i < numElements; i++)
+    {
+        //have to have the if statments to account for the fact that the value could be a range
+        if(inputHistoExecutionType == 1)
+        {
+            integralFunction->SetParameter((i*2), paraVals[i]->getN0());
+            integralFunction->SetParameter((i*2)+1, paraVals[i]->getValueDecayConst());
+        }else if(inputHistoExecutionType == 2 || inputHistoExecutionType == 3)
+        {
+            integralFunction->SetParameter((i*2), paraVals[i]->getN0());
             integralFunction->SetParameter((i*2)+1, paraVals[i]->getValueDecayConst10Ns());
-            batemanFunction->SetParameter((i*2)+1, paraVals[i]->getValueDecayConst10Ns());
+        }
+    }
+}
+
+/// \brief Sets the parameters for the single Bateman fit functions
+void ElementFit::SetSingleBatemanFunctionParamers()
+{
+    for(int i = 0; i < numElements; i++)
+    {
+        for(int k = 0; k <= i; k++)
+        {
+            singleBatemanFitFunctions[(i*2)]->SetParameter((k*2), paraVals[k]->getN0());
+            singleBatemanFitFunctions[(i*2)]->SetParameter(((k*2)+1), paraVals[k]->getValueDecayConst());
+        }
+    }
+}
+
+/// \brief Sets the parameters for the single Bateman fit functions
+void ElementFit::SetSingleIntegralFunctionParamers()
+{
+    for(int i = 0; i < numElements; i++)
+    {
+        for(int k = 0; k <= i; k++)
+        {
+            singleIntegralFitFunctions[(i*2)]->SetParameter((k*2), paraVals[k]->getN0());
+            singleIntegralFitFunctions[(i*2)]->SetParameter(((k*2)+1), paraVals[k]->getValueDecayConst());
         }
     }
 }
@@ -1017,106 +1088,134 @@ void ElementFit::DisplayTotalFunctionParameters()
     cout << "INITIAL FIT FUNCTION PARAMETERS" << endl;
     for(int i = 0; i < numElements; i++)
     {
-        cout << elementNames[i] << ":\tInit value: " << paraVals[i]->getInitValue();
+        cout << elementNames[i] << ":\tInit value: " << paraVals[i]->getN0();
         cout << "\tHalf Life: " << paraVals[i]->getValueHalfLife();
         cout << endl;
     }
     cout << endl;
 }
 
-/// \brief Sets the parameters for the single fit functions
-///
-/// Sets the parameters for the single fit functions. Must do this with a TF1 or else it will not do the fit. Just set the initial values to the accepted values.
-void ElementFit::setFunctionParamersSingle()
+/// \brief Sets the limits for the total bateman function.
+void ElementFit::SetTotalBatemanParameterLimits()
 {
     for(int i = 0; i < numElements; i++)
     {
-        for(int k = 0; k <= i; k++)
+        //1 = case for simulated data, range done with scalar multiples instead of user input range.
+        if(inputHistoExecutionType == 1){
+            //Setting limits for N0
+            if(paraVals[i]->GetFixN0()){
+                batemanFunction->FixParameter((i*2), paraVals->GetN0());
+            }else{
+                batemanFunction->SetParLimits((i*2), 0., doubleNumEvents*10000);
+            }
+            //Setting limits for decay constant
+            if(paraVals[i]->GetFixDecayConstant()){
+                batemanFunction->FixParameter((i*2)+1, paraVals[i]->getValueDecayConst());
+            }else{
+                batemanFunction->SetParLimits((i*2)+1, (paraVals[i]->getValueDecayConst() * .01), (paraVals[i]->getValueDecayConst() * 100.));
+            }
+            
+        //2 = setting from fit parameters of fitted input histogram, use user defined limits.
+        }else if(inputHistoExecutionType == 2 || inputHistoExecutionType == 3)
         {
-            singleFitFunctions[(i*2)]->SetParameter((k*2), paraVals[k]->getInitValue());
-            singleFitFunctions[(i*2)+1]->SetParameter((k*2), paraVals[k]->getInitValue());
-            singleFitFunctions[(i*2)]->SetParameter(((k*2)+1), paraVals[k]->getValueDecayConst());
-            singleFitFunctions[(i*2)+1]->SetParameter(((k*2)+1), paraVals[k]->getValueDecayConst());
+            //Setting limits for N0
+            if(paraVals[i]->GetFixN0()){
+                batemanFunction->FitParameter((i*2), paraVals->GetN0());
+            }else{
+                batemanFunction->SetParLimits((i*2), paraVals[i]->getLowerRangeN0(), paraVals[i]->getUpperRangeN0());
+            }
+            //Setting limits for decay constant
+            if(paraVals[i]->GetFixDecayConstant()){
+                batemanFunction->FitParameter((i*2)+1, paraVals[i]->getValueDecayConst);
+            }else{
+                batemanFunction->SetParLimits((i*2)+1, (paraVals[i]->getLowerRangeDecayConst10Ns()), (paraVals[i]->getUpperRangeDecayConst10Ns()));
+            }
         }
     }
 }
 
-/// \brief Sets the limits in which the parameters can fit in the fit function.
-///
-/// Sets the limits in which the parameters can fit in the fit function. If they are too large the program will not fit correctly but too large then its like cheating.
-/// I just use scalar multiples of the accepted values in the range.
-void ElementFit::setTotalParaLimits()
+/// \brief Sets the limits for the total integral function.
+void ElementFit::SetTotalIntegralParameterLimits()
 {
-    DisplayParameterLimits();
-    //sets limits for N0 of the total function
     for(int i = 0; i < numElements; i++)
     {
-        //1 = setting from user values
-        if(inputHistoExecutionType == 1)
-        {
-            batemanFunction->SetParLimits((i*2), 0., doubleNumEvents*10000);
-            integralFunction->SetParLimits((i*2), 0., doubleNumEvents*10000);
-        //2 = setting from fit parameters of fitted input histogram
+        //1 = case for simulated data, range done with scalar multiples instead of user input range.
+        if(inputHistoExecutionType == 1){
+            //Setting limits for N0
+            if(paraVals[i]->GetFixN0()){
+                integralFunction->FixParameter((i*2), paraVals->GetN0());
+            }else{
+                integralFunction->SetParLimits((i*2), 0., doubleNumEvents*10000);
+            }
+            //Setting limits for decay constant
+            if(paraVals[i]->GetFixDecayConstant()){
+                integralFunction->FixParameter((i*2)+1, paraVals[i]->getValueDecayConst());
+            }else{
+                integralFunction->SetParLimits((i*2)+1, (paraVals[i]->getValueDecayConst() * .01), (paraVals[i]->getValueDecayConst() * 100.));
+            }
+            
+        //2 = setting from fit parameters of fitted input histogram, use user defined limits.
         }else if(inputHistoExecutionType == 2 || inputHistoExecutionType == 3)
         {
-            batemanFunction->SetParLimits((i*2), paraVals[i]->getLowerRangeInitValue(), paraVals[i]->getUpperRangeInitValue());
-            integralFunction->SetParLimits((i*2), paraVals[i]->getLowerRangeInitValue(), paraVals[i]->getUpperRangeInitValue());
-        }
-    }
-    //sets limits for lambda value of total function
-    for(int i = 0; i < numElements; i++)
-    {
-        //1 = setting from user values
-        if(inputHistoExecutionType == 1)
-        {
-            batemanFunction->SetParLimits((i*2)+1, (paraVals[i]->getValueDecayConst() * .01), (paraVals[i]->getValueDecayConst() * 100.));
-            integralFunction->SetParLimits((i*2)+1, (paraVals[i]->getValueDecayConst() * .01), (paraVals[i]->getValueDecayConst() * 100.));
-        //2 = setting from fit parameters of fitted input histogram
-        }else if(inputHistoExecutionType == 2 || inputHistoExecutionType == 3)
-        {
-            batemanFunction->SetParLimits((i*2)+1, (paraVals[i]->getLowerRangeDecayConst10Ns()), (paraVals[i]->getUpperRangeDecayConst10Ns()));
-            integralFunction->SetParLimits((i*2)+1, (paraVals[i]->getLowerRangeDecayConst10Ns()), (paraVals[i]->getUpperRangeDecayConst10Ns()));
+            //Setting limits for N0
+            if(paraVals[i]->GetFixN0()){
+                integralFunction->FitParameter((i*2), paraVals->GetN0());
+            }else{
+                integralFunction->SetParLimits((i*2), paraVals[i]->getLowerRangeN0(), paraVals[i]->getUpperRangeN0());
+            }
+            //Setting limits for decay constant
+            if(paraVals[i]->GetFixDecayConstant()){
+                integralFunction->FitParameter((i*2)+1, paraVals[i]->getValueDecayConst());
+            }else{
+                integralFunction->SetParLimits((i*2)+1, (paraVals[i]->getLowerRangeDecayConst10Ns()), (paraVals[i]->getUpperRangeDecayConst10Ns()));
+            }
         }
     }
 }
 
-/// \brief Sets the limits in which the parameters can fit in the fit function.
-///
-/// Sets the limits in which the parameters can fit in the fit function. If they are too large the program will not fit correctly but too large then its like cheating.
-/// I just use scalar multiples of the accepted values in the range.
-void ElementFit::setSingleParaLimits()
+/// \brief Sets the limits for the single bateman functions.
+void ElementFit::setSingleBatemanParameterLimits()
 {
     //sets limits for N0 of the single functions
     for(int i = 0; i < numElements; i++)
     {
         for(int k = 0; k < i+1; k++)
         {
-            //1 = setting from user values
-            if(inputHistoExecutionType == 1)
-            {
-                (singleFitFunctions[(i*2)])->SetParLimits((k*2), 0., doubleNumEvents*10000);
-                (singleFitFunctions[(i*2)+1])->SetParLimits((k*2), 0., doubleNumEvents*10000);
-            //2 = setting from fit parameters of fitted input histogram
+            //Setting limits for N0
+            if(paraVals[i]->GetFixN0()){
+                singleBatemanFitFunctions[i]->FitParameter((k*2), paraVals->GetN0());
             }else{
-                (singleFitFunctions[(i*2)])->SetParLimits((k*2), paraVals[i]->getLowerRangeInitValue(), paraVals[i]->getUpperRangeInitValue());
-                (singleFitFunctions[(i*2)+1])->SetParLimits((k*2), paraVals[i]->getLowerRangeInitValue(), paraVals[i]->getUpperRangeInitValue());
+                singleBatemanFitFunctions[i]->SetParLimits((k*2), 0., doubleNumEvents*10000);
+            }
+            //Setting limits for decay constant
+            if(paraVals[i]->GetFixDecayConstant()){
+                singleBatemanFitFunctions[i]->FitParameter((k*2)+1, paraVals[i]->getValueDecayConst());
+            }else{
+                singleBatemanFitFunctions[i]->SetParLimits((k*2)+1, paraVals[i]->getLowerRangeDecayConst(), (paraVals[i]->getUpperRangeDecayConst());
             }
         }
     }
-    //sets limits for lambda values of the single functions
+}
+
+/// \brief Sets the limits for the single integral functions.
+void ElementFit::setSingleIntegralParameterLimits()
+{
+    //sets limits for N0 of the single functions
     for(int i = 0; i < numElements; i++)
     {
-        for(int k = 0; k <= i; k++)
+        for(int k = 0; k < i+1; k++)
         {
-            //1 = setting from user values
-            if(inputHistoExecutionType == 1)
-            {
-                (singleFitFunctions[(i*2)])->SetParLimits((k*2)+1, (paraVals[k]->getValueDecayConst() * .01), (paraVals[k]->getValueDecayConst() * 100.));
-                (singleFitFunctions[(i*2)+1])->SetParLimits((k*2)+1, (paraVals[k]->getValueDecayConst() * .01), (paraVals[k]->getValueDecayConst() * 100.));
-            //2 = setting from fit parameters of fitted input histogram
+            //Setting limits for N0
+            if(paraVals[i]->GetFixN0()){
+                singleIntegralFitFunctions[i]->FitParameter((k*2), paraVals->GetN0());
             }else{
-                (singleFitFunctions[(i*2)])->SetParLimits((k*2)+1, (paraVals[i]->getLowerRangeDecayConst()), (paraVals[i]->getUpperRangeDecayConst()));
-                (singleFitFunctions[(i*2)+1])->SetParLimits((k*2)+1, (paraVals[i]->getLowerRangeDecayConst()), (paraVals[i]->getUpperRangeDecayConst()));
+                singleIntegralFitFunctions[i]->SetParLimits((k*2), 0., doubleNumEvents*10000);
+            }
+            //Setting limits for decay constant
+            if(paraVals[i]->GetFixDecayConstant()){
+                singleIntegralFitFunctions[i]->FitParameter((k*2)+1, paraVals[i]->getValueDecayConst());
+            }else{
+                singleIntegralFitFunctions[i]->SetParLimits((k*2)+1, paraVals[i]->getLowerRangeDecayConst(), (paraVals[i]->getUpperRangeDecayConst()));
             }
         }
     }
@@ -1146,7 +1245,7 @@ void ElementFit::DisplayParameterLimits()
         {
             cout << elementNames[i] << ":" << endl;
             cout << "\tInitial Lower Range: 0" << endl;
-            cout << "\tInitial Upper Range: " << paraVals[i]->getUpperRangeInitValue() << endl;
+            cout << "\tInitial Upper Range: " << paraVals[i]->getUpperRangeN0() << endl;
             cout << "\tHalf Life Lower Range: " << paraVals[i]->getLowerRangeHalfLife() << endl;
             cout << "\tHalf Life Upper Range: " << paraVals[i]->getUpperRangeHalfLife() << endl;
             cout << endl;

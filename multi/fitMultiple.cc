@@ -37,7 +37,7 @@ int main()
 
 void fitMultiple()
 {
-    Int_t eventDecrement, numBins, rebinDifference, createFitFunctionsChoice, events, programExecutionType, histoSimulateChoice, rangeValueChoice, displayIndividualFitsChoice, rebinChoice, inputHistoExecutionType, inputHistoBinNum;
+    Int_t eventDecrement, numBins, rebinBinInc, createFitFunctionsChoice, events, programExecutionType, histoSimulateChoice, rangeValueChoice, displayIndividualFitsChoice, rebinChoice, inputHistoExecutionType, inputHistoBinNum;
     Double_t timeRunEndSimulated, timeRunEndInput, timeRunStartInput, inputHistoTimeEnd, valueHolder, leaveOutStartBinsSim, leaveOutEndBinsSim, binWidth, leaveOutStartBinsInput, leaveOutEndBinsInput;
     FitOption* fitOptions = new FitOption();
     ElementFit* element;
@@ -144,24 +144,42 @@ void fitMultiple()
         //Gets N0 value and range
         inFile.ignore(256,':');
         inFile >> valueHolder;
-        paraVals[i]->setInitValue(valueHolder);
+        paraVals[i]->SetN0(valueHolder);
         inFile.ignore(256,':');
         inFile >> valueHolder;
-        paraVals[i]->setLowerRangeInitValue(valueHolder);
+        paraVals[i]->SetLowerRangeN0(valueHolder);
         inFile.ignore(256,':');
         inFile >> valueHolder;
-        paraVals[i]->setUpperRangeInitValue(valueHolder);
+        paraVals[i]->SetUpperRangeN0(valueHolder);
+        inFile.ignore(256,':');
+        inFile >> valueHolder;
+        if(valueHolder == 1)
+        {
+            paraVals[i]->SetFixN0(true);
+        }else
+        {
+            paraVals[i]->SetFixN0(false);
+        }
 
         //Gets Half life value and range
         inFile.ignore(256,':');
         inFile >> valueHolder;
-        paraVals[i]->setValueHalfLife(valueHolder);
+        paraVals[i]->SetHalfLife(valueHolder);
         inFile.ignore(256,':');
         inFile >> valueHolder;
-        paraVals[i]->setLowerRangeHalfLife(valueHolder);
+        paraVals[i]->SetLowerRangeHalfLife(valueHolder);
         inFile.ignore(256,':');
         inFile >> valueHolder;
-        paraVals[i]->setUpperRangeHalfLife(valueHolder);
+        paraVals[i]->SetUpperRangeHalfLife(valueHolder);
+        inFile.ignore(256,':');
+        inFile >> valueHolder;
+        if(valueHolder == 1)
+        {
+            paraVals[i]->SetFixHalfLife(true);
+        }else
+        {
+            paraVals[i]->SetFixHalfLife(false);
+        }
     }
     //gets option to create the fit functions if need be
     inFile.ignore(256,':');
@@ -190,12 +208,12 @@ void fitMultiple()
     //note: lower range half life will produce upper range decay constant becuase of the formula for conversion
     for(int i = 0; i < numElements; i++)
     {
-        valueHolder = (log(2)/paraVals[i]->getLowerRangeHalfLife());
-        paraVals[i]->setUpperRangeDecayConst(valueHolder);
-        valueHolder = (log(2)/paraVals[i]->getUpperRangeHalfLife());
-        paraVals[i]->setLowerRangeDecayConst(valueHolder);
-        valueHolder = (log(2)/paraVals[i]->getValueHalfLife());
-        paraVals[i]->setValueDecayConst(valueHolder);
+        valueHolder = (log(2)/paraVals[i]->GetLowerRangeHalfLife());
+        paraVals[i]->SetUpperRangeDecayConst(valueHolder);
+        valueHolder = (log(2)/paraVals[i]->GetUpperRangeHalfLife());
+        paraVals[i]->SetLowerRangeDecayConst(valueHolder);
+        valueHolder = (log(2)/paraVals[i]->GetHalfLife());
+        paraVals[i]->SetDecayConst(valueHolder);
     }
     
     //switch statement for dealing with an input histogram
@@ -245,11 +263,11 @@ void fitMultiple()
             for(int i = 0; i < numElements; i++)
             {
                 tempHalfLife = integralFitValues->GetAnHalfLife(i);
-                paraVals[i]->setValueHalfLife(tempHalfLife);
+                paraVals[i]->SetHalfLife(tempHalfLife);
             }
 
             delete element;
-            
+            return;
             break;
         }
         //Case for changing fit time on input histogram.
@@ -259,7 +277,6 @@ void fitMultiple()
             Double_t timeInc;
             TH1D* inputHistogram;
             FitOption* inputHistoFitOptions = new FitOption();
-            Double_t timeFitEnd;
             inputRootFile = new TFile(rootFilePath.c_str(), "READ");
 
             //if program cannot open root file
@@ -311,9 +328,6 @@ void fitMultiple()
             Run* run = new Run(element);
             Cycle* cycle = new Cycle(run, element);
 
-            timeFitEnd = inputHistoFitOptions->GetTimeLengthArr()[0];
-            element->createTotalFitFunctions(timeFitEnd);
-
             cycle->runSeperateSingleGen();
             cycle->genSeperateMeanGraphsTimeDifference();
             TCanvas** canvasArr = new TCanvas* [numElements];
@@ -354,8 +368,8 @@ void fitMultiple()
         {
             for(int i = 0; i < fitOptions->GetNumElements(); i++)
             {
-                cout << "INIT: " << paraVals[i]->getInitValue() << endl;
-                cout << "Half-life: " << paraVals[i]->getValueHalfLife() << endl << endl;
+                cout << "INIT: " << paraVals[i]->GetN0() << endl;
+                cout << "Half-life: " << paraVals[i]->GetHalfLife() << endl << endl;
             }
             fitOptions->SetMultiSourceChoice(true);
             element = new ElementFit(BatemanDecaybyActivity, IntegralDecaybyActivity, batemanFitFunctions, integralFitFunctions, paraVals, fitOptions);
@@ -513,7 +527,7 @@ void fitMultiple()
             inFile.ignore(256,':');
             inFile >> rebinChoice;
             inFile.ignore(256,':');
-            inFile >> rebinDifference;
+            inFile >> rebinBinInc;
 
             fitOptions->SetNumRuns(numRuns);
             fitOptions->SetNumCycles(numCycles);
@@ -532,7 +546,7 @@ void fitMultiple()
             {
                 fitOptions->SetRebinChoice(true);
             }
-            fitOptions->SetRebinDifference(rebinDifference);
+            fitOptions->SetRebinBinInc(rebinBinInc);
 
             element = new ElementFit(BatemanDecaybyActivity, IntegralDecaybyActivity, batemanFitFunctions, integralFitFunctions, paraVals, fitOptions);
             Run* elementRunsCycle = new Run(element);

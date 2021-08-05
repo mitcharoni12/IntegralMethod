@@ -9,21 +9,43 @@ using namespace std;
 /// Used to hold all the fit options for the program. Holds these options reguarless of program execution type chosen.
 class FitOption{
 private:
-    Int_t numRuns = 1, numCycles = 1, numElements, numBins, binRebinInc = 0, leaveOutStartBinsSim = 0, leaveOutEndBinsSim = 0, programExecutionType = 1,
-          leaveOutStartBinsInput = 0, leaveOutEndBinsInput = 0,eventDecrement = 0, timeShiftType = 1, rebinDifference = 0, binTimeFitInc = 0, inputHistoExecutionType = 1
-          ,inputHistoBinNum;
-    Double_t timeRunEndSimulated, timeRunStartInput, timeRunEndInput, events, binWidth, inputHistoTimeEnd, inputTimeInc;
-    Double_t* timeFitEndArr, *timeFitStartArr, *binWidthArr, *timeLengthArr, *fitStartBinArr, *fitEndBinArr;
-    string* elementNames;
-    Int_t* binNumArr;
-    bool multiSource = false, rebin = false, runMeanDifference = false;
+    Int_t numRuns = 1, numCycles = 1, numElements, numBins, inputHistoBinNum;
+    Int_t rebinBinInc = 0;              ///< Increment of number of bins between cycles for a rebin type program execution.
+    Int_t leaveOutStartBinsSim = 0;     ///< Number of bins to leave out at start for data simulation execution type.
+    Int_t leaveOutEndBinsSim = 0;       ///< Number of bins to leave out at end for data simulation execution type.
+    Int_t programExecutionType = 1;     ///< Execution type for simulation portion of program, 1 = single run, 2 = multiple runs, 3 = multiple cycles.
+    Int_t leaveOutStartBinsInput = 0;   ///< Number of bins to leave out at start for data input histogram execution type.
+    Int_t leaveOutEndBinsInput = 0;     ///< Number of bins to leave out at end for data input histogram execution type.
+    Int_t eventDecrement = 0;           ///< Number of events to decrement between each cycle of the program.
+    Int_t timeShiftType = 1;            ///< Determines the type of time shift that will happen between cycles of the program, 1 = start: const, end: change, 2 = start: change, end: const.
+    Int_t binTimeFitInc = 0;            ///< Bin increment when changing time fit for simulation of the program. Want to keep bin width same to to change time fit add on bin to end.
+    Int_t inputHistoExecutionType = 1;  ///< Determines the execution type reguarding the input histogram. 1 = no input histogram, 2 = monte carlo type error evaluation, 3 = input histogram changing time fit.
+    Int_t singleElementDataChoice = 1;  ///< Determines if the program will generates and fit single Bateman/integral histograms. 1 = don't generate single histogram, 2 = generate single histograms.
+    Double_t timeRunEndSimulated;       ///< Inital time in which data will stop generating/fitting for the simulation execution type of program.(S)
+    Double_t timeRunStartInput;         ///< Inital time to start fitting the input histogram(10^-8S).
+    Double_t timeRunEndInput;           ///< Inital time to end fitting the input histogram(10^-8S).
+    Double_t events;                    ///< Number of events generated for EACH ELEMENT in the decay chain.
+    Double_t binWidth;                  ///< Width of the bins for the simulation execution type of the program.
+    Double_t inputHistoTimeEnd;         ///< Time in which the input histogram ends(10^-8s).
+    Double_t inputTimeInc;              ///< Increment in which time fit will change between cycles of the input histogram.
+    Double_t* timeFitEndArr;            ///< Contains the time in which the fit will end between cycles for either the input histogram or the simulated histogram.
+    Double_t* timeFitStartArr;          ///< Contains the time in which the fit will start between cycles for either the input histogram or the simulated histogram.
+    Double_t* binWidthArr;              ///< Contains the bin width for the histogram in a certain cycle of the program execution for either the input histogram or simulated histograms.
+    Double_t* timeLengthArr;            ///< Contains the time length of the fit between cycles of the program for the input histogram.
+    Double_t* fitStartBinArr;           ///< Contains the bin on which the fit time will start between cycles of the program for the input histogram.
+    Double_t* fitEndBinArr;             ///< Contains the bin on which the fit time will end between cycles of the program for the input histogram.
+    string* elementNames;               ///< Contains the names of the elements in the decay chain.
+    Int_t* binNumArr;                   ///< Contains the number of bins for the histogram that is being fitted between cycles of the program for either the input histogram or the simulated histograms.
+    bool multiSource = false;           ///< Determines if simulated data is to be just one histogram or multiple histograms. false = one histogram, true =  multiple histograms.
+    bool rebin = false;                 ///< Determines if the program is to be run with changing the bin number in a set time span(rebinning) or changing the time fit. false = changing time fit, true = rebinning.
+    bool runMeanDifference = false;     ///< Determines if the program is going to display the difference between the integral method value and the bateman method value for the fit values. false = display integral and bateman fit values seperatly, true = display difference between values.
 public:
     //getters and setters
     void SetNumRuns(Int_t numRuns){this->numRuns = numRuns;}
     void SetNumCycles(Int_t numCycles){this->numCycles = numCycles;}
     void SetNumElements(Int_t numElements){this->numElements = numElements;}
     void SetNumBins(Int_t numBins){this->numBins = numBins;}
-    void SetRebinBinInc(Int_t binRebinInc){this->binRebinInc = binRebinInc;}
+    void SetRebinBinInc(Int_t rebinBinInc){this->rebinBinInc = rebinBinInc;}
     void SetLeaveOutStartBinsSim(Int_t leaveOutStartBinsSim){this->leaveOutStartBinsSim = leaveOutStartBinsSim;}
     void SetLeaveOutEndBinsSim(Int_t leaveOutEndBinsSim){this->leaveOutEndBinsSim = leaveOutEndBinsSim;}
     void SetLeaveOutStartBinsInput(Int_t leaveOutStartBinsInput){this->leaveOutStartBinsInput = leaveOutStartBinsInput;}
@@ -31,8 +53,8 @@ public:
     void SetProgramExecutionType(Int_t programExecutionType){this->programExecutionType = programExecutionType;}
     void SetEventDecrement(Int_t eventDecrement){this->eventDecrement = eventDecrement;}
     void SetTimeShiftType(Int_t timeShiftType){this->timeShiftType = timeShiftType;}
-    void SetRebinDifference(Int_t rebinDifference){this->rebinDifference = rebinDifference;}
     void SetInputHistoExecutionType(Int_t inputHistoExecutionType){this->inputHistoExecutionType = inputHistoExecutionType;}
+    void SetSingleElementDataChoice(Int_t singleElementDataChoice){this->singleElementDataChoice = singleElementDataChoice;}
     void SetInputHistoBinNum(Int_t inputHistoBinNum){this->inputHistoBinNum = inputHistoBinNum;}
     void SetTimeRunEndSimulated(Double_t timeRunEndSimulated){this->timeRunEndSimulated = timeRunEndSimulated;}
     void SetTimeRunEndInput(Double_t timeRunEndInput){this->timeRunEndInput = timeRunEndInput;}
@@ -50,7 +72,7 @@ public:
     Int_t GetNumCycles(){return numCycles;}
     Int_t GetNumElements(){return numElements;}
     Int_t GetNumBins(){return numBins;}
-    Int_t GetRebinBinInc(){return binRebinInc;}
+    Int_t GetRebinBinInc(){return rebinBinInc;}
     Int_t GetLeaveOutStartBinsSim(){return leaveOutStartBinsSim;}
     Int_t GetLeaveOutEndBinsSim(){return leaveOutEndBinsSim;}
     Int_t GetLeaveOutStartBinsInput(){return leaveOutStartBinsInput;}
@@ -58,9 +80,9 @@ public:
     Int_t GetProgramExecutionType(){return programExecutionType;}
     Int_t GetEventDecrement(){return eventDecrement;}
     Int_t GetTimeShiftType(){return timeShiftType;}
-    Int_t GetRebinDifference(){return rebinDifference;}
     Int_t GetInputHistoExecutionType(){return inputHistoExecutionType;}
     Int_t GetInputHistoBinNum(){return inputHistoBinNum;}
+    Int_t GetSingleElementDataChoice(){return singleElementDataChoice;}
     Int_t* GetBinNumArr(){return binNumArr;}
     Double_t GetTimeRunEndSimulated(){return timeRunEndSimulated;}
     Double_t GetTimeRunEndInput(){return timeRunEndInput;}
@@ -110,7 +132,7 @@ void FitOption::CreateRequiredDataSets()
             binWidthArr[i] = tempWidth;
             binNumArr[i] = rebinSize;
             timeFitStartArr[i] = 0.0f;
-            rebinSize = rebinSize + rebinDifference;
+            rebinSize = rebinSize + rebinBinInc;
             tempWidth = timeRunEndSimulated / rebinSize;
         }
     }
@@ -168,6 +190,7 @@ void FitOption::CreateRequiredDataSets()
             if(timeShiftType == 1)
             {
                 fitEnd = fitEnd + inputTimeInc;
+                cout << "END: " << fitEnd;
             //move start
             }else if(timeShiftType == 2)
             {

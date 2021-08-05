@@ -3,29 +3,35 @@ element 1 Name:TE
 element 1 N0 value:5
 element 1 N0 lower:0
 element 1 N0 upper:200000
+element 1 fix N0(1) don't fix(2):2
 
 element 1 half life value(s):750
 element 1 half life lower(s):0
 element 1 half life upper(s):.130
+element 1 fix half life(1) don't fix(2):2
 
 element 2 Name:I
 
 element 2 N0 value:0
 element 2 N0 lower:0
 element 2 N0 upper:0
+element 2 fix N0(1) don't fix(2):2
 
 element 2 half life value(s):74988
 element 2 half life lower(s):0
 element 2 half life upper(s):.280
+element 2 fix half life(1) don't fix(2):2
 
 element 3 Name:XE
 
 element 3 N0 value:0
 element 3 N0 lower:0
 element 3 N0 upper:0
+element 3 fix N0(1) don't fix(2):2
 
 element 3 half life value(s):453384
 element 3 half life lower(s):0
 element 3 half life upper(s):2.10
+element 3 fix half life(1) don't fix(2):2
 
 Create Fit Functions(1) Dont Create Fit Function(2):1
