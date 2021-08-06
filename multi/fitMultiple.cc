@@ -10,7 +10,7 @@
 
 #include "ElementFit.h"
 #include "Run.h"
-#include "Cycle.h"
+//#include "Cycle.h"
 #include "ParameterValue.h"
 #include "CycleCanvasHolder.h"
 #include "SingleCycleCanvasHolder.h"
@@ -37,7 +37,8 @@ int main()
 
 void fitMultiple()
 {
-    Int_t eventDecrement, numBins, rebinBinInc, createFitFunctionsChoice, events, programExecutionType, histoSimulateChoice, rangeValueChoice, displayIndividualFitsChoice, rebinChoice, inputHistoExecutionType, inputHistoBinNum;
+    Int_t eventDecrement, numBins, rebinBinInc, createFitFunctionsChoice, events, programExecutionType, histoSimulateChoice, rangeValueChoice,
+          displayIndividualFitsChoice, rebinChoice, inputHistoExecutionType, inputHistoBinNum, singleElementDataChoice;
     Double_t timeRunEndSimulated, timeRunEndInput, timeRunStartInput, inputHistoTimeEnd, valueHolder, leaveOutStartBinsSim, leaveOutEndBinsSim, binWidth, leaveOutStartBinsInput, leaveOutEndBinsInput;
     FitOption* fitOptions = new FitOption();
     ElementFit* element;
@@ -88,6 +89,8 @@ void fitMultiple()
     inFile >> timeRunEndInput;
     inFile.ignore(256,':');
     inFile >> inputHistoTimeEnd;
+    inFile.ignore(256,':');
+    inFile >> singleElementDataChoice;
     //gets the fit generation choice
     inFile.ignore(256,':');
     inFile >> programExecutionType;
@@ -123,6 +126,7 @@ void fitMultiple()
     fitOptions->SetNumElements(numElements);
     fitOptions->SetInputHistoExecutionType(inputHistoExecutionType);
     fitOptions->SetInputHistoTimeEnd(inputHistoTimeEnd);
+    fitOptions->SetSingleElementDataChoice(singleElementDataChoice);
     Int_t numFitFunction = numElements*2;
 
     //open first option file
@@ -250,15 +254,14 @@ void fitMultiple()
 
             inputHistoMonteFitOptions->SetNumRuns(1);
             inputHistoMonteFitOptions->SetNumCycles(1);
-            
             element = new ElementFit(BatemanDecaybyActivity, IntegralDecaybyActivity, batemanFitFunctions, integralFitFunctions, paraVals, inputHistoMonteFitOptions, inputHistogram);
 
             timeFitEnd = inputHistoMonteFitOptions->GetTimeLengthArr()[0];
-            element->createTotalFitFunctions(timeFitEnd);
-            element->fitBatemanHisto(0, 0, 0.0, timeFitEnd);
-            element->fitIntegralGraph(0, 0, 0.0, timeFitEnd);
-            element->displayParameters();
-            integralFitValues = element->getIntegralFitParameters();
+            element->FitTotalBatemanHisto(0, 0);
+            element->FitTotalIntegralGraph(0, 0);
+            element->DisplayTotalBatemanParameters();
+            element->DisplayTotalIntegralParameters();
+            integralFitValues = element->GetIntegralFitParameters();
 
             for(int i = 0; i < numElements; i++)
             {
@@ -271,6 +274,7 @@ void fitMultiple()
             break;
         }
         //Case for changing fit time on input histogram.
+        /*
         case 3:
         {
             Int_t numCycles, timeShiftType, displayIndividualFitsChoice, lowerCycleHistoIndex, upperCycleHistoIndex;
@@ -356,6 +360,7 @@ void fitMultiple()
             delete cycle;
             return;
         }
+        */
     }
     //switching program to simulate data now
     fitOptions->SetInputHistoExecutionType(1);
@@ -373,22 +378,47 @@ void fitMultiple()
             }
             fitOptions->SetMultiSourceChoice(true);
             element = new ElementFit(BatemanDecaybyActivity, IntegralDecaybyActivity, batemanFitFunctions, integralFitFunctions, paraVals, fitOptions);
-            element->fitHistos(0, 0);
-            element->displayParameters();
-        
-            //case for displaying histogram
-            TCanvas** singleCanvas = new TCanvas* [numElements*2];
-            for(int i = 0; i < numElements; i++)
-            {
-                singleCanvas[(i*2)] = new TCanvas((elementNames[i] + " Single Bateman Histo").c_str(), (elementNames[i] + " Single Bateman Histo").c_str(), 500, 500);
-                singleCanvas[(i*2)+1] = new TCanvas((elementNames[i] + " Single Integral Histo").c_str(), (elementNames[i] + " Single Integral Histo").c_str(), 500, 500);
-            }
+
+            //fit total bateman and integral data
+            element->FitTotalBatemanHisto(0, 0);
+            element->FitTotalIntegralGraph(0, 0);
+
+            //display total bateman and integral fitted parameters
+            element->DisplayTotalBatemanParameters();
+            element->DisplayTotalIntegralParameters();
+
             TCanvas* batemanTotalCanvas = new TCanvas("Total Bateman Histo", "Total Bateman Histo", 500, 500);
             TCanvas* integralTotalCanvas = new TCanvas("Total Integral Histo", "Total Integral Histo", 500, 500);
-            element->displaySingleHistos(singleCanvas);
-            element->displayBatemanHisto(batemanTotalCanvas);
-            element->displayIntegralGraph(integralTotalCanvas);
-            delete [] singleCanvas;
+
+            //display total bateman and integral histogram and graph
+            element->DisplayTotalBatemanHisto(batemanTotalCanvas);
+            element->DisplayTotalIntegralGraph(integralTotalCanvas);
+
+            if(singleElementDataChoice == 2)
+            {
+                //fit single bateman and integral data
+                element->FitSingleBatemanHistos(0, 0);
+                element->FitSingleIntegralGraphs(0, 0);
+
+                //display single bateman and integral fitted parameters
+                element->DisplaySingleBatemanParameters();
+                element->DisplaySingleIntegralParameters();
+
+                TCanvas** singleBatemanCanvases = new TCanvas* [numElements];
+                TCanvas** singleIntegralCanvases = new TCanvas* [numElements];
+                for(int i = 0; i < numElements; i++)
+                {
+                    singleBatemanCanvases[i] = new TCanvas((elementNames[i] + " Single Bateman Histo").c_str(), (elementNames[i] + " Single Bateman Histo").c_str(), 500, 500);
+                    singleIntegralCanvases[i] = new TCanvas((elementNames[i] + " Single Integral Histo").c_str(), (elementNames[i] + " Single Integral Histo").c_str(), 500, 500);
+                }
+
+                //display total bateman and integral histogram and graph
+                element->DisplaySingleBatemanHistos(singleBatemanCanvases);
+                element->DisplaySingleIntegralGraph(singleIntegralCanvases);
+
+                delete [] singleBatemanCanvases;
+                delete [] singleIntegralCanvases;
+            }
             delete element;
         break;
         }
@@ -419,56 +449,82 @@ void fitMultiple()
             element = new ElementFit(BatemanDecaybyActivity, IntegralDecaybyActivity, batemanFitFunctions, integralFitFunctions, paraVals, fitOptions);
             Run* elementRun = new Run(element); 
             
-            elementRun->runNoChange(0);
+            elementRun->RunTotalBatemanRunsNoChange(0);
+            elementRun->RunTotalIntegralRunsNoChange(0);
+            if(singleElementDataChoice == 2)
+            {
+                elementRun->RunSingleBatemanRunsNoChange(0);
+                elementRun->RunSingleIntegralRunsNoChange(0);
+            }
 
             //choice for displaying data via histogram
             if(graphOrHistoChoice == 1)
             {
                 //calls functions to create and fill histograms with data
-                TH1D** runResultHisto = elementRun->createRunResultHistos();
-                TH1D** runResultHistoSingleElements = elementRun->createRunResultHistosSingleElements();
-                runResultHisto = elementRun->fillRunResultHistos(runResultHisto);
-                runResultHistoSingleElements = elementRun->fillRunResultHistosSingleElement(runResultHistoSingleElements);
-
-                //put the histograms in these histo arrays to be able to display them right
-                TH1D** totalResultHisto = new TH1D* [numElements*4];
-                for(int i = 0; i < numElements; i++)
+                elementRun->CreateTotalBatemanMultiRunHistos();
+                elementRun->CreateTotalIntegralMultiRunHistos();
+                elementRun->FillTotalBatemanMultiRunHistos();
+                elementRun->FillTotalIntegralMultiRunHistos();
+                if(singleElementDataChoice == 2)
                 {
-                    totalResultHisto[(i*4)] = runResultHisto[(i*2)];
-                    totalResultHisto[(i*4)+1] = runResultHistoSingleElements[(i*2)];
-                    totalResultHisto[(i*4)+2] = runResultHisto[(i*2)+1];
-                    totalResultHisto[(i*4)+3] = runResultHistoSingleElements[(i*2)+1];
+                    elementRun->CreateSingleBatemanMultiRunHistos();
+                    elementRun->CreateSingleIntegralMultiRunHistos();
+                    elementRun->FillSingleBatemanMultiRunHistos();
+                    elementRun->FillSingleIntegralMultiRunHistos();
                 }
-                //delete only runResultHisto and runResultHisto arrays because you do not want to delete the individual histograms
-                delete [] runResultHisto;
-                delete [] runResultHistoSingleElements;
-
                 //creates canvases to display histos and displays them
-                TCanvas** totalRunResultCanvases = new TCanvas* [numElements];
+                TCanvas** runResultCanvases = new TCanvas* [numElements];
                 for(int i = 0;i < numElements; i++)
                 {
-                    totalRunResultCanvases[i] = new TCanvas((elementNames[i] + "ResultHisto").c_str(), (elementNames[i] + "ResultHisto").c_str(), 1100, 1100);
-                    totalRunResultCanvases[i]->Divide(2,2,.02,.02);
+                    if(singleElementDataChoice != 2)
+                    {
+                        runResultCanvases[i] = new TCanvas((elementNames[i] + "ResultHisto").c_str(), (elementNames[i] + "ResultHisto").c_str(), 1100, 550);
+                        runResultCanvases[i]->Divide(2,1,.02,.02);
+                    }else{
+                        runResultCanvases[i] = new TCanvas((elementNames[i] + "ResultHisto").c_str(), (elementNames[i] + "ResultHisto").c_str(), 1100, 1100);
+                        runResultCanvases[i]->Divide(2,2,.02,.02);
+                    }
+                }
+                elementRun->DisplayTotalBatemanFitValuesHistos(runResultCanvases);
+                elementRun->DisplayTotalIntegralFitValuesHistos(runResultCanvases);
+                if(singleElementDataChoice == 2)
+                {
+                    elementRun->DisplaySingleBatemanFitValuesHistos(runResultCanvases);
+                    elementRun->DisplaySingleIntegralFitValuesHistos(runResultCanvases);
                 }
 
-                elementRun->displayMultiRunResultHistos(totalRunResultCanvases, totalResultHisto);
-
-                delete [] totalRunResultCanvases;
-                delete [] totalResultHisto;
-
+                delete [] runResultCanvases;
             //choice of displaying data via graph
             }else{
-                elementRun->genGraphsNoChange();
-                elementRun->genGraphsNoChangeSingleElement();                
-                
+                elementRun->GenTotalBatemanGraphsNoChange();              
+                elementRun->GenTotalIntegralGraphsNoChange();
+                if(singleElementDataChoice == 2)
+                {
+                    elementRun->GenSingleBatemanGraphsNoChange();
+                    elementRun->GenSingleIntegralGraphsNoChange();
+                }
+
                 TCanvas** runResultCanvases = new TCanvas* [numElements];
                 for(int i = 0; i < numElements; i++)
                 {
-                    runResultCanvases[i] = new TCanvas((elementNames[i] + "ResultGraph").c_str(), (elementNames[i] + "ResultGraph").c_str(), 1100, 1100);
-                    runResultCanvases[i]->Divide(2,2,.02,.02);
+                    if(singleElementDataChoice != 2)
+                    {
+                        runResultCanvases[i] = new TCanvas((elementNames[i] + "ResultHisto").c_str(), (elementNames[i] + "ResultHisto").c_str(), 1100, 550);
+                        runResultCanvases[i]->Divide(2,1,.02,.02);
+                    }else{
+                        runResultCanvases[i] = new TCanvas((elementNames[i] + "ResultHisto").c_str(), (elementNames[i] + "ResultHisto").c_str(), 1100, 1100);
+                        runResultCanvases[i]->Divide(2,2,.02,.02);
+                    }
                 }
-                elementRun->displayMultiRunResultGraphs(runResultCanvases);
-                delete [] runResultCanvases;                        
+                elementRun->DisplayTotalBatemanFitValuesGraphs(runResultCanvases);
+                elementRun->DisplayTotalIntegralFitValuesGraphs(runResultCanvases);
+                if(singleElementDataChoice == 2)
+                {
+                    elementRun->DisplaySingleBatemanFitValuesGraphs(runResultCanvases);
+                    elementRun->DisplaySingleIntegralFitValuesGraphs(runResultCanvases);
+                }
+
+                delete [] runResultCanvases;
             }
 
         //case for displaying the individual fits for runs
@@ -476,15 +532,24 @@ void fitMultiple()
         {
             CycleCanvasHolder* batemanCanvases = new CycleCanvasHolder(lowerRunHistoIndex, upperRunHistoIndex, 0, 0, "Total Bateman Fit");
             CycleCanvasHolder* integralCanvases = new CycleCanvasHolder(lowerRunHistoIndex, upperRunHistoIndex, 0, 0, "Total Integral Fit");
-            SingleCycleCanvasHolder* singleBatemanCanvases = new SingleCycleCanvasHolder(lowerRunHistoIndex, upperRunHistoIndex, 0, 0, numElements, elementNames, "Single bateman Fit");
-            SingleCycleCanvasHolder* singleIntegralCanvases = new SingleCycleCanvasHolder(lowerRunHistoIndex, upperRunHistoIndex, 0, 0, numElements, elementNames, "Single Integral Fit");
-
-            element->DrawIndividualHistos(batemanCanvases, integralCanvases, singleBatemanCanvases, singleIntegralCanvases, lowerRunHistoIndex, upperRunHistoIndex, 0, 0);
             
+            element->DrawTotalBatemanIndividualHistos(batemanCanvases, lowerRunHistoIndex, upperRunHistoIndex, 0, 0);
+            element->DrawTotalIntegralIndividualHistos(integralCanvases, lowerRunHistoIndex, upperRunHistoIndex, 0, 0);
+
             delete batemanCanvases;
             delete integralCanvases;
-            delete singleBatemanCanvases;
-            delete singleIntegralCanvases;
+
+            if(singleElementDataChoice == 2)
+            {
+                SingleCycleCanvasHolder* singleBatemanCanvases = new SingleCycleCanvasHolder(lowerRunHistoIndex, upperRunHistoIndex, 0, 0, numElements, elementNames, "Single bateman Fit");
+                SingleCycleCanvasHolder* singleIntegralCanvases = new SingleCycleCanvasHolder(lowerRunHistoIndex, upperRunHistoIndex, 0, 0, numElements, elementNames, "Single Integral Fit");
+
+                element->DrawSingleBatemanIndividualHistos(singleBatemanCanvases, lowerRunHistoIndex, upperRunHistoIndex, 0, 0);
+                element->DrawSingleIntegralIndividualHistos(singleIntegralCanvases, lowerRunHistoIndex, upperRunHistoIndex, 0, 0);
+                
+                delete singleBatemanCanvases;
+                delete singleIntegralCanvases;
+            }
         }
 
         inFile.close();
@@ -492,6 +557,7 @@ void fitMultiple()
         delete elementRun;
         break;
         }
+    /*
 
         //multiple runs of histogram
         case 3:
@@ -668,6 +734,7 @@ void fitMultiple()
             delete cycle;
             inFile.close();
         }
+*/
     }
     //delete dyanmically allocated data
     for(int i = 0; i < numElements; i++)

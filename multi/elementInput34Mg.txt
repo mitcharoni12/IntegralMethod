@@ -1,0 +1,49 @@
+element 1 Name:MG
+
+element 1 N0 value:10000
+element 1 N0 lower:0
+element 1 N0 upper:100000000000
+element 1 fix N0(1) don't fix(2):2
+
+element 1 half life value(s):.0200
+element 1 half life lower(s):0.0002
+element 1 half life upper(s):2.0
+element 1 fix half life(1) don't fix(2):2
+
+element 2 Name:AL
+
+element 2 N0 value:10000
+element 2 N0 lower:0
+element 2 N0 upper:100000000000
+element 2 fix N0(1) don't fix(2):2
+
+element 2 half life value(s):.563
+element 2 half life lower(s):.00563
+element 2 half life upper(s):56.3
+element 2 fix half life(1) don't fix(2):2
+
+element 3 Name:SI
+
+element 3 N0 value:10000
+element 3 N0 lower:0
+element 3 N0 upper:100000000000
+element 3 fix N0(1) don't fix(2):2
+
+element 3 half life value(s):2.77
+element 3 half life lower(s):0.0277
+element 3 half life upper(s):277.0
+element 3 fix half life(1) don't fix(2):1
+
+element 4 Name:P
+
+element 4 N0 value:10000
+element 4 N0 lower:0
+element 4 N0 upper:100000000000
+element 4 fix N0(1) don't fix(2):2
+
+element 4 half life value(s):12.43
+element 4 half life lower(s):0.1243
+element 4 half life upper(s):1243.0
+element 4 fix half life(1) don't fix(2):1
+
+Create Fit Functions(1) Dont Create Fit Function(2):2

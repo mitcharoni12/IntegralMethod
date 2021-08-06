@@ -37,6 +37,7 @@ class ParameterValue{
         Double_t GetLowerRangeHalfLife10Ns(){return lowerRangeHalfLife*1e8;}
         Double_t GetUpperRangeHalfLife10Ns(){return upperRangeHalfLife*1e8;}
         Double_t GetHalfLife10Ns(){return valueHalfLife*1e8;}
+        bool GetFixHalfLife(){return fixHalfLife;}
 
         Double_t GetLowerRangeDecayConst(){return lowerRangeDecayConst;}
         Double_t GetUpperRangeDecayConst(){return upperRangeDecayConst;}
@@ -44,10 +45,12 @@ class ParameterValue{
         Double_t GetLowerRangeDecayConst10Ns(){return lowerRangeDecayConst*1e-8;}
         Double_t GetUpperRangeDecayConst10Ns(){return upperRangeDecayConst*1e-8;}
         Double_t GetDecayConst10Ns(){return valueDecayConst*1e-8;}
+        bool GetFixDecayConst(){return fixDecayConst;}
 
         Double_t GetLowerRangeN0(){return lowerRangeN0;}
         Double_t GetUpperRangeN0(){return upperRangeN0;}
         Double_t GetN0(){return N0;}
+        bool GetFixN0(){return fixN0;}
         ParameterValue();
 };
 
