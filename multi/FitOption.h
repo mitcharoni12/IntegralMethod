@@ -39,6 +39,7 @@ private:
     bool multiSource = false;           ///< Determines if simulated data is to be just one histogram or multiple histograms. false = one histogram, true =  multiple histograms.
     bool rebin = false;                 ///< Determines if the program is to be run with changing the bin number in a set time span(rebinning) or changing the time fit. false = changing time fit, true = rebinning.
     bool runMeanDifference = false;     ///< Determines if the program is going to display the difference between the integral method value and the bateman method value for the fit values. false = display integral and bateman fit values seperatly, true = display difference between values.
+    bool displayFitAverages = false;    ///< Determines if program will display the average value of the fitted value in the Cycle class.
 public:
     //getters and setters
     void SetNumRuns(Int_t numRuns){this->numRuns = numRuns;}
@@ -67,6 +68,7 @@ public:
     void SetMultiSourceChoice(bool multiSource){this->multiSource = multiSource;}
     void SetRebinChoice(bool rebin){this->rebin = rebin;}
     void SetRunMeanDifference(bool runMeanDifference){this->runMeanDifference = runMeanDifference;}
+    void SetDisplayFitAverages(bool displayFitAverages){this->displayFitAverages = displayFitAverages;}
     void SetElementNames(string* elementNames){this->elementNames = elementNames;}
     Int_t GetNumRuns(){return numRuns;}
     Int_t GetNumCycles(){return numCycles;}
@@ -101,6 +103,7 @@ public:
     bool GetMultiSourceChoice(){return multiSource;}
     bool GetRebinChoice(){return rebin;}
     bool GetRunMeanDifference(){return runMeanDifference;}
+    bool GetDisplayFitAverages(){return displayFitAverages;}
     string* GetElementNames(){return elementNames;}
     //functions
     void CreateRequiredDataSets();

@@ -41,7 +41,6 @@ private:
     Double_t* runsXAxis;                                    ///< Array containing the runs indexes.
     Double_t *zero;                                         ///< Array of 0's, used for setting 0 error in the x values.
     string* elementNameStrs;                                ///< Contains element names for each element in the decay chain.
-    TH1D** multiRunResultHistograms;                        ///< Histograms used to store the fit values
     TH1D** singleBatemanMultiRunFitHisto;                   ///< Histogram used to store the fit values for the multiple runs of the run class for the single bateman fit values.
     TH1D** singleIntegralMultiRunFitHisto;                  ///< Histogram used to store the fit values for the multiple runs of the run class for the single integral fit values
     TH1D** totalBatemanMultiRunFitHisto;                    ///< Histogram used to store the fit values for the multiple runs of the run class for the total bateman fit values
@@ -92,7 +91,10 @@ public:
     ChainRunFitValues* GetIntegralFitValues(){return integralFitValues;}
     SingleChainRunFitValues* GetSingleBatemanFitValues(){return singleBatemanFitValues;}
     SingleChainRunFitValues* GetSingleIntegralFitValues(){return singleIntegralFitValues;}
-    TH1D** GetMultiRunResultHistos(){return multiRunResultHistograms;}
+    TH1D** GetSingleBatemanMultiRunFitHisto(){return singleBatemanMultiRunFitHisto;}
+    TH1D** GetSingleIntegralMultiRunFitHisto(){return singleIntegralMultiRunFitHisto;}
+    TH1D** GetTotalBatemanMultiRunFitHisto(){return totalBatemanMultiRunFitHisto;}
+    TH1D** GetTotalIntegralMultiRunFitHisto(){return totalIntegralMultiRunFitHisto;}
     string* GetElementStringNames(){return elementNameStrs;}
     Int_t GetNumRuns(){return numRuns;}
     //setter function
@@ -185,8 +187,6 @@ void Run::CreateSingleBatemanMultiRunHistos()
         parameterValue = TMath::LogE()/(element->GetElementParameters(i));
         singleBatemanMultiRunFitHisto[i] = new TH1D((elementNameStrs[i] + " Fit Result Single Bateman Histo").c_str(), (elementNameStrs[i] + " Fit Result Single Bateman Histo").c_str(), 500, parameterValue*0, parameterValue*2.5);
     }
-
-    return multiRunResultHistograms;
 }
 
 /// \brief Dynamically allocates histograms for the storage of the fit values for the multiple runs of the single integral histograms.
@@ -200,8 +200,6 @@ void Run::CreateSingleIntegralMultiRunHistos()
         parameterValue = TMath::LogE()/(element->GetElementParameters(i));
         singleIntegralMultiRunFitHisto[i] = new TH1D((elementNameStrs[i] + " Fit Result Single Integral Histo").c_str(), (elementNameStrs[i] + " Fit Result Single Integral Histo").c_str(), 500, parameterValue*0, parameterValue*2.5);
     }
-
-    return multiRunResultHistograms;
 }
 
 /// \brief Dynamically allocates histograms for the storage of the fit values for the multiple runs of the total bateman histograms.
@@ -215,8 +213,6 @@ void Run::CreateTotalBatemanMultiRunHistos()
         parameterValue = TMath::LogE()/(element->GetElementParameters(i));
         totalBatemanMultiRunFitHisto[i] = new TH1D((elementNameStrs[i] + " Fit Result Total Bateman Histo").c_str(), (elementNameStrs[i] + " Fit Result Total Bateman Histo").c_str(), 500, parameterValue*0, parameterValue*2.5);
     }
-
-    return multiRunResultHistograms;
 }
 
 /// \brief Dynamically allocates histograms for the storage of the fit values for the multiple runs of the total integral histograms.
@@ -230,8 +226,6 @@ void Run::CreateTotalIntegralMultiRunHistos()
         parameterValue = TMath::LogE()/(element->GetElementParameters(i));
         totalIntegralMultiRunFitHisto[i] = new TH1D((elementNameStrs[i] + " Fit Result Total Integral Histo").c_str(), (elementNameStrs[i] + " Fit Result Total Integral Histo").c_str(), 500, parameterValue*0, parameterValue*2.5);
     }
-
-    return multiRunResultHistograms;
 }
 
 

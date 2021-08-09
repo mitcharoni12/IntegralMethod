@@ -1,15 +1,16 @@
-Number of Runs:5
-Number of Cycles:10
+Number of Runs:3
+Number of Cycles:3
 Event Decement:1
 X Axis Range, Start = Constant, End = Changing (1) X Axis Range, Start = Changing, End = Constant(2):1
-Bin Increment per Cycle(Changes Time Fit):1
-Single Source Histo (1) Mutli Source Histo (2):2
+Bin Increment per Cycle(Changes Time Fit):50
+Single Source Histo (1) Mutli Source Histo (2):1
 Mean Difference(1) Seperate mean(2):2
-Display Individual Fits(1) Dont Display Individual Fits(2):2
+Display Individual Fits(1) Dont Display Individual Fits(2):1
+Display Fit Averages(1) Dont Display Fit Averages(2):2
 NOTE; if single source histo keep run index from 0 to 0
-Lower Run Histo Index(0 based):0
-Upper Run Histo Index(0 based):0
-Lower Cycle Histo Index(0 based):0
-upper Cycle Histo Index(0 based):0
+Lower Run Histo Index(0 based):1
+Upper Run Histo Index(0 based):2
+Lower Cycle Histo Index(0 based):1
+upper Cycle Histo Index(0 based):2
 Rebin(1) Don't Rebin(2):2
-Number Bin Difference(add x bins):1
+Number Bin Difference(add x bins):100
