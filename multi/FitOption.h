@@ -16,7 +16,6 @@ private:
     Int_t programExecutionType = 1;     ///< Execution type for simulation portion of program, 1 = single run, 2 = multiple runs, 3 = multiple cycles.
     Int_t leaveOutStartBinsInput = 0;   ///< Number of bins to leave out at start for data input histogram execution type.
     Int_t leaveOutEndBinsInput = 0;     ///< Number of bins to leave out at end for data input histogram execution type.
-    Int_t eventDecrement = 0;           ///< Number of events to decrement between each cycle of the program.
     Int_t timeShiftType = 1;            ///< Determines the type of time shift that will happen between cycles of the program, 1 = start: const, end: change, 2 = start: change, end: const.
     Int_t binTimeFitInc = 0;            ///< Bin increment when changing time fit for simulation of the program. Want to keep bin width same to to change time fit add on bin to end.
     Int_t inputHistoExecutionType = 1;  ///< Determines the execution type reguarding the input histogram. 1 = no input histogram, 2 = monte carlo type error evaluation, 3 = input histogram changing time fit.
@@ -52,7 +51,6 @@ public:
     void SetLeaveOutStartBinsInput(Int_t leaveOutStartBinsInput){this->leaveOutStartBinsInput = leaveOutStartBinsInput;}
     void SetLeaveOutEndBinsInput(Int_t leaveOutEndBinsInput){this->leaveOutEndBinsInput = leaveOutEndBinsInput;}
     void SetProgramExecutionType(Int_t programExecutionType){this->programExecutionType = programExecutionType;}
-    void SetEventDecrement(Int_t eventDecrement){this->eventDecrement = eventDecrement;}
     void SetTimeShiftType(Int_t timeShiftType){this->timeShiftType = timeShiftType;}
     void SetInputHistoExecutionType(Int_t inputHistoExecutionType){this->inputHistoExecutionType = inputHistoExecutionType;}
     void SetSingleElementDataChoice(Int_t singleElementDataChoice){this->singleElementDataChoice = singleElementDataChoice;}
@@ -80,7 +78,6 @@ public:
     Int_t GetLeaveOutStartBinsInput(){return leaveOutStartBinsInput;}
     Int_t GetLeaveOutEndBinsInput(){return leaveOutEndBinsInput;}
     Int_t GetProgramExecutionType(){return programExecutionType;}
-    Int_t GetEventDecrement(){return eventDecrement;}
     Int_t GetTimeShiftType(){return timeShiftType;}
     Int_t GetInputHistoExecutionType(){return inputHistoExecutionType;}
     Int_t GetInputHistoBinNum(){return inputHistoBinNum;}

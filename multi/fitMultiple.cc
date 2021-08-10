@@ -37,7 +37,7 @@ int main()
 
 void fitMultiple()
 {
-    Int_t eventDecrement, numBins, rebinBinInc, createFitFunctionsChoice, events, programExecutionType, histoSimulateChoice, rangeValueChoice,
+    Int_t numBins, rebinBinInc, createFitFunctionsChoice, events, programExecutionType, histoSimulateChoice, rangeValueChoice,
           displayIndividualFitsChoice, rebinChoice, inputHistoExecutionType, inputHistoBinNum, singleElementDataChoice;
     Double_t timeRunEndSimulated, timeRunEndInput, timeRunStartInput, inputHistoTimeEnd, valueHolder, leaveOutStartBinsSim, leaveOutEndBinsSim, binWidth, leaveOutStartBinsInput, leaveOutEndBinsInput;
     FitOption* fitOptions = new FitOption();
@@ -435,11 +435,9 @@ void fitMultiple()
             Int_t numRuns;
             int graphOrHistoChoice, lowerRunHistoIndex, upperRunHistoIndex;
 
-            inFile.open("simulated_single_cycle.txt");
+            inFile.open("simulatedSingleCycle.txt");
             inFile.ignore(256,':');
             inFile >> numRuns;
-            inFile.ignore(256,':');
-            inFile >> eventDecrement;
             inFile.ignore(256,':');
             inFile >> graphOrHistoChoice;
             inFile.ignore(256, ':');
@@ -450,7 +448,6 @@ void fitMultiple()
             inFile >> upperRunHistoIndex;
 
             fitOptions->SetNumRuns(numRuns);
-            fitOptions->SetEventDecrement(eventDecrement);
             fitOptions->SetMultiSourceChoice(true);
             
             element = new ElementFit(BatemanDecaybyActivity, IntegralDecaybyActivity, batemanFitFunctions, integralFitFunctions, paraVals, fitOptions);
@@ -572,13 +569,11 @@ void fitMultiple()
                   lowerRunHistoIndex, upperRunHistoIndex, lowerCycleHistoIndex, upperCycleHistoIndex;
             Double_t binTimeFitInc, runMeanDifference;
 
-            inFile.open("simulated_multi_cycle.txt");
+            inFile.open("simulatedMultiCycle.txt");
             inFile.ignore(256,':');
             inFile >> numRuns;
             inFile.ignore(256,':');
             inFile >> numCycles;
-            inFile.ignore(256,':');
-            inFile >> eventDecrement;
             inFile.ignore(256,':');
             inFile >> timeShiftType;
             inFile.ignore(256,':');
@@ -606,7 +601,6 @@ void fitMultiple()
 
             fitOptions->SetNumRuns(numRuns);
             fitOptions->SetNumCycles(numCycles);
-            fitOptions->SetEventDecrement(eventDecrement);
             fitOptions->SetTimeShiftType(timeShiftType);
             fitOptions->SetTimeFitBinInc(binTimeFitInc);
             if(singleSourceHistoChoice == 2)

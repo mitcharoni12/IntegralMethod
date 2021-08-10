@@ -7,7 +7,7 @@ using namespace std;
 
 /// Used for storing the the fitted values for either the values of a total Bateman/integral histogram or one element of a single Bateman/integral histogram.
 /// EX: If we look at decay chain 144Cs->144Ba->144La and we look at the total Bateman histogram, the total bateman equation is going to have values for N0, N0Error, half life, and half life error for each element in that chain.
-// This class stores that type of data.
+/// This class stores that type of data.
 class ChainFitValues{
 private:
     FitValues** chainFitVals;

@@ -29,7 +29,7 @@ using namespace std;
 /// Class will handle multiple runs of the program. Used extensively in the Cycle class.
 class Run{
 private:
-    Int_t numRuns, numElements, eventDecrement, inputHistoExecutionType, singleElementDataChoice;
+    Int_t numRuns, numElements, inputHistoExecutionType, singleElementDataChoice;
     FitOption* fitOptions;                                  ///< Contains fit options for program.
     ElementFit* element;                                    ///< Element fit object. Used to do individual runs.
     ChainRunFitValues* batemanFitValues;                    ///< Stores fit values of different runs of the total Bateman histograms.
@@ -109,7 +109,6 @@ Run::Run(ElementFit* element)
     //getting parameters for the program execution type
     this->fitOptions = element->GetFitOptions();
     this->numRuns = fitOptions->GetNumRuns();
-    this->eventDecrement = fitOptions->GetEventDecrement();
     this->element = element;
     this->elementNameStrs = fitOptions->GetElementNames();
     this->timeFitEnd = fitOptions->GetTimeLengthArr();
