@@ -43,7 +43,7 @@ void fitMultiple()
     FitOption* fitOptions = new FitOption();
     ElementFit* element;
     ifstream inFile;
-    string rootFilePath, histogramName;
+    string rootFilePath, histogramName, elementDataFile;
     TFile* inputRootFile;
     TH1D* inputHistogram;
 
@@ -105,6 +105,8 @@ void fitMultiple()
     inFile.ignore(256,':');
     inFile >> leaveOutEndBinsInput;
     inFile.ignore(256,':');
+    inFile >> elementDataFile;
+    inFile.ignore(256,':');
     inFile >> rootFilePath;
     inFile.ignore(256,':');
     inFile >> histogramName;
@@ -130,7 +132,7 @@ void fitMultiple()
     Int_t numFitFunction = numElements*2;
 
     //open first option file
-    inFile.open("elementInput.txt");
+    inFile.open(elementDataFile.c_str());
     //create storage for the read in parameter values
     ParameterValue** paraVals = new ParameterValue* [numElements];
     //ENTERING VALUES FROM PARAMETER VALUES
@@ -270,11 +272,12 @@ void fitMultiple()
             }
 
             delete element;
-            return;
+            fitOptions->SetSingleElementDataChoice(1);
+            fitOptions->SetProgramExecutionType(2);
+            cout << "\n\n\nSIMULATING DATA" << endl; 
             break;
         }
         //Case for changing fit time on input histogram.
-        /*
         case 3:
         {
             Int_t numCycles, timeShiftType, displayIndividualFitsChoice, lowerCycleHistoIndex, upperCycleHistoIndex;
@@ -327,20 +330,24 @@ void fitMultiple()
             inputHistoFitOptions->SetInputHistoExecutionType(inputHistoExecutionType);
             inputHistoFitOptions->SetInputHistoTimeEnd(inputHistoTimeEnd);
             inputHistoFitOptions->SetElementNames(elementNames);
+            inputHistoFitOptions->SetSingleElementDataChoice(1);
 
             element = new ElementFit(BatemanDecaybyActivity, IntegralDecaybyActivity, batemanFitFunctions, integralFitFunctions, paraVals, inputHistoFitOptions, inputHistogram);
             Run* run = new Run(element);
             Cycle* cycle = new Cycle(run, element);
 
-            cycle->runSeperateSingleGen();
-            cycle->genSeperateMeanGraphsTimeDifference();
+            cycle->RunTotalBatemanCyclesSingleGen();
+            cycle->RunTotalIntegralCyclesSingleGen();
+            cycle->GenTotalBatemanMeanGraphsTimeDifference();
+            cycle->GenTotalIntegralMeanGraphsTimeDifference();
             TCanvas** canvasArr = new TCanvas* [numElements];
             for(int i = 0; i < numElements; i++)
             {
                 canvasArr[i] = new TCanvas((elementNames[i] + " Single Source Seperate Mean").c_str(), (elementNames[i] + " Single Source Seperate Mean").c_str(), 1100, 1100);
                 canvasArr[i]->Divide(2,1,.02,.02);
             }
-            cycle->displayMeanSeperateGraphs(canvasArr);
+            cycle->DisplayTotalBatemanMeanGraphs(canvasArr);
+            cycle->DisplayTotalIntegralMeanGraphs(canvasArr);
             delete [] canvasArr;
 
             if(displayIndividualFitsChoice == 1)
@@ -348,7 +355,8 @@ void fitMultiple()
                 CycleCanvasHolder* batemanInputHistoCanvas = new CycleCanvasHolder(0, 0, lowerCycleHistoIndex, upperCycleHistoIndex, "Bateman Input Histogram");
                 CycleCanvasHolder* integralInputHistoCanvas = new CycleCanvasHolder(0, 0, lowerCycleHistoIndex, upperCycleHistoIndex, "Integral Input Histogram");
 
-                element->DrawInputIndividualHistos(batemanInputHistoCanvas, integralInputHistoCanvas, 0, 0, lowerCycleHistoIndex, upperCycleHistoIndex);
+                element->DrawTotalBatemanIndividualHistos(batemanInputHistoCanvas, 0, 0, lowerCycleHistoIndex, upperCycleHistoIndex);
+                element->DrawTotalIntegralIndividualHistos(integralInputHistoCanvas, 0, 0, lowerCycleHistoIndex, upperCycleHistoIndex);
 
                 delete batemanInputHistoCanvas;
                 delete integralInputHistoCanvas;
@@ -360,13 +368,12 @@ void fitMultiple()
             delete cycle;
             return;
         }
-        */
     }
     //switching program to simulate data now
     fitOptions->SetInputHistoExecutionType(1);
 
     //SWITCH FOR PROGRAM EXECUTION TYPE
-    switch(programExecutionType)
+    switch(fitOptions->GetProgramExecutionType())
     {
         //single run of histogam
         case 1:

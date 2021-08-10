@@ -154,7 +154,6 @@ void FitOption::CreateRequiredDataSets()
             binWidthArr[i] = binWidth;
             timeFitStartArr[i] = fitStart;
 
-            //cout << "FIT END: " << fitEnd << " NUM BINS: " << totalBins << " BIN WIDTH: " << binWidth << " START FIT: " << fitStart << endl;
             addedBins = addedBins + binTimeFitInc;
             //move end
             if(timeShiftType == 1){
@@ -188,12 +187,10 @@ void FitOption::CreateRequiredDataSets()
             fitEndBinArr[i] = fitEndBinNum;
             binNumArr[i] = fitEndBinNum - fitStartBinNum + 1;
 
-            //cout << "FIT END: " << fitEnd << " NUM BINS: " << binNumArr[i] << " BIN WIDTH: " << binWidth << " START FIT: " << fitStart << endl;
             //move end
             if(timeShiftType == 1)
             {
                 fitEnd = fitEnd + inputTimeInc;
-                cout << "END: " << fitEnd;
             //move start
             }else if(timeShiftType == 2)
             {

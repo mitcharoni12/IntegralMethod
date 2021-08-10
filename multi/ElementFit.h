@@ -661,6 +661,7 @@ void ElementFit::DrawTotalBatemanIndividualHistos(CycleCanvasHolder* batemanTota
     {
         for(int runIndex = lowerRunIndex; runIndex < upperRunIndex; runIndex++)
         {
+            cout << "Getting cycle: " << cycleIndex << " Run: " << runIndex << endl;
             batemanTotalCanvases->GetACanvas(cycleIndex, runIndex)->cd();
             batemanHisto->GetAHisto(cycleIndex, runIndex)->Draw();
         }
@@ -706,7 +707,7 @@ void ElementFit::FitSingleBatemanHistos(Int_t cycleIndex, Int_t runIndex)
         tempSingleBatemanHisto = singleBatemanHisto->GetAHisto(cycleIndex, runIndex, i);
 
         cout << "FITTING SINGLE BATEMAN " << elementNames[i] << " CYCLE: " << cycleIndex << " RUN: " << runIndex << endl;
-        tempSingleBatemanHisto->Fit(singleBatemanFitFunctions[i], "L", "", startFit, endFit);
+        tempSingleBatemanHisto->Fit(singleBatemanFitFunctions[i], "LQ", "", startFit, endFit);
 
         for(int k = 0; k < (i+1); k++)
         {
@@ -750,7 +751,7 @@ void ElementFit::FitSingleIntegralGraphs(Int_t cycleIndex, Int_t runIndex)
         tempSingleGraph = singleIntegralGraph->GetAGraph(cycleIndex, runIndex, i);
 
         cout << "FITTING SINGLE INTEGRAL " << elementNames[i] << " CYCLE: " << cycleIndex << " RUN: " << runIndex << endl;
-        tempSingleGraph->Fit(singleIntegralFitFunctions[i], "", "", startFit, endFit);
+        tempSingleGraph->Fit(singleIntegralFitFunctions[i], "Q", "", startFit, endFit);
 
         for(int k = 0; k < (i+1); k++)
         {
@@ -797,7 +798,7 @@ void ElementFit::FitTotalBatemanHisto(Int_t cycleIndex, Int_t runIndex)
     tempHisto = batemanHisto->GetAHisto(cycleIndex, runIndex);
 
     cout << "FITTING TOTAL BATEMAN CYCLE: " << cycleIndex << " RUN: " << runIndex << endl;
-    tempHisto->Fit(batemanFunction, "L", "", startFit, endFit);
+    tempHisto->Fit(batemanFunction, "LQ", "", startFit, endFit);
     for(int i = 0; i < numElements; i++)
     {   
         valueN0 = batemanFunction->GetParameter((i*2));
@@ -806,7 +807,7 @@ void ElementFit::FitTotalBatemanHisto(Int_t cycleIndex, Int_t runIndex)
         errorDecayConst = batemanFunction->GetParError((i*2)+1);
         valueHalfLife = log(2)/(valueDecayConst);
         errorHalfLife = ((log(2)/valueDecayConst)*(errorDecayConst/valueDecayConst));
-        if(inputHistoExecutionType == 2|| inputHistoExecutionType == 3)
+        if((inputHistoExecutionType == 2|| inputHistoExecutionType == 3) && (paraVals[i]->GetFixDecayConst() == false))
         {
             valueDecayConst = valueDecayConst / 1e-8;
             errorDecayConst = errorDecayConst / 1e-8;
@@ -848,7 +849,7 @@ void ElementFit::FitTotalIntegralGraph(Int_t cycleIndex, Int_t runIndex)
     tempGraph = integralGraph->GetAGraph(cycleIndex, runIndex);
 
     cout << "FITTING TOTAL INTEGRAL CYCLE: " << cycleIndex << " RUN: " << runIndex << endl;
-    tempGraph->Fit(integralFunction, "", "", startFit, endFit);
+    tempGraph->Fit(integralFunction, "Q", "", startFit, endFit);
 
     for(int i = 0; i < numElements; i++)
     {   
@@ -858,7 +859,7 @@ void ElementFit::FitTotalIntegralGraph(Int_t cycleIndex, Int_t runIndex)
         errorDecayConst = integralFunction->GetParError((i*2)+1);
         valueHalfLife = log(2)/(valueDecayConst);
         errorHalfLife = ((log(2)/valueDecayConst)*(errorDecayConst/valueDecayConst));
-        if(inputHistoExecutionType == 2|| inputHistoExecutionType == 3)
+        if((inputHistoExecutionType == 2 || inputHistoExecutionType == 3) && (paraVals[i]->GetFixDecayConst() == false))
         {
             valueDecayConst = valueDecayConst / 1e-8;
             errorDecayConst = errorDecayConst / 1e-8;
@@ -1189,7 +1190,7 @@ void ElementFit::SetSingleIntegralParameterLimits()
 /// \brief Sets the limits for the total bateman function.
 void ElementFit::SetTotalBatemanParameterLimits()
 {
-    DisplayParameterLimits();
+    //DisplayParameterLimits();
     for(int i = 0; i < numElements; i++)
     {
         //1 = case for simulated data, range done with scalar multiples instead of user input range.
