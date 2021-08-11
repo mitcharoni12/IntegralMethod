@@ -10,10 +10,10 @@
 class RunFitValues{
 private:
     Int_t numRuns;
-    GeneralValues* N0Run;
-    GeneralValues* N0ErrorRun;
-    GeneralValues* halfLifeRun;
-    GeneralValues* halfLifeErrorRun;
+    GeneralValues* N0Cycle;
+    GeneralValues* N0ErrorCycle;
+    GeneralValues* halfLifeCycle;
+    GeneralValues* halfLifeErrorCycle;
 public:
     RunFitValues(Int_t numRuns);
     ~RunFitValues();
@@ -25,75 +25,75 @@ public:
     Double_t GetAnN0Error(Int_t runIndex);
     Double_t GetAnHalfLife(Int_t runIndex);
     Double_t GetAnHalfLifeError(Int_t runIndex);
-    Double_t* GetN0Arr(){return N0Run->GetFitArr();}
-    Double_t* GetN0ErrorArr(){return N0ErrorRun->GetFitArr();}
-    Double_t* GetHalfLifeArr(){return halfLifeRun->GetFitArr();}
-    Double_t* GetHalfLifeErrorArr(){return halfLifeErrorRun->GetFitArr();}
+    Double_t* GetN0Arr(){return N0Cycle->GetFitArr();}
+    Double_t* GetN0ErrorArr(){return N0ErrorCycle->GetFitArr();}
+    Double_t* GetHalfLifeArr(){return halfLifeCycle->GetFitArr();}
+    Double_t* GetHalfLifeErrorArr(){return halfLifeErrorCycle->GetFitArr();}
 };
 
 RunFitValues::RunFitValues(Int_t numRuns)
 {
     this->numRuns = numRuns;
-    N0Run = new GeneralValues(numRuns);
-    N0ErrorRun = new GeneralValues(numRuns);
-    halfLifeRun = new GeneralValues(numRuns);
-    halfLifeErrorRun = new GeneralValues(numRuns);
+    N0Cycle = new GeneralValues(numRuns);
+    N0ErrorCycle = new GeneralValues(numRuns);
+    halfLifeCycle = new GeneralValues(numRuns);
+    halfLifeErrorCycle = new GeneralValues(numRuns);
 }
 
 RunFitValues::~RunFitValues()
 {
-    delete N0Run;
-    delete N0ErrorRun;
-    delete halfLifeRun;
-    delete halfLifeErrorRun;
+    delete N0Cycle;
+    delete N0ErrorCycle;
+    delete halfLifeCycle;
+    delete halfLifeErrorCycle;
 }
 
 /// Sets an N0 for a specified run index.
 void RunFitValues::SetAnN0(Int_t runIndex, Double_t N0)
 {
-    N0Run->SetVal(runIndex, N0);
+    N0Cycle->SetVal(runIndex, N0);
 }
 
 /// Sets an N0 for a specified run index.
 void RunFitValues::SetAnN0Error(Int_t runIndex, Double_t N0Error)
 {
-    N0ErrorRun->SetVal(runIndex, N0Error);
+    N0ErrorCycle->SetVal(runIndex, N0Error);
 }
 
 /// Sets an N0 for a specified run index.
 void RunFitValues::SetAnHalfLife(Int_t runIndex, Double_t HalfLife)
 {
-    halfLifeRun->SetVal(runIndex, HalfLife);
+    halfLifeCycle->SetVal(runIndex, HalfLife);
 }
 
 /// Sets an N0 for a specified run index.
 void RunFitValues::SetAnHalfLifeError(Int_t runIndex, Double_t halfLifeError)
 {
-    halfLifeErrorRun->SetVal(runIndex, halfLifeError);
+    halfLifeErrorCycle->SetVal(runIndex, halfLifeError);
 }
 
 /// Gets an N0 for a specified run index.
 Double_t RunFitValues::GetAnN0(Int_t runIndex)
 {
-    return N0Run->GetVal(runIndex);
+    return N0Cycle->GetVal(runIndex);
 }
 
 /// Gets an N0 error for a specified run index.
 Double_t RunFitValues::GetAnN0Error(Int_t runIndex)
 {
-    return N0ErrorRun->GetVal(runIndex);
+    return N0ErrorCycle->GetVal(runIndex);
 }
 
 /// Gets an half life for a specified run index.
 Double_t RunFitValues::GetAnHalfLife(Int_t runIndex)
 {
-    return halfLifeRun->GetVal(runIndex);
+    return halfLifeCycle->GetVal(runIndex);
 }
 
 /// Gets an half life error for a specified run index.
 Double_t RunFitValues::GetAnHalfLifeError(Int_t runIndex)
 {
-    return halfLifeErrorRun->GetVal(runIndex);
+    return halfLifeErrorCycle->GetVal(runIndex);
 }
 
 #endif

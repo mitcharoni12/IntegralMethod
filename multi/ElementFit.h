@@ -42,12 +42,12 @@ class ElementFit{
                    ParameterValue** paraVals, FitOption* fitOptions, TH1D* inputHistogram);
         ~ElementFit();
         //getter function
-        Double_t GetElementParameters(int i){return paraVals[i]->GetDecayConst();}                 ///< Returns decay constant values used to set starting point for fit functions
-        FitOption* GetFitOptions(){return fitOptions;}                                                  ///< Returns options the user chose to fit with
-        ChainFitValues* GetBatemanFitParameters(){return totalBatemanFitValues;}                    ///< Returns fitted values for the fit of the total Bateman histogram
-        ChainFitValues* GetIntegralFitParameters(){return totalIntegralFitValues;}                  ///< Returns fitted values for the fit of the total Integral histogram
-        SingleElementFitValues* GetsingleBatemanFitValues(){return singleBatemanFitValues;}     ///< Returns fitted values for the fit of all the single Bateman histograms
-        SingleElementFitValues* GetsingleIntegralFitValues(){return singleIntegralFitValues;}   ///< Returns fitted values for the fit of all the single Integral histograms
+        Double_t GetElementParameters(int i){return paraVals[i]->GetDecayConst();}              ///< Returns decay constant values used to set starting point for fit functions
+        FitOption* GetFitOptions(){return fitOptions;}                                          ///< Returns options the user chose to fit with
+        ChainFitValues* GetBatemanFitValues(){return totalBatemanFitValues;}                ///< Returns fitted values for the fit of the total Bateman histogram
+        ChainFitValues* GetIntegralFitValues(){return totalIntegralFitValues;}              ///< Returns fitted values for the fit of the total Integral histogram
+        SingleElementFitValues* GetSingleBatemanFitValues(){return singleBatemanFitValues;}     ///< Returns fitted values for the fit of all the single Bateman histograms
+        SingleElementFitValues* GetSingleIntegralFitValues(){return singleIntegralFitValues;}   ///< Returns fitted values for the fit of all the single Integral histograms
         //setter function
         void setNumRuns(Int_t numRuns){this->numRuns = numRuns;}
         void setNumCycles(Int_t numCycles){this->numCycles = numCycles;}
@@ -140,7 +140,7 @@ class ElementFit{
         clock_t Tclock;
 };  
 
-/// \brief The constructor
+/// \brief The constructor for simualting data
 ///
 /// Will take the fit fuctions for the program and the fit options for both the Run class and Cycle class. Dynamically allocates the fit parameter storages here.
 /// Creates data required for creating the histograms between runs and cycles. Runs the call for creating all the histograms.
@@ -209,6 +209,8 @@ ElementFit::ElementFit(Double_t (*batemanFunc)(Double_t*, Double_t*), Double_t (
     //ROOT::Math::MinimizerOptions::SetDefaultMaxFunctionCalls(100000000);
 }
 
+
+/// \brief Constructor for input histogram
 ElementFit::ElementFit(Double_t (*batemanFunc)(Double_t*, Double_t*), Double_t (*integralFunc)(Double_t*, Double_t*), Double_t (**batemanFitFunctions)(Double_t*, Double_t*), Double_t (**integralFitFunctions)(Double_t*, Double_t*),
                    ParameterValue** paraVals, FitOption* fitOptions, TH1D* inputHistogram)
 {
@@ -257,8 +259,8 @@ ElementFit::ElementFit(Double_t (*batemanFunc)(Double_t*, Double_t*), Double_t (
     CutInputHistos();
     CreateInputIntegralGraph();
     //removes restrictions on fitting function calls and itterations
-    //ROOT::Math::MinimizerOptions::SetDefaultMaxIterations(100000000);
-    //ROOT::Math::MinimizerOptions::SetDefaultMaxFunctionCalls(100000000);
+    ROOT::Math::MinimizerOptions::SetDefaultMaxIterations(100000000);
+    ROOT::Math::MinimizerOptions::SetDefaultMaxFunctionCalls(100000000);
 }
 
 ElementFit::~ElementFit()

@@ -263,7 +263,7 @@ void fitMultiple()
             element->FitTotalIntegralGraph(0, 0);
             element->DisplayTotalBatemanParameters();
             element->DisplayTotalIntegralParameters();
-            integralFitValues = element->GetIntegralFitParameters();
+            integralFitValues = element->GetIntegralFitValues();
 
             for(int i = 0; i < numElements; i++)
             {
@@ -378,11 +378,6 @@ void fitMultiple()
         //single run of histogam
         case 1:
         {
-            for(int i = 0; i < fitOptions->GetNumElements(); i++)
-            {
-                cout << "INIT: " << paraVals[i]->GetN0() << endl;
-                cout << "Half-life: " << paraVals[i]->GetHalfLife() << endl << endl;
-            }
             fitOptions->SetMultiSourceChoice(true);
             element = new ElementFit(BatemanDecaybyActivity, IntegralDecaybyActivity, batemanFitFunctions, integralFitFunctions, paraVals, fitOptions);
 

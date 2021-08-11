@@ -426,7 +426,7 @@ void Run::RunSingleBatemanRunsGenOnce(Int_t cycleIndex, Int_t runIndex)
     element->FitSingleBatemanHistos(cycleIndex, 0);
 
     //get single bateman fit parameters
-    singleTempFitParameters = element->GetSingleBatemanFitParameters();
+    singleTempFitParameters = element->GetSingleBatemanFitValues();
 
     //move single bateman fit parameters into respective class
     for(int i = 0; i < numElements; i++)
@@ -460,7 +460,7 @@ void Run::RunSingleIntegralRunsGenOnce(Int_t cycleIndex, Int_t runIndex)
     element->FitSingleIntegralGraphs(cycleIndex, 0);
 
     //get single integral fit parameters
-    singleTempFitParameters = element->GetSingleIntegralFitParameters();
+    singleTempFitParameters = element->GetSingleIntegralFitValues();
 
     //move single integral fit parameters into respective class
     for(int i = 0; i < numElements; i++)
@@ -492,7 +492,7 @@ void Run::RunTotalBatemanRunsGenOnce(Int_t cycleIndex, Int_t runIndex)
 
     element->FitTotalBatemanHisto(cycleIndex, 0);
 
-    tempFitParameters = element->GetBatemanFitParameters();
+    tempFitParameters = element->GetBatemanFitValues();
 
     //move total bateman parameters into respective class
     for(int i = 0; i < numElements; i++)
@@ -523,7 +523,7 @@ void Run::RunTotalIntegralRunsGenOnce(Int_t cycleIndex, Int_t runIndex)
     element->FitTotalIntegralGraph(cycleIndex, 0);
 
     //gets total integral fit parameters
-    tempFitParameters = element->GetIntegralFitParameters();
+    tempFitParameters = element->GetIntegralFitValues();
 
     //move total integral parameters into respective class
     for(int i = 0; i < numElements; i++)
@@ -555,7 +555,7 @@ void Run::RunSingleBatemanRunsNoChange(Int_t cycleIndex)
         element->FitSingleBatemanHistos(cycleIndex, j);
 
         //get single bateman fit parameters
-        singleTempFitParameters = element->GetSingleBatemanFitParameters();
+        singleTempFitParameters = element->GetSingleBatemanFitValues();
 
         //move single bateman fit parameters into respective class
         for(int i = 0; i < numElements; i++)
@@ -590,7 +590,7 @@ void Run::RunSingleIntegralRunsNoChange(Int_t cycleIndex)
         element->FitSingleIntegralGraphs(cycleIndex, j);
 
         //get single integral fit parameters
-        singleTempFitParameters = element->GetSingleIntegralFitParameters();
+        singleTempFitParameters = element->GetSingleIntegralFitValues();
 
         //move single integral fit parameters into respective class
         for(int i = 0; i < numElements; i++)
@@ -624,7 +624,7 @@ void Run::RunTotalBatemanRunsNoChange(Int_t cycleIndex)
         //generates random data and fits it. Then extract the fit parametes
         element->FitTotalBatemanHisto(cycleIndex, j);
         //gets total bateman fit parameters
-        tempFitParameters = element->GetBatemanFitParameters();
+        tempFitParameters = element->GetBatemanFitValues();
         
         //move total bateman parameters into respective class
         for(int i = 0; i < numElements; i++)
@@ -656,7 +656,7 @@ void Run::RunTotalIntegralRunsNoChange(Int_t cycleIndex)
         //generates random data and fits it. Then extract the fit parametes
         element->FitTotalIntegralGraph(cycleIndex, j);
         //gets total integral fit parameters
-        tempFitParameters = element->GetIntegralFitParameters();
+        tempFitParameters = element->GetIntegralFitValues();
 
         //move total integral parameters into respective class
         for(int i = 0; i < numElements; i++)
