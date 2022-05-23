@@ -618,6 +618,8 @@ void Run::RunTotalBatemanRunsNoChange(Int_t cycleIndex)
     Double_t tempN0Error;
     Double_t tempHalfLife;
     Double_t tempHalfLifeError;
+    
+    Double_t avgHalfLife [3] = {0.0, 0.0, 0.0};
 
     for(int j = 0; j < numRuns; j++)
     {
@@ -632,6 +634,7 @@ void Run::RunTotalBatemanRunsNoChange(Int_t cycleIndex)
             tempN0 = tempFitParameters->GetAnN0(i);
             tempN0Error = tempFitParameters->GetAnN0Error(i);
             tempHalfLife = tempFitParameters->GetAnHalfLife(i);
+            avgHalfLife[i] += tempHalfLife;
             tempHalfLifeError = tempFitParameters->GetAnHalfLifeError(i);
 
             batemanFitValues->SetAnN0(j, i, tempN0);
@@ -640,6 +643,11 @@ void Run::RunTotalBatemanRunsNoChange(Int_t cycleIndex)
             batemanFitValues->SetAnHalfLifeError(j, i, tempHalfLifeError);
         }
     }
+        for(int i = 0; i < 3; i++)
+        {
+            avgHalfLife[i] = avgHalfLife[i] / numRuns;
+            cout << "Element: " << i << " HalfLife: " << avgHalfLife[i] << endl;
+        }
 }
 
 /// \brief Preforms the multiple runs of the program for the total integral data not changing anything setting between runs.
@@ -650,6 +658,8 @@ void Run::RunTotalIntegralRunsNoChange(Int_t cycleIndex)
     Double_t tempN0Error;
     Double_t tempHalfLife;
     Double_t tempHalfLifeError;
+
+    Double_t avgHalfLife [3] = {0.0, 0.0, 0.0};
 
     for(int j = 0; j < numRuns; j++)
     {
@@ -664,6 +674,7 @@ void Run::RunTotalIntegralRunsNoChange(Int_t cycleIndex)
             tempN0 = tempFitParameters->GetAnN0(i);
             tempN0Error = tempFitParameters->GetAnN0Error(i);
             tempHalfLife = tempFitParameters->GetAnHalfLife(i);
+            avgHalfLife[i] += tempHalfLife;
             tempHalfLifeError = tempFitParameters->GetAnHalfLifeError(i);
 
             integralFitValues->SetAnN0(j, i, tempN0);
@@ -671,6 +682,12 @@ void Run::RunTotalIntegralRunsNoChange(Int_t cycleIndex)
             integralFitValues->SetAnHalfLife(j, i, tempHalfLife);
             integralFitValues->SetAnHalfLifeError(j, i, tempHalfLifeError);
         }
+    }
+
+    for(int i = 0; i < 3; i++)
+    {
+        avgHalfLife[i] = avgHalfLife[i] / numRuns;
+        cout << "Element: " << i << " HalfLife: " << avgHalfLife[i] << endl;
     }
 }
 

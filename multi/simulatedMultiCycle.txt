@@ -1,5 +1,5 @@
-Number of Runs:3
-Number of Cycles:3
+Number of Runs:5
+Number of Cycles:5
 X Axis Range, Start = Constant, End = Changing (1) X Axis Range, Start = Changing, End = Constant(2):1
 Bin Increment per Cycle(Changes Time Fit):50
 Single Source Histo (1) Mutli Source Histo (2):2
