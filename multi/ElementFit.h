@@ -798,6 +798,7 @@ void ElementFit::FitTotalBatemanHisto(Int_t cycleIndex, Int_t runIndex)
     endFit = timeRunEnd - endFitOffset;
 
     tempHisto = batemanHisto->GetAHisto(cycleIndex, runIndex);
+    cout << "BIN CONTENT: " << tempHisto->RetrieveBinContent(1) << endl << endl;
 
     cout << "FITTING TOTAL BATEMAN CYCLE: " << cycleIndex << " RUN: " << runIndex << endl;
     tempHisto->Fit(batemanFunction, "LQ", "", startFit, endFit);
