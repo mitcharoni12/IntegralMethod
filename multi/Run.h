@@ -344,6 +344,7 @@ void Run::FillTotalBatemanMultiRunHistos()
         {
             totalBatemanMultiRunFitHisto[i]->Fill(batemanFitValues->GetAnHalfLife(j, i));
         }
+        cout << "Element " << i << " Bateman mean: " << totalBatemanMultiRunFitHisto[i]->GetMean() << endl;
     }
 }
 
@@ -357,6 +358,7 @@ void Run::FillTotalIntegralMultiRunHistos()
         {
             totalIntegralMultiRunFitHisto[i]->Fill(integralFitValues->GetAnHalfLife(j, i));
         }
+        cout << "Element " << i << " integral mean: " << totalIntegralMultiRunFitHisto[i]->GetMean() << endl;
     }
 }
 
