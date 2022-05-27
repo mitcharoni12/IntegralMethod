@@ -1,6 +1,6 @@
 element 1 Name:Test1
 
-element 1 N0 value:100
+element 1 N0 value:10
 element 1 N0 lower:0
 element 1 N0 upper:10000000
 element 1 fix N0(1) don't fix(2):2

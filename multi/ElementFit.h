@@ -755,7 +755,7 @@ void ElementFit::FitSingleIntegralGraphs(Int_t cycleIndex, Int_t runIndex)
         tempSingleGraph = singleIntegralGraph->GetAGraph(cycleIndex, runIndex, i);
 
         cout << "FITTING SINGLE INTEGRAL " << elementNames[i] << " CYCLE: " << cycleIndex << " RUN: " << runIndex << endl;
-        tempSingleGraph->Fit(singleIntegralFitFunctions[i], "Q", "", startFit, endFit);
+        tempSingleGraph->Fit(singleIntegralFitFunctions[i], "LQ", "", startFit, endFit);
 
         for(int k = 0; k < (i+1); k++)
         {
@@ -853,7 +853,7 @@ void ElementFit::FitTotalIntegralGraph(Int_t cycleIndex, Int_t runIndex)
     tempGraph = integralGraph->GetAGraph(cycleIndex, runIndex);
 
     cout << "FITTING TOTAL INTEGRAL CYCLE: " << cycleIndex << " RUN: " << runIndex << endl;
-    tempGraph->Fit(integralFunction, "Q", "", startFit, endFit);
+    tempGraph->Fit(integralFunction, "LQ", "", startFit, endFit);
 
     for(int i = 0; i < numElements; i++)
     {   
