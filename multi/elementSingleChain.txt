@@ -1,6 +1,6 @@
 element 1 Name:Test1
 
-element 1 N0 value:10000
+element 1 N0 value:100
 element 1 N0 lower:0
 element 1 N0 upper:10000000
 element 1 fix N0(1) don't fix(2):2
@@ -21,5 +21,17 @@ element 2 half life value(s):0.010
 element 2 half life lower(s):.000001
 element 2 half life upper(s):100000.0
 element 2 fix half life(1) don't fix(2):2
+
+element 3 Name:Test3
+
+element 3 N0 value:0
+element 3 N0 lower:0
+element 3 N0 upper:10000000
+element 3 fix N0(1) don't fix(2):2
+
+element 3 half life value(s):0.100
+element 3 half life lower(s):.000001
+element 3 half life upper(s):100000.0
+element 3 fix half life(1) don't fix(2):2
 
 Create Fit Functions(1) Dont Create Fit Function(2):2
