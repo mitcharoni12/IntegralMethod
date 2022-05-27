@@ -18,12 +18,12 @@ public:
 
 };
 
-CovMatrix::CovMatrix(Int_t numBins)
+CovMatrix::CovMatrix(Int_t numBins, Double_t* batemanHistoCov, Double_t* integralHistoCov)
 {
-    batemanHistoCov = new Double_t[numBins];
-    integralHistoCov = new Double_t[numBins];
+    this->batemanHistoCov = batemanHistoCov;
+    this->integralHistoCov = integralHistoCov;
     this->numBins = numBins;
-    covMatrix
+    
 }
 
 #endif

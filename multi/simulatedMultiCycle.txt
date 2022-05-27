@@ -1,15 +1,24 @@
-Number of Runs:5
-Number of Cycles:5
+Number of Runs:2
+Number of Cycles:100
+
+Change time fit(1) Don't change time fit(2): 2
 X Axis Range, Start = Constant, End = Changing (1) X Axis Range, Start = Changing, End = Constant(2):1
-Bin Increment per Cycle(Changes Time Fit):50
+Bin Increment per Cycle(Changes Time Fit):2
+
+Rebin(1) Don't Rebin(2):2
+Rebin Bin Difference(add x bins):5
+
+Increment Events(1) Don't Increment Event(2):1
+Multaplicative Increment(1) Linear Increment(2):1
+Increment factor:10
+
 Single Source Histo (1) Mutli Source Histo (2):2
 Mean Difference(1) Seperate mean(2):2
+
 Display Individual Fits(1) Dont Display Individual Fits(2):2
-Display Fit Averages(1) Dont Display Fit Averages(2):1
-NOTE; if single source histo keep run index from 0 to 0
+Display Fit Averages(1) Dont Display Fit Averages(2):2
+NOTE; if single source histo keep upper/lower run index 0
 Lower Run Histo Index(0 based):0
 Upper Run Histo Index(0 based):0
 Lower Cycle Histo Index(0 based):0
 upper Cycle Histo Index(0 based):2
-Rebin(1) Don't Rebin(2):2
-Rebin Bin Difference(add x bins):100

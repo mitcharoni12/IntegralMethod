@@ -105,6 +105,7 @@ class ElementFit{
         Int_t numEvents, numElements, numParameters, numRuns, numCycles, inputHistoExecutionType, singleElementDataChoice;
         bool multiSourceChoice;                                                     ///< True = generate multiple sets of histograms for the different cyles. False = generate a single set of histograms for the diiferent cyles.
         bool rebinChoice;                                                           ///< True = Have program execute with changing bin number between cylces and keeping time fit constant. False = Dont do rebin
+        bool numEventChangeChoice;                                                  ///< True = Change number of events between cylces
         bool inputHistogramChoice;                                                  ///< True = dealing with input histogram.
         Int_t* binNumArr;                                                           ///< Contains an array of number of bins the histogram have between cycles.
         TF1* integralFunction, *batemanFunction;
@@ -162,6 +163,7 @@ ElementFit::ElementFit(Double_t (*batemanFunc)(Double_t*, Double_t*), Double_t (
     this->timeRunEnd = fitOptions->GetTimeRunEndSimulated();
     this->paraVals = paraVals;
     this->multiSourceChoice = fitOptions->GetMultiSourceChoice();
+    this->numEventChangeChoice = fitOptions->GetNumEventChangeChoice();
     this->rebinChoice = fitOptions->GetRebinChoice();
     this->leaveOutStartBinsSim = fitOptions->GetLeaveOutStartBinsSim();
     this->leaveOutEndBinsSim = fitOptions->GetLeaveOutEndBinsSim();
@@ -798,7 +800,6 @@ void ElementFit::FitTotalBatemanHisto(Int_t cycleIndex, Int_t runIndex)
     endFit = timeRunEnd - endFitOffset;
 
     tempHisto = batemanHisto->GetAHisto(cycleIndex, runIndex);
-    cout << "BIN CONTENT: " << tempHisto->RetrieveBinContent(1) << endl << endl;
 
     cout << "FITTING TOTAL BATEMAN CYCLE: " << cycleIndex << " RUN: " << runIndex << endl;
     tempHisto->Fit(batemanFunction, "LQ", "", startFit, endFit);
@@ -992,6 +993,10 @@ void ElementFit::GenBatemanHistograms()
                 stack = 0.0f;
             }
         }
+    //case for changing event number between cycles
+    }else if(numEventChangeChoice)
+    {
+        Double_t* eventNums = fitOptions->GetEventNumArr();
     }
 
     delete [] singleTempHisto;

@@ -557,11 +557,11 @@ void fitMultiple()
         break;
         }
 
-        //multiple runs of histogram
+        //multiple cycles of histogram
         case 3:
         {
-            Int_t numRuns, numCycles, singleSourceHistoChoice, timeShiftType, displayFitAveragesChoice,
-                  lowerRunHistoIndex, upperRunHistoIndex, lowerCycleHistoIndex, upperCycleHistoIndex;
+            Int_t numRuns, numCycles, singleSourceHistoChoice, eventChangeChoice, eventChangeType, eventChangeIncrement, timeFitChoice,
+                  timeShiftType, displayFitAveragesChoice, lowerRunHistoIndex, upperRunHistoIndex, lowerCycleHistoIndex, upperCycleHistoIndex;
             Double_t binTimeFitInc, runMeanDifference;
 
             inFile.open("simulatedMultiCycle.txt");
@@ -570,9 +570,21 @@ void fitMultiple()
             inFile.ignore(256,':');
             inFile >> numCycles;
             inFile.ignore(256,':');
+            inFile >> timeFitChoice;
+            inFile.ignore(256,':');
             inFile >> timeShiftType;
             inFile.ignore(256,':');
             inFile >> binTimeFitInc;
+            inFile.ignore(256,':');
+            inFile >> rebinChoice;
+            inFile.ignore(256,':');
+            inFile >> rebinBinInc;
+            inFile.ignore(256,':');
+            inFile >> eventChangeChoice;
+            inFile.ignore(256,':');
+            inFile >> eventChangeType;
+            inFile.ignore(256,':');
+            inFile >> eventChangeIncrement;
             inFile.ignore(256,':');
             inFile >> singleSourceHistoChoice;
             inFile.ignore(256,':');
@@ -589,15 +601,13 @@ void fitMultiple()
             inFile >> lowerCycleHistoIndex;
             inFile.ignore(256,':');
             inFile >> upperCycleHistoIndex;
-            inFile.ignore(256,':');
-            inFile >> rebinChoice;
-            inFile.ignore(256,':');
-            inFile >> rebinBinInc;
 
             fitOptions->SetNumRuns(numRuns);
             fitOptions->SetNumCycles(numCycles);
             fitOptions->SetTimeShiftType(timeShiftType);
             fitOptions->SetTimeFitBinInc(binTimeFitInc);
+            fitOptions->SetEventChangeType(eventChangeType);
+            fitOptions->SetEventChangeFactor(eventChangeIncrement);
             if(singleSourceHistoChoice == 2)
             {
                 fitOptions->SetMultiSourceChoice(true);
@@ -609,6 +619,14 @@ void fitMultiple()
             if(rebinChoice == 1)
             {
                 fitOptions->SetRebinChoice(true);
+            }
+            if(eventChangeChoice == 1)
+            {
+                fitOptions->SetEventNumChangeChoice(true);
+            }
+            if(timeFitChoice == 1)
+            {
+                fitOptions->SetTimeFitChoice(true);
             }
             if(displayFitAveragesChoice == 1)
             {
@@ -622,8 +640,8 @@ void fitMultiple()
 
             TCanvas** canvasArr;
 
-            //single histo source
-            if(singleSourceHistoChoice == 1 && rebinChoice == 2)
+            //time fit change single histo source
+            if(fitOptions->GetMultiSourceChoice() == false && fitOptions->GetTimeFitChoice() == true)
             {
                 //mean difference
                 if(runMeanDifference == 1)
@@ -705,8 +723,8 @@ void fitMultiple()
                     }
                     delete [] canvasArr;
                 }
-            //multi histo source
-            }else if(singleSourceHistoChoice == 2 && rebinChoice == 2)
+            //time fit change multi histo source
+            }else if(fitOptions->GetMultiSourceChoice() == true && fitOptions->GetTimeFitChoice() == true)
             {
                 //mean difference
                 if(runMeanDifference == 1)
@@ -781,8 +799,8 @@ void fitMultiple()
                     }
                     delete [] canvasArr;
                 }
-            //rebin
-            }else if(rebinChoice == 1)
+            //rebinning option
+            }else if(fitOptions->GetRebinChoice() == true)
             {
                 //mean difference
                 if(runMeanDifference == 1)
@@ -864,6 +882,15 @@ void fitMultiple()
                     }
                     delete [] canvasArr;
                 }
+            //Changing events between cycles
+            }else if(fitOptions->GetNumEventChangeChoice() == true)
+            {
+                Double_t* eventNums = fitOptions->GetEventNumArr();
+                for(int i = 0; i < numCycles; i++)
+                {
+                    cout << eventNums[i] << endl;
+                }
+
             }
 
             //case for displaying the individual fits for runs

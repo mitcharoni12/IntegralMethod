@@ -14,6 +14,8 @@ private:
     Int_t leaveOutStartBinsSim = 0;     ///< Number of bins to leave out at start for data simulation execution type.
     Int_t leaveOutEndBinsSim = 0;       ///< Number of bins to leave out at end for data simulation execution type.
     Int_t programExecutionType = 1;     ///< Execution type for simulation portion of program, 1 = single run, 2 = multiple runs, 3 = multiple cycles.
+    Int_t eventChangeType = 1;          ///< If the changing events will change 1 = multapicatively based on factor, 2 = Linearly based on factor.
+    Int_t eventChangeFactor = 1;        ///< Factor by which number of events will change.
     Int_t leaveOutStartBinsInput = 0;   ///< Number of bins to leave out at start for data input histogram execution type.
     Int_t leaveOutEndBinsInput = 0;     ///< Number of bins to leave out at end for data input histogram execution type.
     Int_t timeShiftType = 1;            ///< Determines the type of time shift that will happen between cycles of the program, 1 = start: const, end: change, 2 = start: change, end: const.
@@ -30,15 +32,18 @@ private:
     Double_t* timeFitEndArr;            ///< Contains the time in which the fit will end between cycles for either the input histogram or the simulated histogram.
     Double_t* timeFitStartArr;          ///< Contains the time in which the fit will start between cycles for either the input histogram or the simulated histogram.
     Double_t* binWidthArr;              ///< Contains the bin width for the histogram in a certain cycle of the program execution for either the input histogram or simulated histograms.
+    Double_t* eventNumArr;              ///< Contains the number of events for a histogram in a certain cycle.
     Double_t* timeLengthArr;            ///< Contains the time length of the fit between cycles of the program for the input histogram.
     Double_t* fitStartBinArr;           ///< Contains the bin on which the fit time will start between cycles of the program for the input histogram.
     Double_t* fitEndBinArr;             ///< Contains the bin on which the fit time will end between cycles of the program for the input histogram.
     string* elementNames;               ///< Contains the names of the elements in the decay chain.
     Int_t* binNumArr;                   ///< Contains the number of bins for the histogram that is being fitted between cycles of the program for either the input histogram or the simulated histograms.
-    bool multiSource = false;           ///< Determines if simulated data is to be just one histogram or multiple histograms. false = one histogram, true =  multiple histograms.
-    bool rebin = false;                 ///< Determines if the program is to be run with changing the bin number in a set time span(rebinning) or changing the time fit. false = changing time fit, true = rebinning.
-    bool runMeanDifference = false;     ///< Determines if the program is going to display the difference between the integral method value and the bateman method value for the fit values. false = display integral and bateman fit values seperatly, true = display difference between values.
     bool displayFitAverages = false;    ///< Determines if program will display the average value of the fitted value in the Cycle class.
+    bool eventNumChangeChoice = false;  ///< Determines if the number of events will change between cycles.
+    bool multiSource = false;           ///< Determines if simulated data is to be just one histogram or multiple histograms. false = one histogram, true =  multiple histograms.
+    bool rebinChoice = false;           ///< Determines if the program is to be run with changing the bin number in a set time span(rebinning) or changing the time fit. false = changing time fit, true = rebinning.
+    bool runMeanDifference = false;     ///< Determines if the program is going to display the difference between the integral method value and the bateman method value for the fit values. false = display integral and bateman fit values seperatly, true = display difference between values.
+    bool timeFitChoice = false;         ///< Determines if the program is going to change the time fit between program cycles
 public:
     //getters and setters
     void SetNumRuns(Int_t numRuns){this->numRuns = numRuns;}
@@ -51,6 +56,8 @@ public:
     void SetLeaveOutStartBinsInput(Int_t leaveOutStartBinsInput){this->leaveOutStartBinsInput = leaveOutStartBinsInput;}
     void SetLeaveOutEndBinsInput(Int_t leaveOutEndBinsInput){this->leaveOutEndBinsInput = leaveOutEndBinsInput;}
     void SetProgramExecutionType(Int_t programExecutionType){this->programExecutionType = programExecutionType;}
+    void SetEventChangeType(Int_t eventChangeType){this->eventChangeType = eventChangeType;}
+    void SetEventChangeFactor(Int_t eventChangeFactor){this->eventChangeFactor = eventChangeFactor;}
     void SetTimeShiftType(Int_t timeShiftType){this->timeShiftType = timeShiftType;}
     void SetInputHistoExecutionType(Int_t inputHistoExecutionType){this->inputHistoExecutionType = inputHistoExecutionType;}
     void SetSingleElementDataChoice(Int_t singleElementDataChoice){this->singleElementDataChoice = singleElementDataChoice;}
@@ -63,10 +70,12 @@ public:
     void SetBinWidth(Double_t binWidth){this->binWidth = binWidth;}
     void SetInputHistoTimeEnd(Double_t inputHistoTimeEnd){this->inputHistoTimeEnd = inputHistoTimeEnd;}
     void SetInputTimeInc(Double_t inputTimeInc){this->inputTimeInc = inputTimeInc;}
-    void SetMultiSourceChoice(bool multiSource){this->multiSource = multiSource;}
-    void SetRebinChoice(bool rebin){this->rebin = rebin;}
-    void SetRunMeanDifference(bool runMeanDifference){this->runMeanDifference = runMeanDifference;}
     void SetDisplayFitAverages(bool displayFitAverages){this->displayFitAverages = displayFitAverages;}
+    void SetEventNumChangeChoice(bool eventNumChangeChoice){this->eventNumChangeChoice = eventNumChangeChoice;}
+    void SetMultiSourceChoice(bool multiSource){this->multiSource = multiSource;}
+    void SetRebinChoice(bool rebinChoice){this->rebinChoice = rebinChoice;}
+    void SetRunMeanDifference(bool runMeanDifference){this->runMeanDifference = runMeanDifference;}
+    void SetTimeFitChoice(bool timeFitChoice){this->timeFitChoice = timeFitChoice;}
     void SetElementNames(string* elementNames){this->elementNames = elementNames;}
     Int_t GetNumRuns(){return numRuns;}
     Int_t GetNumCycles(){return numCycles;}
@@ -78,6 +87,8 @@ public:
     Int_t GetLeaveOutStartBinsInput(){return leaveOutStartBinsInput;}
     Int_t GetLeaveOutEndBinsInput(){return leaveOutEndBinsInput;}
     Int_t GetProgramExecutionType(){return programExecutionType;}
+    Int_t GetEventChangeType(){return eventChangeType;}
+    Int_t GetEventChangeFactor(){return eventChangeFactor;}
     Int_t GetTimeShiftType(){return timeShiftType;}
     Int_t GetInputHistoExecutionType(){return inputHistoExecutionType;}
     Int_t GetInputHistoBinNum(){return inputHistoBinNum;}
@@ -94,13 +105,16 @@ public:
     Double_t* GetTimeFitEndArr(){return timeFitEndArr;}
     Double_t* GetTimeFitStartArr(){return timeFitStartArr;}
     Double_t* GetBinWidthArr(){return binWidthArr;}
+    Double_t* GetEventNumArr(){return eventNumArr;}
     Double_t* GetTimeLengthArr(){return timeLengthArr;}
     Double_t* GetFitStartBinArr(){return fitStartBinArr;}
     Double_t* GetFitEndBinArr(){return fitEndBinArr;}
-    bool GetMultiSourceChoice(){return multiSource;}
-    bool GetRebinChoice(){return rebin;}
-    bool GetRunMeanDifference(){return runMeanDifference;}
     bool GetDisplayFitAverages(){return displayFitAverages;}
+    bool GetNumEventChangeChoice(){return eventNumChangeChoice;}
+    bool GetMultiSourceChoice(){return multiSource;}
+    bool GetRebinChoice(){return rebinChoice;}
+    bool GetRunMeanDifference(){return runMeanDifference;}
+    bool GetTimeFitChoice(){return timeFitChoice;}
     string* GetElementNames(){return elementNames;}
     //functions
     void CreateRequiredDataSets();
@@ -114,13 +128,14 @@ void FitOption::CreateRequiredDataSets()
     binNumArr = new Int_t [numCycles];
     timeFitEndArr = new Double_t [numCycles];
     binWidthArr = new Double_t [numCycles];
+    eventNumArr = new Double_t [numCycles];
     timeFitStartArr = new Double_t [numCycles];
     timeLengthArr = new Double_t [numCycles];
     fitStartBinArr = new Double_t [numCycles];
     fitEndBinArr = new Double_t [numCycles];
 
     //need to calculate bin width initally
-    if(rebin)
+    if(rebinChoice)
     {
         Double_t rebinSize = (Double_t) numBins;
         Double_t tempWidth;
@@ -137,7 +152,7 @@ void FitOption::CreateRequiredDataSets()
         }
     }
     //need to calculate number of bins initally, change time fit based on number bins
-    if(!rebin && inputHistoExecutionType == 1)
+    if(!rebinChoice && inputHistoExecutionType == 1)
     {
         Double_t fitEnd = timeRunEndSimulated;
         Double_t fitStart = 0.0f;
@@ -195,6 +210,22 @@ void FitOption::CreateRequiredDataSets()
             }
         }
     }
+    //Getting number of events generated for each different cycle
+    if(eventNumChangeChoice)
+    {
+        cout << "Change factor " << eventChangeFactor << endl;
+        eventNumArr[0] = events;
+        for(int i = 1; i < numCycles; i++)
+        {
+            if(eventChangeType == 1)
+            {
+                eventNumArr[i] = TMath::Power(eventChangeFactor, i) * events;
+            }else if(eventChangeType == 2)
+            {
+                eventNumArr[i] = (eventChangeFactor * i) + events;
+            }
+        }
+    }
 }
 
 FitOption::~FitOption()
@@ -203,6 +234,7 @@ FitOption::~FitOption()
     delete [] binWidthArr;
     delete [] timeFitEndArr;
     delete [] timeFitStartArr;
+    delete [] eventNumArr;
     delete [] timeLengthArr;
     delete [] fitStartBinArr;
     delete [] fitEndBinArr;

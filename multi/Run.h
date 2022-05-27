@@ -637,8 +637,10 @@ void Run::RunTotalBatemanRunsNoChange(Int_t cycleIndex)
             batemanFitValues->SetAnN0(j, i, tempN0);
             batemanFitValues->SetAnN0Error(j, i, tempN0Error);
             batemanFitValues->SetAnHalfLife(j, i, tempHalfLife);
+            cout << "Element: " << (i+1) << " run: " << (j+1) << " HalfLife: " << tempHalfLife << endl;
             batemanFitValues->SetAnHalfLifeError(j, i, tempHalfLifeError);
         }
+        cout << endl;
     }
 }
 
@@ -669,8 +671,10 @@ void Run::RunTotalIntegralRunsNoChange(Int_t cycleIndex)
             integralFitValues->SetAnN0(j, i, tempN0);
             integralFitValues->SetAnN0Error(j, i, tempN0Error);
             integralFitValues->SetAnHalfLife(j, i, tempHalfLife);
+            cout << "Element: " << (i+1) << " run: " << (j+1) << " HalfLife: " << tempHalfLife << endl;
             integralFitValues->SetAnHalfLifeError(j, i, tempHalfLifeError);
         }
+        cout << endl;
     }
 }
 
