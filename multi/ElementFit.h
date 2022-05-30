@@ -801,8 +801,14 @@ void ElementFit::FitTotalBatemanHisto(Int_t cycleIndex, Int_t runIndex)
 
     tempHisto = batemanHisto->GetAHisto(cycleIndex, runIndex);
 
+    //----------->>>>>>HEY, MAKE SURE TO CHANGE THIS WHEN YOU ARE DONE TESTING<<<<<<-------------------------
+
+
+
     cout << "FITTING TOTAL BATEMAN CYCLE: " << cycleIndex << " RUN: " << runIndex << endl;
-    tempHisto->Fit(batemanFunction, "L", "", startFit, endFit);
+    TFitResultPtr fitResult = tempHisto->Fit(batemanFunction, "LS", "", startFit, endFit);
+    //delete 
+    
     for(int i = 0; i < numElements; i++)
     {   
         valueN0 = batemanFunction->GetParameter((i*2));
@@ -810,6 +816,10 @@ void ElementFit::FitTotalBatemanHisto(Int_t cycleIndex, Int_t runIndex)
         valueDecayConst = batemanFunction->GetParameter((i*2)+1);
         errorDecayConst = batemanFunction->GetParError((i*2)+1);
         valueHalfLife = log(2)/(valueDecayConst);
+        if(fitResult->Status() != 0)
+        {
+            valueHalfLife = 0.000000000000;
+        }
         errorHalfLife = ((log(2)/valueDecayConst)*(errorDecayConst/valueDecayConst));
         if((inputHistoExecutionType == 2|| inputHistoExecutionType == 3) && (paraVals[i]->GetFixDecayConst() == false))
         {
@@ -853,7 +863,12 @@ void ElementFit::FitTotalIntegralGraph(Int_t cycleIndex, Int_t runIndex)
     tempGraph = integralGraph->GetAGraph(cycleIndex, runIndex);
 
     cout << "FITTING TOTAL INTEGRAL CYCLE: " << cycleIndex << " RUN: " << runIndex << endl;
-    tempGraph->Fit(integralFunction, "", "", startFit, endFit);
+
+    //----------->>>>>>HEY, MAKE SURE TO CHANGE THIS WHEN YOU ARE DONE TESTING<<<<<<-------------------------
+
+
+    
+    TFitResultPtr fitResult = tempGraph->Fit(integralFunction, "S", "", startFit, endFit);
 
     for(int i = 0; i < numElements; i++)
     {   
@@ -862,6 +877,10 @@ void ElementFit::FitTotalIntegralGraph(Int_t cycleIndex, Int_t runIndex)
         valueDecayConst = integralFunction->GetParameter((i*2)+1);
         errorDecayConst = integralFunction->GetParError((i*2)+1);
         valueHalfLife = log(2)/(valueDecayConst);
+        if(fitResult->Status() != 0)
+        {
+            valueHalfLife = 0.000000000000;
+        }
         errorHalfLife = ((log(2)/valueDecayConst)*(errorDecayConst/valueDecayConst));
         if((inputHistoExecutionType == 2 || inputHistoExecutionType == 3) && (paraVals[i]->GetFixDecayConst() == false))
         {
