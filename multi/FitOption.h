@@ -10,6 +10,7 @@ using namespace std;
 class FitOption{
 private:
     Int_t numRuns = 1, numCycles = 1, numElements, numBins, inputHistoBinNum;
+    Int_t fitRetries = 1;               ///< Number of retries of the fit before the program moves on
     Int_t rebinBinInc = 0;              ///< Increment of number of bins between cycles for a rebin type program execution.
     Int_t leaveOutStartBinsSim = 0;     ///< Number of bins to leave out at start for data simulation execution type.
     Int_t leaveOutEndBinsSim = 0;       ///< Number of bins to leave out at end for data simulation execution type.

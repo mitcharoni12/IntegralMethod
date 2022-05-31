@@ -147,24 +147,44 @@ void fitMultiple()
         inFile.ignore(256,':');
         inFile >> elementNames[i];
         
-        //Gets N0 value and range
+        //Gets Bateman N0 value and range
         inFile.ignore(256,':');
         inFile >> valueHolder;
-        paraVals[i]->SetN0(valueHolder);
+        paraVals[i]->SetBatemanN0(valueHolder);
         inFile.ignore(256,':');
         inFile >> valueHolder;
-        paraVals[i]->SetLowerRangeN0(valueHolder);
+        paraVals[i]->SetLowerRangeBatemanN0(valueHolder);
         inFile.ignore(256,':');
         inFile >> valueHolder;
-        paraVals[i]->SetUpperRangeN0(valueHolder);
+        paraVals[i]->SetUpperRangeBatemanN0(valueHolder);
         inFile.ignore(256,':');
         inFile >> valueHolder;
         if(valueHolder == 1)
         {
-            paraVals[i]->SetFixN0(true);
+            paraVals[i]->SetFixBatemanN0(true);
         }else
         {
-            paraVals[i]->SetFixN0(false);
+            paraVals[i]->SetFixBatemanN0(false);
+        }
+
+        //Gets Bateman N0 value and range
+        inFile.ignore(256,':');
+        inFile >> valueHolder;
+        paraVals[i]->SetIntegralN0(valueHolder);
+        inFile.ignore(256,':');
+        inFile >> valueHolder;
+        paraVals[i]->SetLowerRangeIntegralN0(valueHolder);
+        inFile.ignore(256,':');
+        inFile >> valueHolder;
+        paraVals[i]->SetUpperRangeIntegralN0(valueHolder);
+        inFile.ignore(256,':');
+        inFile >> valueHolder;
+        if(valueHolder == 1)
+        {
+            paraVals[i]->SetFixIntegralN0(true);
+        }else
+        {
+            paraVals[i]->SetFixIntegralN0(false);
         }
 
         //Gets Half life value and range

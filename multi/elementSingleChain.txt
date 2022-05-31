@@ -1,8 +1,13 @@
 element 1 Name:Test1
 
-element 1 N0 value:1000
-element 1 N0 lower:0
-element 1 N0 upper:10000000
+element 1 Bateman N0 value:10
+element 1 Bateman N0 lower:0
+element 1 Bateman N0 upper:10000000
+element 1 fix N0(1) don't fix(2):2
+
+element 1 Integral N0 value:9000
+element 1 Integral N0 lower:0
+element 1 Integral N0 upper:10000000
 element 1 fix N0(1) don't fix(2):2
 
 element 1 half life value(s):0.001
@@ -12,9 +17,14 @@ element 1 fix half life(1) don't fix(2):2
 
 element 2 Name:Test2
 
-element 2 N0 value:10
-element 2 N0 lower:0
-element 2 N0 upper:10000000
+element 2 Bateman N0 value:10
+element 2 Bateman N0 lower:0
+element 2 Bateman N0 upper:10000000
+element 2 fix N0(1) don't fix(2):2
+
+element 2 Integral N0 value:0
+element 2 Integral N0 lower:0
+element 2 Integral N0 upper:10000000
 element 2 fix N0(1) don't fix(2):2
 
 element 2 half life value(s):0.010
@@ -24,9 +34,14 @@ element 2 fix half life(1) don't fix(2):2
 
 element 3 Name:Test3
 
-element 3 N0 value:10
-element 3 N0 lower:0
-element 3 N0 upper:10000000
+element 3 Bateman N0 value:10
+element 3 Bateman N0 lower:0
+element 3 Bateman N0 upper:10000000
+element 3 fix N0(1) don't fix(2):2
+
+element 3 Integral N0 value:0
+element 3 Integral N0 lower:0
+element 3 Integral N0 upper:10000000
 element 3 fix N0(1) don't fix(2):2
 
 element 3 half life value(s):0.100

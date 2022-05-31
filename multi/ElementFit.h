@@ -27,6 +27,7 @@
 #include "ParameterValue.h"
 #include "FitFunction.h"
 #include "FitOption.h"
+#include "Math/MinimizerOptions.h"
 
 using namespace std;
 
@@ -207,8 +208,8 @@ ElementFit::ElementFit(Double_t (*batemanFunc)(Double_t*, Double_t*), Double_t (
         GenSingleIntegralGraph();
     }
     //removes restrictions on fitting function calls and itterations
-    //ROOT::Math::MinimizerOptions::SetDefaultMaxIterations(100000000);
-    //ROOT::Math::MinimizerOptions::SetDefaultMaxFunctionCalls(100000000);
+    ROOT::Math::MinimizerOptions::SetDefaultMaxIterations(100000000);
+    ROOT::Math::MinimizerOptions::SetDefaultMaxFunctionCalls(100000000);
 }
 
 
@@ -806,7 +807,11 @@ void ElementFit::FitTotalBatemanHisto(Int_t cycleIndex, Int_t runIndex)
 
 
     cout << "FITTING TOTAL BATEMAN CYCLE: " << cycleIndex << " RUN: " << runIndex << endl;
-    TFitResultPtr fitResult = tempHisto->Fit(batemanFunction, "LS", "", startFit, endFit);
+    TFitResultPtr fitResult = nullptr;
+    for(int i = 0; i < 1; i++)
+    {
+        fitResult = tempHisto->Fit(batemanFunction, "LS", "", 0.0001, endFit);
+    }
     //delete 
     
     for(int i = 0; i < numElements; i++)
@@ -867,8 +872,9 @@ void ElementFit::FitTotalIntegralGraph(Int_t cycleIndex, Int_t runIndex)
     //----------->>>>>>HEY, MAKE SURE TO CHANGE THIS WHEN YOU ARE DONE TESTING<<<<<<-------------------------
 
 
-    
-    TFitResultPtr fitResult = tempGraph->Fit(integralFunction, "S", "", startFit, endFit);
+    TFitResultPtr fitResult;
+    int fitStatus = 1;
+    fitResult = tempGraph->Fit(integralFunction, "S", "", startFit, endFit);
 
     for(int i = 0; i < numElements; i++)
     {   
@@ -1055,7 +1061,7 @@ void ElementFit::SetSingleBatemanFunctionParameters()
     {
         for(int k = 0; k <= i; k++)
         {
-            singleBatemanFitFunctions[i]->SetParameter((k*2), paraVals[k]->GetN0());
+            singleBatemanFitFunctions[i]->SetParameter((k*2), paraVals[k]->GetBatemanN0());
             singleBatemanFitFunctions[i]->SetParameter(((k*2)+1), paraVals[k]->GetDecayConst());
         }
     }
@@ -1068,7 +1074,7 @@ void ElementFit::SetSingleIntegralFunctionParameters()
     {
         for(int k = 0; k <= i; k++)
         {
-            singleIntegralFitFunctions[i]->SetParameter((k*2), paraVals[k]->GetN0());
+            singleIntegralFitFunctions[i]->SetParameter((k*2), paraVals[k]->GetIntegralN0());
             singleIntegralFitFunctions[i]->SetParameter(((k*2)+1), paraVals[k]->GetDecayConst());
         }
     }
@@ -1082,11 +1088,11 @@ void ElementFit::SetTotalBatemanFunctionParameters()
         //have to have the if statments to account for the fact that the value could be a range
         if(inputHistoExecutionType == 1)
         {
-            batemanFunction->SetParameter((i*2), paraVals[i]->GetN0());
+            batemanFunction->SetParameter((i*2), paraVals[i]->GetBatemanN0());
             batemanFunction->SetParameter((i*2)+1, paraVals[i]->GetDecayConst());
         }else if(inputHistoExecutionType == 2 || inputHistoExecutionType == 3)
         {
-            batemanFunction->SetParameter((i*2), paraVals[i]->GetN0());
+            batemanFunction->SetParameter((i*2), paraVals[i]->GetBatemanN0());
             batemanFunction->SetParameter((i*2)+1, paraVals[i]->GetDecayConst10Ns());
         }
     }
@@ -1100,11 +1106,11 @@ void ElementFit::SetTotalIntegralFunctionParameters()
         //have to have the if statments to account for the fact that the value could be a range
         if(inputHistoExecutionType == 1)
         {
-            integralFunction->SetParameter((i*2), paraVals[i]->GetN0());
+            integralFunction->SetParameter((i*2), paraVals[i]->GetIntegralN0());
             integralFunction->SetParameter((i*2)+1, paraVals[i]->GetDecayConst());
         }else if(inputHistoExecutionType == 2 || inputHistoExecutionType == 3)
         {
-            integralFunction->SetParameter((i*2), paraVals[i]->GetN0());
+            integralFunction->SetParameter((i*2), paraVals[i]->GetIntegralN0());
             integralFunction->SetParameter((i*2)+1, paraVals[i]->GetDecayConst10Ns());
         }
     }
@@ -1116,7 +1122,8 @@ void ElementFit::DisplayTotalFunctionParameters()
     cout << "INITIAL FIT FUNCTION PARAMETERS" << endl;
     for(int i = 0; i < numElements; i++)
     {
-        cout << elementNames[i] << ":\tInit value: " << paraVals[i]->GetN0();
+        cout << elementNames[i] << ":\tBateman init value: " << paraVals[i]->GetBatemanN0();
+        cout << elementNames[i] << "\tIntegral init value: " << paraVals[i]->GetIntegralN0();
         cout << "\tHalf Life: " << paraVals[i]->GetHalfLife();
         cout << endl;
     }
@@ -1132,8 +1139,8 @@ void ElementFit::SetSingleBatemanParameterLimits()
         for(int k = 0; k < i+1; k++)
         {
             //Setting limits for N0
-            if(paraVals[k]->GetFixN0()){
-                singleBatemanFitFunctions[i]->FixParameter((k*2), paraVals[k]->GetN0());
+            if(paraVals[k]->GetFixBatemanN0()){
+                singleBatemanFitFunctions[i]->FixParameter((k*2), paraVals[k]->GetBatemanN0());
             }else{
                 singleBatemanFitFunctions[i]->SetParLimits((k*2), 0., doubleNumEvents*10000);
             }
@@ -1156,8 +1163,8 @@ void ElementFit::SetSingleIntegralParameterLimits()
         for(int k = 0; k < i+1; k++)
         {
             //Setting limits for N0
-            if(paraVals[k]->GetFixN0()){
-                singleIntegralFitFunctions[i]->FixParameter((k*2), paraVals[k]->GetN0());
+            if(paraVals[k]->GetFixIntegralN0()){
+                singleIntegralFitFunctions[i]->FixParameter((k*2), paraVals[k]->GetIntegralN0());
             }else{
                 singleIntegralFitFunctions[i]->SetParLimits((k*2), 0., doubleNumEvents*10000);
             }
@@ -1180,8 +1187,8 @@ void ElementFit::SetTotalBatemanParameterLimits()
         //1 = case for simulated data, range done with scalar multiples instead of user input range.
         if(inputHistoExecutionType == 1){
             //Setting limits for N0
-            if(paraVals[i]->GetFixN0()){
-                batemanFunction->FixParameter((i*2), paraVals[i]->GetN0());
+            if(paraVals[i]->GetFixBatemanN0()){
+                batemanFunction->FixParameter((i*2), paraVals[i]->GetBatemanN0());
             }else{
                 batemanFunction->SetParLimits((i*2), 0., doubleNumEvents*10000);
             }
@@ -1196,10 +1203,10 @@ void ElementFit::SetTotalBatemanParameterLimits()
         }else if(inputHistoExecutionType == 2 || inputHistoExecutionType == 3)
         {
             //Setting limits for N0
-            if(paraVals[i]->GetFixN0()){
-                batemanFunction->FixParameter((i*2), paraVals[i]->GetN0());
+            if(paraVals[i]->GetFixBatemanN0()){
+                batemanFunction->FixParameter((i*2), paraVals[i]->GetBatemanN0());
             }else{
-                batemanFunction->SetParLimits((i*2), paraVals[i]->GetLowerRangeN0(), paraVals[i]->GetUpperRangeN0());
+                batemanFunction->SetParLimits((i*2), paraVals[i]->GetLowerRangeBatemanN0(), paraVals[i]->GetUpperRangeBatemanN0());
             }
             //Setting limits for decay constant
             if(paraVals[i]->GetFixDecayConst()){
@@ -1219,8 +1226,8 @@ void ElementFit::SetTotalIntegralParameterLimits()
         //1 = case for simulated data, range done with scalar multiples instead of user input range.
         if(inputHistoExecutionType == 1){
             //Setting limits for N0
-            if(paraVals[i]->GetFixN0()){
-                integralFunction->FixParameter((i*2), paraVals[i]->GetN0());
+            if(paraVals[i]->GetFixIntegralN0()){
+                integralFunction->FixParameter((i*2), paraVals[i]->GetIntegralN0());
             }else{
                 integralFunction->SetParLimits((i*2), 0., doubleNumEvents*10000);
             }
@@ -1235,10 +1242,10 @@ void ElementFit::SetTotalIntegralParameterLimits()
         }else if(inputHistoExecutionType == 2 || inputHistoExecutionType == 3)
         {
             //Setting limits for N0
-            if(paraVals[i]->GetFixN0()){
-                integralFunction->FixParameter((i*2), paraVals[i]->GetN0());
+            if(paraVals[i]->GetFixIntegralN0()){
+                integralFunction->FixParameter((i*2), paraVals[i]->GetIntegralN0());
             }else{
-                integralFunction->SetParLimits((i*2), paraVals[i]->GetLowerRangeN0(), paraVals[i]->GetUpperRangeN0());
+                integralFunction->SetParLimits((i*2), paraVals[i]->GetLowerRangeIntegralN0(), paraVals[i]->GetUpperRangeIntegralN0());
             }
             //Setting limits for decay constant
             if(paraVals[i]->GetFixDecayConst()){
@@ -1273,8 +1280,10 @@ void ElementFit::DisplayParameterLimits()
         for(int i = 0; i < numElements; i++)
         {
             cout << elementNames[i] << ":" << endl;
-            cout << "\tInitial Lower Range: 0" << endl;
-            cout << "\tInitial Upper Range: " << paraVals[i]->GetUpperRangeN0() << endl;
+            cout << "\tBateman initial Lower Range: " << paraVals[i]->GetUpperRangeBatemanN0() << endl;
+            cout << "\tBateman initial Upper Range: " << paraVals[i]->GetUpperRangeBatemanN0() << endl;
+            cout << "\tIntegral initial Lower Range: " << paraVals[i]->GetUpperRangeIntegralN0() << endl;
+            cout << "\tIntegral initial Upper Range: " << paraVals[i]->GetUpperRangeIntegralN0() << endl;
             cout << "\tHalf Life Lower Range: " << paraVals[i]->GetLowerRangeHalfLife() << endl;
             cout << "\tHalf Life Upper Range: " << paraVals[i]->GetUpperRangeHalfLife() << endl;
             cout << endl;
