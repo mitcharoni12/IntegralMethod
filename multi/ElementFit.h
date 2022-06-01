@@ -810,7 +810,7 @@ void ElementFit::FitTotalBatemanHisto(Int_t cycleIndex, Int_t runIndex)
     TFitResultPtr fitResult = nullptr;
     for(int i = 0; i < 1; i++)
     {
-        fitResult = tempHisto->Fit(batemanFunction, "LS", "", 0.0001, endFit);
+        fitResult = tempHisto->Fit(batemanFunction, "VLSMULTITHREAD", "", startFit, endFit);
     }
     //delete 
     
