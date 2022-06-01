@@ -37,6 +37,7 @@ private:
     Double_t* timeLengthArr;            ///< Contains the time length of the fit between cycles of the program for the input histogram.
     Double_t* fitStartBinArr;           ///< Contains the bin on which the fit time will start between cycles of the program for the input histogram.
     Double_t* fitEndBinArr;             ///< Contains the bin on which the fit time will end between cycles of the program for the input histogram.
+    Double_t** binEdgesArr;             ///< Contains the bin edges for all histograms
     string* elementNames;               ///< Contains the names of the elements in the decay chain.
     Int_t* binNumArr;                   ///< Contains the number of bins for the histogram that is being fitted between cycles of the program for either the input histogram or the simulated histograms.
     bool displayFitAverages = false;    ///< Determines if program will display the average value of the fitted value in the Cycle class.
@@ -110,6 +111,7 @@ public:
     Double_t* GetTimeLengthArr(){return timeLengthArr;}
     Double_t* GetFitStartBinArr(){return fitStartBinArr;}
     Double_t* GetFitEndBinArr(){return fitEndBinArr;}
+    Double_t** GetBinEdges(){return binEdgesArr;}
     bool GetDisplayFitAverages(){return displayFitAverages;}
     bool GetNumEventChangeChoice(){return eventNumChangeChoice;}
     bool GetMultiSourceChoice(){return multiSource;}
@@ -119,6 +121,7 @@ public:
     string* GetElementNames(){return elementNames;}
     //functions
     void CreateRequiredDataSets();
+    void CreateShiftedBinsEdges(Int_t numBins, Double_t binWidth, Double_t* binEdges);
     ~FitOption();
 };
 
@@ -134,6 +137,7 @@ void FitOption::CreateRequiredDataSets()
     timeLengthArr = new Double_t [numCycles];
     fitStartBinArr = new Double_t [numCycles];
     fitEndBinArr = new Double_t [numCycles];
+    binEdgesArr = new Double_t* [numCycles];
 
     //need to calculate bin width initally
     if(rebinChoice)
@@ -141,6 +145,7 @@ void FitOption::CreateRequiredDataSets()
         Double_t rebinSize = (Double_t) numBins;
         Double_t tempWidth;
 
+        //bin data for Bateman histograms
         for(int i = 0; i < numCycles; i++)
         {
             timeFitEndArr[i] = timeRunEndSimulated;
@@ -151,6 +156,15 @@ void FitOption::CreateRequiredDataSets()
             rebinSize = rebinSize + rebinBinInc;
             tempWidth = timeRunEndSimulated / rebinSize;
         }
+
+        //bin data for integral histograms
+        for(int i = 0; i < numCycles; i++)
+        {
+            tempWidth = binWidthArr[i];
+            rebinSize = binNumArr[i];
+            binEdgesArr[i] = new Double_t[rebinSize + 2];
+            CreateShiftedBinsEdges(rebinSize, tempWidth, binEdgesArr[i])
+        }
     }
     //need to calculate number of bins initally, change time fit based on number bins
     if(!rebinChoice && inputHistoExecutionType == 1)
@@ -160,6 +174,7 @@ void FitOption::CreateRequiredDataSets()
         Double_t initBinNum = fitEnd / binWidth;
         Double_t addedBins = 0.0f;
         Double_t totalBins = initBinNum;
+        //data for Bateman histograms
         for(int i = 0; i < numCycles; i++)
         {
             timeFitEndArr[i] = fitEnd;
@@ -178,7 +193,15 @@ void FitOption::CreateRequiredDataSets()
                 fitStart = addedBins * binWidth;
             }
         }
+
+        //data for integral histograms
+        for(int i = 0; i < numCycles; i++)
+        {
+            binEdgesArr[i] = new Double_t[binNumArr[i] + 2];
+            CreateShiftedBinEdges(binNumArr[i], binWidthArr[i], binEdgesArr[i]);
+        }
     }
+    //for input histogram
     if(inputHistoExecutionType == 3 || inputHistoExecutionType == 2)
     {
         Double_t binWidth = inputHistoTimeEnd / inputHistoBinNum;
@@ -186,6 +209,7 @@ void FitOption::CreateRequiredDataSets()
         Double_t fitEnd = timeRunEndInput;
         Double_t fitStartBinNum;
         Double_t fitEndBinNum;
+        //data for input histogram
         for(int i = 0; i < numCycles; i++)
         {
             timeFitEndArr[i] = fitEnd;
@@ -210,6 +234,12 @@ void FitOption::CreateRequiredDataSets()
                 fitStart = fitStart + inputTimeInc;
             }
         }
+        //data for integral of input histogram
+        for(int i = 0; i < numCycles; i++)
+        {
+            binEdgesArr[i] = new Double_t[binNumArr[i] + 2];
+            CreateShiftedBinsEdges(binNumArr[i], binWidth, binEdgesArr[i]);
+        }
     }
     //Getting number of events generated for each different cycle
     if(eventNumChangeChoice)
@@ -229,6 +259,19 @@ void FitOption::CreateRequiredDataSets()
     }
 }
 
+///Creates the bin edges arrays required for the creation of the integral histograms
+void FitOptions::CreateShiftedBinsEdges(Int_t numBins, Double_t binWidth, Double_t* binEdges)
+{
+    Double_t tempBinEdge = 0.0;
+
+    binEdges[0] = 0.0;
+    binEdges[1] = (binWidth / 2.0);
+    for(int i = 2; i < (numBins + 2); i++)
+    {
+        binEdges[i] = ((i-1) * binWidth) + (binWidth / 2.0);
+    }
+}
+
 FitOption::~FitOption()
 {
     delete [] binNumArr;
@@ -239,6 +282,11 @@ FitOption::~FitOption()
     delete [] timeLengthArr;
     delete [] fitStartBinArr;
     delete [] fitEndBinArr;
+    for(int i = 0; i < numCycles; i++)
+    {
+        delete [] binEdgesArr[i];
+    }
+    delete [] binEdgesArr;
 }
 
 #endif

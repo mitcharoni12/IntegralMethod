@@ -6,7 +6,7 @@ using namespace std;
 #include "TH1D.h"
 #include "RunHistoHolder.h"
 
-/// Used to store the histograms for the multiple cycles of a single element. These histograms contain the simulated data and the ones that are fit.
+/// Used to store the histograms for the multiple Bateman cycles of a single element. These histograms contain the simulated data and the ones that are fit.
 /// EX: If we are doing 20 cycles of 20 runs for the decay chain 144Cs->144Ba->144La this class would hold all the histograms for the 20 cycles of La, each cycle held by a RunHistoHolder class.
 class CycleHistoHolder{
 private:

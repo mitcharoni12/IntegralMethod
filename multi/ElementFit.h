@@ -22,8 +22,8 @@
 #include "CycleHistoHolder.h"
 #include "SingleCycleCanvasHolder.h"
 #include "CycleCanvasHolder.h"
-#include "SingleCycleGraphHolder.h"
-#include "CycleGraphHolder.h"
+#include "CycleIntegralHistoHolder.h"
+#include "SingleCycleIntegralHistoHolder.h"
 #include "ParameterValue.h"
 #include "FitFunction.h"
 #include "FitOption.h"
@@ -112,12 +112,10 @@ class ElementFit{
         TF1* integralFunction, *batemanFunction;
         TF1** singleIntegralFitFunctions, **singleBatemanFitFunctions;
         CycleHistoHolder* batemanHisto;                                             ///< Contains every total Bateman histogram for the entire program.
-        CycleHistoHolder* integralHisto;                                            ///< Contains every total integral histogram for the entire program.
+        CycleIntegralHistoHolder* integralHisto;                                    ///< Contains every total integral histogram for the entire program.
         SingleCycleHistoHolder* singleBatemanHisto;                                 ///< Contains every single Bateman histogram for the entire program.
-        SingleCycleHistoHolder* singleIntegralHisto;                                ///< Contains every single integral histogram for the entire program.
+        SingleCycleIntegralHistoHolder* singleIntegralHisto;                        ///< Contains every single integral histogram for the entire program.
         TH1D* inputHistogram;                                                       ///< Contains the raw input histogram.
-        CycleGraphHolder* integralGraph;                                            ///< Contains every total integral graph for the entire program.
-        SingleCycleGraphHolder* singleIntegralGraph;                                ///< Contains every single integral graph for the entire program.
         //passed fit functions used to make the TF1 for fitting
         decayFunction* batemanFitFunctions, *integralFitFunctions;
         decayFunction passedBatemanFunction, passedIntegralFunction;
@@ -133,11 +131,12 @@ class ElementFit{
         Double_t* binWidth;                                                         ///< Holds bin widths between cycles.
         Double_t* timeEndArr;                                                       ///< Holds the time of fit end between cycles.
         Double_t* timeStartArr;                                                     ///< Holds the time of fit start between cycles.
+        Double_t** binEdgesArr;                                                     ///< Holds the bin edges for the integral histograms.
         ChainFitValues* totalBatemanFitValues, *totalIntegralFitValues;
         SingleElementFitValues* singleBatemanFitValues, *singleIntegralFitValues;
         ParameterValue** paraVals;                                                  ///< Accepted values for all parameters in all the fit functions.
         Int_t globalSeedChanger = 0;                                                ///< Used for assigning in changing the seed.
-        //TCanvas* test = new TCanvas("test", "test", 500, 500);
+        TCanvas* test = new TCanvas("test", "test", 500, 500);
         //TCanvas* test2 = new TCanvas("test2", "test2", 500, 500);
         clock_t Tclock;
 };  
@@ -172,6 +171,7 @@ ElementFit::ElementFit(Double_t (*batemanFunc)(Double_t*, Double_t*), Double_t (
     this->leaveOutEndBinsInput = fitOptions->GetLeaveOutEndBinsInput();
     this->inputHistoExecutionType = fitOptions->GetInputHistoExecutionType();
     this->singleElementDataChoice = fitOptions->GetSingleElementDataChoice();
+    this->binEdgesArr = fitOptions->GetBinEdges();
     doubleNumEvents = (Double_t) numEvents;
 
     //creating fit parameter holders
@@ -239,6 +239,7 @@ ElementFit::ElementFit(Double_t (*batemanFunc)(Double_t*, Double_t*), Double_t (
     this->inputHistogram = inputHistogram;
     this->inputHistoExecutionType = fitOptions->GetInputHistoExecutionType();
     this->singleElementDataChoice = fitOptions->GetSingleElementDataChoice();
+    this->binEdgesArr = fitOptions->GetBinEdges();
     doubleNumEvents = (Double_t) numEvents;
 
     //creating fit parameter holders
@@ -381,7 +382,7 @@ void ElementFit::CreateSingleIntegralHistoHolders()
 {
     string histoName;
     histoName = "Single Integral Histo";
-    singleIntegralHisto = new SingleCycleHistoHolder(numCycles, numElements, numRuns, histoName, binNumArr, timeEndArr, elementNames);
+    singleIntegralHisto = new SingleCycleIntegralHistoHolder(numCycles, numElements, numRuns, histoName, binNumArr, binEdgesArr, elementNames);
 }
 
 /// \brief Creates all total bateman histograms for the entre program.
@@ -405,91 +406,7 @@ void ElementFit::CreateTotalIntegralHistoHolders()
 {
     string histoName;
     histoName = "Total Integral Histo";
-    integralHisto = new CycleHistoHolder(numCycles, numRuns, histoName, binNumArr, timeEndArr);
-}
-
-/// \brief creates the single integral graphs from integral histogram
-void ElementFit::GenSingleIntegralGraph()
-{
-    TH1D* tempHisto;
-    TGraph* tempGraph;
-    Int_t* pointsArr = new Int_t [numCycles];
-    Double_t tempBinWidth, tempTimeValue, tempBinValue;
-
-    for(int i = 0; i < numCycles; i++)
-    {
-        pointsArr[i] = binNumArr[i] + 1;
-    }
-
-    //creates the storage objects for in the integral graphs
-    singleIntegralGraph = new SingleCycleGraphHolder(numCycles, numElements, numRuns, "Single Integral Graph", pointsArr, elementNames);
-
-    for(int cycleIndex = 0; cycleIndex < numCycles; cycleIndex++)
-    {
-        //bin width for cycle
-        tempBinWidth = binWidth[cycleIndex];
-
-        for(int runIndex = 0; runIndex < numRuns; runIndex++)
-        {  
-            //creates the graphs for the single integral graphs
-            for(int elementIndex = 0; elementIndex < numElements; elementIndex++)
-            {
-                tempHisto = singleIntegralHisto->GetAHisto(cycleIndex, runIndex, elementIndex);
-                tempGraph = singleIntegralGraph->GetAGraph(cycleIndex, runIndex, elementIndex);
-                tempGraph->SetPoint(1, 0.0, 0.0);
-
-                for(int i = 1; i < binNumArr[cycleIndex] + 1; i++)
-                {
-                    tempTimeValue = i * tempBinWidth;
-                    tempBinValue = tempHisto->GetBinContent(i);
-                    tempGraph->SetPoint(i+1, tempTimeValue, tempBinValue);
-                }
-            }
-        }
-    }
-
-    delete [] pointsArr;
-}
-
-/// \brief creates the total integral graphs from integral histogram
-void ElementFit::GenTotalIntegralGraph()
-{
-    TH1D* tempHisto;
-    TGraph* tempGraph;
-    Int_t* pointsArr = new Int_t [numCycles];
-    Double_t tempBinWidth, tempTimeValue, tempBinValue;
-
-    for(int i = 0; i < numCycles; i++)
-    {
-        pointsArr[i] = binNumArr[i] + 1;
-    }
-
-    //creates the storage objects for in the integral graphs
-    integralGraph = new CycleGraphHolder(numCycles, numRuns, "Total Integral Graph", pointsArr);
-
-    for(int cycleIndex = 0; cycleIndex < numCycles; cycleIndex++)
-    {
-        //bin width for cycle
-        tempBinWidth = binWidth[cycleIndex];
-
-        for(int runIndex = 0; runIndex < numRuns; runIndex++)
-        {  
-            //storing graph object that will be created from the histogram
-            tempHisto = integralHisto->GetAHisto(cycleIndex, runIndex);
-            tempGraph = integralGraph->GetAGraph(cycleIndex, runIndex);
-            tempGraph->SetPoint(1, 0.0, 0.0);
-            
-            //creates graph for total integral graph
-            for(int i = 1; i < binNumArr[cycleIndex] + 1; i++)
-            {
-                tempTimeValue = i * tempBinWidth;
-                tempBinValue = tempHisto->GetBinContent(i);
-                tempGraph->SetPoint(i+1, tempTimeValue, tempBinValue);
-            }
-        }
-    }
-
-    delete [] pointsArr;
+    integralHisto = new CycleIntegralHistoHolder(numCycles, numRuns, histoName, binNumArr, binEdgesArr);
 }
 
 /// \brief creates the TF1 objects for the single Bateman fit functions 
@@ -845,7 +762,12 @@ void ElementFit::FitTotalBatemanHisto(Int_t cycleIndex, Int_t runIndex)
 void ElementFit::FitTotalIntegralGraph(Int_t cycleIndex, Int_t runIndex)
 {
     Double_t valueN0, errorN0, valueDecayConst, errorDecayConst, valueHalfLife, errorHalfLife, startFitOffset, startFit, endFitOffset, endFit;
-    TH1D* tempHisto;
+    TH1D* tempBatemanHisto, *deleteTempHisto;
+    Int_t deleteBinNum = binNumArr[0];
+    Double_t* deleteBinWidths = new Double_t[deleteBinNum+1];
+    Double_t deleteBinWidth = binWidth[0];
+    Double_t deleteValue = 0.0;
+    cout << "BIN WIDTHS: " << deleteBinWidth << endl;
     TGraph* tempGraph;
 
     timeRunStart = timeStartArr[cycleIndex];
@@ -865,7 +787,24 @@ void ElementFit::FitTotalIntegralGraph(Int_t cycleIndex, Int_t runIndex)
     endFitOffset = leaveOutEndBinsSim * binWidth[cycleIndex];
     endFit = timeRunEnd - endFitOffset;
 
-    tempGraph = integralGraph->GetAGraph(cycleIndex, runIndex);
+    //tempGraph = integralGraph->GetAGraph(cycleIndex, runIndex);
+    //test
+    tempBatemanHisto = batemanHisto->GetAHisto(cycleIndex, runIndex);
+    deleteBinWidths[0] = 0;
+    deleteBinWidths[1] = deleteBinWidth / 2.0;
+    for(int i = 2; i < deleteBinNum+1; i++)
+    {
+        deleteBinWidths[i] = (i-1) * deleteBinWidth + (deleteBinWidth/2.0);
+    }
+    deleteTempHisto = new TH1D(("Temp name " + to_string(runIndex)).c_str(), ("Temp name" + to_string(runIndex)).c_str(), deleteBinNum, deleteBinWidths);
+    deleteTempHisto->SetBinContent(1, 0);
+    deleteTempHisto->SetBinContent(2, tempBatemanHisto->GetBinContent(1));
+    for(int i = 3; i <= deleteBinNum; i++)
+    {
+        deleteValue = deleteTempHisto->GetBinContent(i-1) + tempBatemanHisto->GetBinContent(i-1);
+        deleteTempHisto->SetBinContent(i, deleteValue);
+    }
+
 
     cout << "FITTING TOTAL INTEGRAL CYCLE: " << cycleIndex << " RUN: " << runIndex << endl;
 
@@ -874,7 +813,10 @@ void ElementFit::FitTotalIntegralGraph(Int_t cycleIndex, Int_t runIndex)
 
     TFitResultPtr fitResult;
     int fitStatus = 1;
-    fitResult = tempGraph->Fit(integralFunction, "S", "", startFit, endFit);
+    //fitResult = tempGraph->Fit(integralFunction, "S", "", startFit, endFit);
+    fitResult = deleteTempHisto->Fit(integralFunction, "LSMULTITHREAD", "", startFit + (deleteBinWidth/2.0), endFit + (deleteBinWidth/2.0));
+    test->cd();
+    deleteTempHisto->Draw();
 
     for(int i = 0; i < numElements; i++)
     {   
