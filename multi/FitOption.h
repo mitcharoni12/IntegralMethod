@@ -162,8 +162,8 @@ void FitOption::CreateRequiredDataSets()
         {
             tempWidth = binWidthArr[i];
             rebinSize = binNumArr[i];
-            int temp = 2;
-            binEdgesArr[i] = new Double_t[(rebinSize + temp)];
+            int intRebinSize = (int)rebinSize;
+            binEdgesArr[i] = new Double_t[intRebinSize + 2];
             CreateShiftedBinEdges(rebinSize, tempWidth, binEdgesArr[i]);
         }
     }
