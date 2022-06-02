@@ -477,7 +477,7 @@ void Run::RunSingleIntegralRunsGenOnce(Int_t cycleIndex, Int_t runIndex)
     Double_t tempHalfLife;
     Double_t tempHalfLifeError;
 
-    element->FitSingleIntegralGraphs(cycleIndex, 0);
+    element->FitSingleIntegralHistos(cycleIndex, 0);
 
     //get single integral fit parameters
     singleTempFitParameters = element->GetSingleIntegralFitValues();
@@ -510,7 +510,7 @@ void Run::RunTotalBatemanRunsGenOnce(Int_t cycleIndex, Int_t runIndex)
     Double_t tempHalfLife;
     Double_t tempHalfLifeError;
 
-    element->FitTotalBatemanHisto(cycleIndex, 0);
+    element->FitTotalBatemanHistos(cycleIndex, 0);
 
     tempFitParameters = element->GetBatemanFitValues();
 
@@ -540,7 +540,7 @@ void Run::RunTotalIntegralRunsGenOnce(Int_t cycleIndex, Int_t runIndex)
     Double_t tempHalfLife;
     Double_t tempHalfLifeError;
 
-    element->FitTotalIntegralGraph(cycleIndex, 0);
+    element->FitTotalIntegralHistos(cycleIndex, 0);
 
     //gets total integral fit parameters
     tempFitParameters = element->GetIntegralFitValues();
@@ -607,7 +607,7 @@ void Run::RunSingleIntegralRunsNoChange(Int_t cycleIndex)
     for(int j = 0; j < numRuns; j++)
     {
         //generates random data and fits it. Then extract the fit parametes
-        element->FitSingleIntegralGraphs(cycleIndex, j);
+        element->FitSingleIntegralHistos(cycleIndex, j);
 
         //get single integral fit parameters
         singleTempFitParameters = element->GetSingleIntegralFitValues();
@@ -642,7 +642,7 @@ void Run::RunTotalBatemanRunsNoChange(Int_t cycleIndex)
     for(int j = 0; j < numRuns; j++)
     {
         //generates random data and fits it. Then extract the fit parametes
-        element->FitTotalBatemanHisto(cycleIndex, j);
+        element->FitTotalBatemanHistos(cycleIndex, j);
         //gets total bateman fit parameters
         tempFitParameters = element->GetBatemanFitValues();
         
@@ -676,7 +676,7 @@ void Run::RunTotalIntegralRunsNoChange(Int_t cycleIndex)
     for(int j = 0; j < numRuns; j++)
     {
         //generates random data and fits it. Then extract the fit parametes
-        element->FitTotalIntegralGraph(cycleIndex, j);
+        element->FitTotalIntegralHistos(cycleIndex, j);
         //gets total integral fit parameters
         tempFitParameters = element->GetIntegralFitValues();
 

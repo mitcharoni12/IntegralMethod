@@ -121,7 +121,7 @@ public:
     string* GetElementNames(){return elementNames;}
     //functions
     void CreateRequiredDataSets();
-    void CreateShiftedBinsEdges(Int_t numBins, Double_t binWidth, Double_t* binEdges);
+    void CreateShiftedBinEdges(Int_t numBins, Double_t binWidth, Double_t* binEdges);
     ~FitOption();
 };
 
@@ -163,7 +163,7 @@ void FitOption::CreateRequiredDataSets()
             tempWidth = binWidthArr[i];
             rebinSize = binNumArr[i];
             binEdgesArr[i] = new Double_t[rebinSize + 2];
-            CreateShiftedBinsEdges(rebinSize, tempWidth, binEdgesArr[i])
+            CreateShiftedBinEdges(rebinSize, tempWidth, binEdgesArr[i]);
         }
     }
     //need to calculate number of bins initally, change time fit based on number bins
@@ -238,7 +238,7 @@ void FitOption::CreateRequiredDataSets()
         for(int i = 0; i < numCycles; i++)
         {
             binEdgesArr[i] = new Double_t[binNumArr[i] + 2];
-            CreateShiftedBinsEdges(binNumArr[i], binWidth, binEdgesArr[i]);
+            CreateShiftedBinEdges(binNumArr[i], binWidth, binEdgesArr[i]);
         }
     }
     //Getting number of events generated for each different cycle
@@ -260,7 +260,7 @@ void FitOption::CreateRequiredDataSets()
 }
 
 ///Creates the bin edges arrays required for the creation of the integral histograms
-void FitOptions::CreateShiftedBinsEdges(Int_t numBins, Double_t binWidth, Double_t* binEdges)
+void FitOption::CreateShiftedBinEdges(Int_t numBins, Double_t binWidth, Double_t* binEdges)
 {
     Double_t tempBinEdge = 0.0;
 

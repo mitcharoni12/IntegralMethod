@@ -279,8 +279,8 @@ void fitMultiple()
             element = new ElementFit(BatemanDecaybyActivity, IntegralDecaybyActivity, batemanFitFunctions, integralFitFunctions, paraVals, inputHistoMonteFitOptions, inputHistogram);
 
             timeFitEnd = inputHistoMonteFitOptions->GetTimeLengthArr()[0];
-            element->FitTotalBatemanHisto(0, 0);
-            element->FitTotalIntegralGraph(0, 0);
+            element->FitTotalBatemanHistos(0, 0);
+            element->FitTotalIntegralHistos(0, 0);
             element->DisplayTotalBatemanParameters();
             element->DisplayTotalIntegralParameters();
             integralFitValues = element->GetIntegralFitValues();
@@ -402,8 +402,8 @@ void fitMultiple()
             element = new ElementFit(BatemanDecaybyActivity, IntegralDecaybyActivity, batemanFitFunctions, integralFitFunctions, paraVals, fitOptions);
 
             //fit total bateman and integral data
-            element->FitTotalBatemanHisto(0, 0);
-            element->FitTotalIntegralGraph(0, 0);
+            element->FitTotalBatemanHistos(0, 0);
+            element->FitTotalIntegralHistos(0, 0);
 
             //display total bateman and integral fitted parameters
             element->DisplayTotalBatemanParameters();
@@ -412,15 +412,15 @@ void fitMultiple()
             TCanvas* batemanTotalCanvas = new TCanvas("Total Bateman Histo", "Total Bateman Histo", 500, 500);
             TCanvas* integralTotalCanvas = new TCanvas("Total Integral Histo", "Total Integral Histo", 500, 500);
 
-            //display total bateman and integral histogram and graph
+            //display total bateman and integral histograms
             element->DisplayTotalBatemanHisto(batemanTotalCanvas);
-            element->DisplayTotalIntegralGraph(integralTotalCanvas);
+            element->DisplayTotalIntegralHisto(integralTotalCanvas);
 
             if(singleElementDataChoice == 2)
             {
                 //fit single bateman and integral data
                 element->FitSingleBatemanHistos(0, 0);
-                element->FitSingleIntegralGraphs(0, 0);
+                element->FitSingleIntegralHistos(0, 0);
 
                 //display single bateman and integral fitted parameters
                 element->DisplaySingleBatemanParameters();
@@ -434,9 +434,9 @@ void fitMultiple()
                     singleIntegralCanvases[i] = new TCanvas((elementNames[i] + " Single Integral Histo").c_str(), (elementNames[i] + " Single Integral Histo").c_str(), 500, 500);
                 }
 
-                //display total bateman and integral histogram and graph
+                //display total bateman and integral histogram
                 element->DisplaySingleBatemanHistos(singleBatemanCanvases);
-                element->DisplaySingleIntegralGraph(singleIntegralCanvases);
+                element->DisplaySingleIntegralHisto(singleIntegralCanvases);
 
                 delete [] singleBatemanCanvases;
                 delete [] singleIntegralCanvases;

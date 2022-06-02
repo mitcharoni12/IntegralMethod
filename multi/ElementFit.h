@@ -14,7 +14,6 @@
 #include "TMath.h"
 #include "TRandom3.h"
 #include "TCanvas.h"
-#include "TGraph.h"
 
 #include "SingleElementFitValues.h"
 #include "ChainFitValues.h"
@@ -54,7 +53,7 @@ class ElementFit{
         void setNumCycles(Int_t numCycles){this->numCycles = numCycles;}
 
         void ChangeSeed();
-        void CreateInputIntegralGraph();
+        void CreateInputIntegralHisto();
         void CutInputHistos();
         void DisplayTotalFunctionParameters();
         void DisplayParameterLimits();
@@ -70,12 +69,12 @@ class ElementFit{
         void SetSingleBatemanParameterLimits();
         //functions for single integral data
         void CreateSingleIntegralFitFunctions(Int_t timeEnd);
-        void GenSingleIntegralGraph();
+        void GenSingleIntegralHisto();
         void CreateSingleIntegralHistoHolders();
-        void DisplaySingleIntegralGraph(TCanvas** can);
+        void DisplaySingleIntegralHisto(TCanvas** can);
         void DisplaySingleIntegralParameters();
         void DrawSingleIntegralIndividualHistos(SingleCycleCanvasHolder* singleIntegralCanvases, Int_t lowerRunIndex, Int_t upperRunIndex, Int_t lowerCycleIndex, Int_t upperCycleIndex);
-        void FitSingleIntegralGraphs(Int_t cycleIndex, Int_t runIndex);
+        void FitSingleIntegralHistos(Int_t cycleIndex, Int_t runIndex);
         void GenSingleIntegralHistos();
         void SetSingleIntegralFunctionParameters();
         void SetSingleIntegralParameterLimits();
@@ -85,18 +84,17 @@ class ElementFit{
         void DisplayTotalBatemanHisto(TCanvas* can);
         void DisplayTotalBatemanParameters();
         void DrawTotalBatemanIndividualHistos(CycleCanvasHolder* batemanTotalCanvases, Int_t lowerRunIndex, Int_t upperRunIndex, Int_t lowerCycleIndex, Int_t upperCycleIndex);
-        void FitTotalBatemanHisto(Int_t cycleIndex, Int_t runIndex);
+        void FitTotalBatemanHistos(Int_t cycleIndex, Int_t runIndex);
         void SetTotalBatemanFunctionParameters();
         void SetTotalBatemanParameterLimits();
         //functions for total integral data
         void CreateTotalIntegralFitFunctions(Int_t timeEnd);
-        void GenTotalIntegralGraph();
+        void GenTotalIntegralHisto();
         void CreateTotalIntegralHistoHolders();
-        void DisplayTotalIntegralGraph(TCanvas* can);
+        void DisplayTotalIntegralHisto(TCanvas* can);
         void DisplayTotalIntegralParameters();
         void DrawTotalIntegralIndividualHistos(CycleCanvasHolder* integralTotalCanvases, Int_t lowerRunIndex, Int_t upperRunIndex, Int_t lowerCycleIndex, Int_t upperCycleIndex);
-        void FitTotalIntegralGraph(Int_t cycleIndex, Int_t runIndex);
-        void GenTotalIntegralHisto();
+        void FitTotalIntegralHistos(Int_t cycleIndex, Int_t runIndex);
         void SetTotalIntegralFunctionParameters();
         void SetTotalIntegralParameterLimits();
     private:
@@ -171,7 +169,6 @@ ElementFit::ElementFit(Double_t (*batemanFunc)(Double_t*, Double_t*), Double_t (
     this->leaveOutEndBinsInput = fitOptions->GetLeaveOutEndBinsInput();
     this->inputHistoExecutionType = fitOptions->GetInputHistoExecutionType();
     this->singleElementDataChoice = fitOptions->GetSingleElementDataChoice();
-    this->binEdgesArr = fitOptions->GetBinEdges();
     doubleNumEvents = (Double_t) numEvents;
 
     //creating fit parameter holders
@@ -191,6 +188,7 @@ ElementFit::ElementFit(Double_t (*batemanFunc)(Double_t*, Double_t*), Double_t (
     timeEndArr = fitOptions->GetTimeFitEndArr();
     timeStartArr = fitOptions->GetTimeFitStartArr();
     binNumArr = fitOptions->GetBinNumArr();
+    binEdgesArr = fitOptions->GetBinEdges();
     //generates all the histo objects and fills each one with data
     CreateTotalBatemanHistoHolders();
     CreateTotalIntegralHistoHolders();
@@ -201,11 +199,9 @@ ElementFit::ElementFit(Double_t (*batemanFunc)(Double_t*, Double_t*), Double_t (
     }
     GenBatemanHistograms();
     GenTotalIntegralHisto();
-    GenTotalIntegralGraph();
     if(singleElementDataChoice == 2)
     {
         GenSingleIntegralHistos();
-        GenSingleIntegralGraph();
     }
     //removes restrictions on fitting function calls and itterations
     ROOT::Math::MinimizerOptions::SetDefaultMaxIterations(100000000);
@@ -239,7 +235,6 @@ ElementFit::ElementFit(Double_t (*batemanFunc)(Double_t*, Double_t*), Double_t (
     this->inputHistogram = inputHistogram;
     this->inputHistoExecutionType = fitOptions->GetInputHistoExecutionType();
     this->singleElementDataChoice = fitOptions->GetSingleElementDataChoice();
-    this->binEdgesArr = fitOptions->GetBinEdges();
     doubleNumEvents = (Double_t) numEvents;
 
     //creating fit parameter holders
@@ -259,9 +254,10 @@ ElementFit::ElementFit(Double_t (*batemanFunc)(Double_t*, Double_t*), Double_t (
     timeEndArr = fitOptions->GetTimeFitEndArr();
     timeStartArr = fitOptions->GetTimeFitStartArr();
     binNumArr = fitOptions->GetBinNumArr();
+    binEdgesArr = fitOptions->GetBinEdges();
     CreateTotalBatemanHistoHolders();
     CutInputHistos();
-    CreateInputIntegralGraph();
+    CreateInputIntegralHisto();
     //removes restrictions on fitting function calls and itterations
     ROOT::Math::MinimizerOptions::SetDefaultMaxIterations(100000000);
     ROOT::Math::MinimizerOptions::SetDefaultMaxFunctionCalls(100000000);
@@ -276,7 +272,6 @@ ElementFit::~ElementFit()
         delete [] randArr;
         delete batemanHisto;
         delete integralHisto;
-        delete integralGraph;
         if(singleElementDataChoice == 2)
         {
             delete singleBatemanFitValues;
@@ -285,7 +280,6 @@ ElementFit::~ElementFit()
             delete [] singleIntegralFitFunctions;
             delete singleBatemanHisto;
             delete singleIntegralHisto;
-            delete singleIntegralGraph;
         }
     }else if(inputHistoExecutionType == 2 || inputHistoExecutionType == 3)
     {
@@ -315,38 +309,29 @@ void ElementFit::ChangeSeed()
     globalSeedChanger++;
 }
 
-/// \brief Creates the integral graphs for the input histogram.
-void ElementFit::CreateInputIntegralGraph()
+/// \brief Creates the integral histos for the input histogram.
+void ElementFit::CreateInputIntegralHisto()
 {
-    string graphName = "Total Input Integral Graph";
-    Int_t* numPointsArr = new Int_t[numCycles];
+    string histoName = "Total Input Integral Histo";
     TH1D* tempBatemanHisto;
-    TGraph* tempIntegralGraph;
-    Double_t tempXPoint, tempIntegralVal = 0.0, tempYPoint;
+    TH1D* tempIntegralHisto;
 
-    for(int i = 0; i < numCycles; i++)
-    {
-        numPointsArr[i] = binNumArr[i] + 1;
-    }
-    integralGraph = new CycleGraphHolder(numCycles, numRuns, graphName, numPointsArr);
+    //creates the integral histogram objects
+    integralHisto = new CycleIntegralHistoHolder(numCycles, numRuns, histoName, binNumArr, binEdgesArr);
 
+    //fills integral histo
     for(int cycleIndex = 0; cycleIndex < numCycles; cycleIndex++)
     {
         tempBatemanHisto = batemanHisto->GetAHisto(cycleIndex, 0);
-        tempIntegralGraph = integralGraph->GetAGraph(cycleIndex, 0);
+        tempIntegralHisto = integralHisto->GetAHisto(cycleIndex, 0);
 
-        tempIntegralGraph->SetPoint(1, 0.0, 0.0);
-        for(int binIndex = 1; binIndex < binNumArr[cycleIndex]; binIndex++)
+        tempIntegralHisto->SetBinContent(1, 0.0);
+        tempIntegralHisto->SetBinContent(2, tempBatemanHisto->GetBinContent(2));
+        for(int binIndex = 3; binIndex < (binNumArr[cycleIndex] + 1); binIndex++)
         {
-            tempXPoint = binWidth[cycleIndex] * binIndex;
-            tempYPoint = tempBatemanHisto->GetBinContent(binIndex);
-            tempIntegralVal = tempIntegralVal + tempYPoint;
-            tempIntegralGraph->SetPoint(binIndex+1, tempXPoint, tempIntegralVal);
+            tempIntegralHisto->SetBinContent(binIndex, tempIntegralHisto->GetBinContent(binIndex-1) + tempBatemanHisto->GetBinContent(binIndex-1));
         }
-        tempIntegralVal = 0.0;
     }
-    
-    delete [] numPointsArr;
 }
 
 /// \brief Cuts the original input histogram bins and puts them in a new histogram.
@@ -512,12 +497,12 @@ void ElementFit::DisplaySingleBatemanHistos(TCanvas** canvas)
 }
 
 /// \brief Displays single integral histograms for the single run option for the program.
-void ElementFit::DisplaySingleIntegralGraph(TCanvas** canvas)
+void ElementFit::DisplaySingleIntegralHisto(TCanvas** canvas)
 {
     for(int i = 0; i < numElements; i++)
     {
         canvas[i]->cd();
-        singleIntegralGraph->GetAGraph(0, 0, i)->Draw();
+        singleIntegralHisto->GetAHisto(0, 0, i)->Draw();
     }
 }
 
@@ -529,10 +514,10 @@ void ElementFit::DisplayTotalBatemanHisto(TCanvas* canvas)
 }
 
 /// \brief Displays total Bateman histogram for the single run option for the program
-void ElementFit::DisplayTotalIntegralGraph(TCanvas* canvas)
+void ElementFit::DisplayTotalIntegralHisto(TCanvas* canvas)
 {
     canvas->cd();
-    integralGraph->GetAGraph(0, 0)->Draw();
+    integralHisto->GetAHisto(0, 0)->Draw();
 }
 
 /// \brief Displays the single Bateman individual histogram for any execution type of the program.
@@ -567,7 +552,7 @@ void ElementFit::DrawSingleIntegralIndividualHistos(SingleCycleCanvasHolder* sin
             for(int elementIndex = 0; elementIndex < numElements; elementIndex++)
             {
                 singleIntegralCanvases->GetACanvas(cycleIndex, runIndex, elementIndex)->cd();
-                singleIntegralGraph->GetAGraph(cycleIndex, runIndex, elementIndex)->Draw();
+                singleIntegralHisto->GetAHisto(cycleIndex, runIndex, elementIndex)->Draw();
             }
         }
     }
@@ -601,7 +586,7 @@ void ElementFit::DrawTotalIntegralIndividualHistos(CycleCanvasHolder* integralTo
         for(int runIndex = lowerRunIndex; runIndex < upperRunIndex; runIndex++)
         {
             integralTotalCanvases->GetACanvas(cycleIndex, runIndex)->cd();
-            integralGraph->GetAGraph(cycleIndex, runIndex)->Draw();
+            integralHisto->GetAHisto(cycleIndex, runIndex)->Draw();
         }
     }
 }
@@ -610,7 +595,8 @@ void ElementFit::DrawTotalIntegralIndividualHistos(CycleCanvasHolder* integralTo
 void ElementFit::FitSingleBatemanHistos(Int_t cycleIndex, Int_t runIndex)
 {
     Double_t valueN0, errorN0, valueDecayConst, errorDecayConst, valueHalfLife, errorHalfLife, startFitOffset, startFit, endFitOffset, endFit;
-    TH1D* tempSingleBatemanHisto, *tempSingleIntegralHisto;
+    TFitResultPtr fitResult = nullptr;
+    TH1D* tempSingleBatemanHisto;
 
     timeRunStart = timeStartArr[cycleIndex];
     timeRunEnd = timeEndArr[cycleIndex];
@@ -624,37 +610,42 @@ void ElementFit::FitSingleBatemanHistos(Int_t cycleIndex, Int_t runIndex)
     endFit = timeRunEnd - endFitOffset;
 
     //loop for fitting and storing value for elements
-    for(int i = 0; i < numElements; i++)
+    for(int elementIndex = 0; elementIndex < numElements; elementIndex++)
     {
-        tempSingleBatemanHisto = singleBatemanHisto->GetAHisto(cycleIndex, runIndex, i);
+        tempSingleBatemanHisto = singleBatemanHisto->GetAHisto(cycleIndex, runIndex, elementIndex);
 
-        cout << "FITTING SINGLE BATEMAN " << elementNames[i] << " CYCLE: " << cycleIndex << " RUN: " << runIndex << endl;
-        tempSingleBatemanHisto->Fit(singleBatemanFitFunctions[i], "L", "", startFit, endFit);
+        cout << "FITTING SINGLE BATEMAN " << elementNames[elementIndex] << " CYCLE: " << cycleIndex << " RUN: " << runIndex << endl;
+        fitResult = tempSingleBatemanHisto->Fit(singleBatemanFitFunctions[elementIndex], "LSMULTITHREAD", "", startFit, endFit);
 
-        for(int k = 0; k < (i+1); k++)
+        for(int subElementIndex = 0; subElementIndex < (elementIndex+1); subElementIndex++)
         {
             //storing values for bateman part of function
-            valueN0 = singleBatemanFitFunctions[i]->GetParameter((k*2));
-            errorN0 = singleBatemanFitFunctions[i]->GetParError((k*2));
-            valueDecayConst = singleBatemanFitFunctions[i]->GetParameter((k*2)+1);
-            errorDecayConst = singleBatemanFitFunctions[i]->GetParError((k*2)+1);
+            valueN0 = singleBatemanFitFunctions[elementIndex]->GetParameter((subElementIndex*2));
+            errorN0 = singleBatemanFitFunctions[elementIndex]->GetParError((subElementIndex*2));
+            valueDecayConst = singleBatemanFitFunctions[elementIndex]->GetParameter((subElementIndex*2)+1);
+            errorDecayConst = singleBatemanFitFunctions[elementIndex]->GetParError((subElementIndex*2)+1);
             valueHalfLife = log(2)/(valueDecayConst);
             errorHalfLife = ((log(2)/valueDecayConst)*(errorDecayConst/valueDecayConst));
+            //if fait fails
+            if(fitResult->Status() != 0)
+            {
+                valueHalfLife = 0.000000000000;
+            }
 
-            singleBatemanFitValues->SetAnN0(i, k, valueN0);
-            singleBatemanFitValues->SetAnN0Error(i, k, errorN0);
-            singleBatemanFitValues->SetAnHalfLife(i, k, valueHalfLife);
-            singleBatemanFitValues->SetAnHalfLifeError(i, k, errorHalfLife);
+            singleBatemanFitValues->SetAnN0(elementIndex, subElementIndex, valueN0);
+            singleBatemanFitValues->SetAnN0Error(elementIndex, subElementIndex, errorN0);
+            singleBatemanFitValues->SetAnHalfLife(elementIndex, subElementIndex, valueHalfLife);
+            singleBatemanFitValues->SetAnHalfLifeError(elementIndex, subElementIndex, errorHalfLife);
         }
     }
 }
 
-/// \brief Fits single integral graphs at specified cycle and run index
-void ElementFit::FitSingleIntegralGraphs(Int_t cycleIndex, Int_t runIndex)
+/// \brief Fits single integral histos at specified cycle and run index
+void ElementFit::FitSingleIntegralHistos(Int_t cycleIndex, Int_t runIndex)
 {
     Double_t valueN0, errorN0, valueDecayConst, errorDecayConst, valueHalfLife, errorHalfLife, startFitOffset, startFit, endFitOffset, endFit;
-    TH1D* tempSingleBatemanHisto, *tempSingleIntegralHisto;
-    TGraph* tempSingleGraph;
+    TH1D* tempSingleBatemanHisto, *tempSingleHisto;
+    TFitResultPtr fitResult = nullptr;
 
     timeRunStart = timeStartArr[cycleIndex];
     timeRunEnd = timeEndArr[cycleIndex];
@@ -666,38 +657,46 @@ void ElementFit::FitSingleIntegralGraphs(Int_t cycleIndex, Int_t runIndex)
     startFit = startFitOffset + timeRunStart;
     endFitOffset = leaveOutEndBinsSim * binWidth[cycleIndex];
     endFit = timeRunEnd - endFitOffset;
+    startFit = startFit + (binWidth[cycleIndex]/2.0);
+    endFit = endFit + (binWidth[cycleIndex]/2.0);
 
     //loop for fitting and storing value for elements
-    for(int i = 0; i < numElements; i++)
+    for(int elementIndex = 0; elementIndex < numElements; elementIndex++)
     {
-        tempSingleGraph = singleIntegralGraph->GetAGraph(cycleIndex, runIndex, i);
+        tempSingleHisto = singleIntegralHisto->GetAHisto(cycleIndex, runIndex, elementIndex);
 
-        cout << "FITTING SINGLE INTEGRAL " << elementNames[i] << " CYCLE: " << cycleIndex << " RUN: " << runIndex << endl;
-        tempSingleGraph->Fit(singleIntegralFitFunctions[i], "", "", startFit, endFit);
+        cout << "FITTING SINGLE INTEGRAL " << elementNames[elementIndex] << " CYCLE: " << cycleIndex << " RUN: " << runIndex << endl;
+        fitResult = tempSingleHisto->Fit(singleIntegralFitFunctions[elementIndex], "LSMULTITHREAD", "", startFit, endFit);
 
-        for(int k = 0; k < (i+1); k++)
+        for(int elementSubIndex = 0; elementSubIndex < (elementIndex+1); elementSubIndex++)
         {
             //storing values for integral part of function
-            valueN0 = singleIntegralFitFunctions[i]->GetParameter((k*2));
-            errorN0 = singleIntegralFitFunctions[i]->GetParError((k*2));
-            valueDecayConst = singleIntegralFitFunctions[i]->GetParameter((k*2)+1);
-            errorDecayConst = singleIntegralFitFunctions[i]->GetParError((k*2)+1);
+            valueN0 = singleIntegralFitFunctions[elementIndex]->GetParameter((elementSubIndex*2));
+            errorN0 = singleIntegralFitFunctions[elementIndex]->GetParError((elementSubIndex*2));
+            valueDecayConst = singleIntegralFitFunctions[elementIndex]->GetParameter((elementSubIndex*2)+1);
+            errorDecayConst = singleIntegralFitFunctions[elementIndex]->GetParError((elementSubIndex*2)+1);
             valueHalfLife = log(2)/(valueDecayConst);
             errorHalfLife = ((log(2)/valueDecayConst)*(errorDecayConst/valueDecayConst));
+            //if fit fails
+            if(fitResult->Status() != 0)
+            {
+                valueHalfLife = 0.000000000000;
+            }
 
-            singleIntegralFitValues->SetAnN0(i, k, valueN0);
-            singleIntegralFitValues->SetAnN0Error(i, k, errorN0);
-            singleIntegralFitValues->SetAnHalfLife(i, k, valueHalfLife);
-            singleIntegralFitValues->SetAnHalfLifeError(i, k, errorHalfLife);
+            singleIntegralFitValues->SetAnN0(elementIndex, elementSubIndex, valueN0);
+            singleIntegralFitValues->SetAnN0Error(elementIndex, elementSubIndex, errorN0);
+            singleIntegralFitValues->SetAnHalfLife(elementIndex, elementSubIndex, valueHalfLife);
+            singleIntegralFitValues->SetAnHalfLifeError(elementIndex, elementSubIndex, errorHalfLife);
         }
     }
 }
 
 /// \brief Fits total Bateman histogram at specified cycle and run index
-void ElementFit::FitTotalBatemanHisto(Int_t cycleIndex, Int_t runIndex)
+void ElementFit::FitTotalBatemanHistos(Int_t cycleIndex, Int_t runIndex)
 {
     //dynamic array
     Double_t valueN0, errorN0, valueDecayConst, errorDecayConst, valueHalfLife, errorHalfLife, startFitOffset, startFit, endFitOffset, endFit;
+    TFitResultPtr fitResult = nullptr;
     TH1D* tempHisto;
 
     timeRunStart = timeStartArr[cycleIndex];
@@ -719,56 +718,48 @@ void ElementFit::FitTotalBatemanHisto(Int_t cycleIndex, Int_t runIndex)
 
     tempHisto = batemanHisto->GetAHisto(cycleIndex, runIndex);
 
-    //----------->>>>>>HEY, MAKE SURE TO CHANGE THIS WHEN YOU ARE DONE TESTING<<<<<<-------------------------
-
-
-
     cout << "FITTING TOTAL BATEMAN CYCLE: " << cycleIndex << " RUN: " << runIndex << endl;
-    TFitResultPtr fitResult = nullptr;
+    //retry fit if it fails
     for(int i = 0; i < 1; i++)
     {
-        fitResult = tempHisto->Fit(batemanFunction, "VLSMULTITHREAD", "", startFit, endFit);
+        fitResult = tempHisto->Fit(batemanFunction, "LSMULTITHREAD", "", startFit, endFit);
     }
-    //delete 
     
-    for(int i = 0; i < numElements; i++)
+    for(int elementIndex = 0; elementIndex < numElements; elementIndex++)
     {   
-        valueN0 = batemanFunction->GetParameter((i*2));
-        errorN0 = batemanFunction->GetParError((i*2));
-        valueDecayConst = batemanFunction->GetParameter((i*2)+1);
-        errorDecayConst = batemanFunction->GetParError((i*2)+1);
+        valueN0 = batemanFunction->GetParameter((elementIndex*2));
+        errorN0 = batemanFunction->GetParError((elementIndex*2));
+        valueDecayConst = batemanFunction->GetParameter((elementIndex*2)+1);
+        errorDecayConst = batemanFunction->GetParError((elementIndex*2)+1);
         valueHalfLife = log(2)/(valueDecayConst);
-        if(fitResult->Status() != 0)
-        {
-            valueHalfLife = 0.000000000000;
-        }
         errorHalfLife = ((log(2)/valueDecayConst)*(errorDecayConst/valueDecayConst));
-        if((inputHistoExecutionType == 2|| inputHistoExecutionType == 3) && (paraVals[i]->GetFixDecayConst() == false))
+        if((inputHistoExecutionType == 2|| inputHistoExecutionType == 3) && (paraVals[elementIndex]->GetFixDecayConst() == false))
         {
             valueDecayConst = valueDecayConst / 1e-8;
             errorDecayConst = errorDecayConst / 1e-8;
             valueHalfLife = log(2)/(valueDecayConst);
             errorHalfLife = ((log(2)/valueDecayConst)*(errorDecayConst/valueDecayConst));
         }
+        //if fit fails
+        if(fitResult->Status() != 0)
+        {
+            valueHalfLife = 0.000000000000;
+        }
+
         //used to get either the N0 value or half life value
-        totalBatemanFitValues->SetAnN0(i, valueN0);
-        totalBatemanFitValues->SetAnN0Error(i, errorN0);
-        totalBatemanFitValues->SetAnHalfLife(i, valueHalfLife);
-        totalBatemanFitValues->SetAnHalfLifeError(i, errorHalfLife);
+        totalBatemanFitValues->SetAnN0(elementIndex, valueN0);
+        totalBatemanFitValues->SetAnN0Error(elementIndex, errorN0);
+        totalBatemanFitValues->SetAnHalfLife(elementIndex, valueHalfLife);
+        totalBatemanFitValues->SetAnHalfLifeError(elementIndex, errorHalfLife);
     }
 }
 
 /// \brief Fits total integral histogram at specified cycle and run index
-void ElementFit::FitTotalIntegralGraph(Int_t cycleIndex, Int_t runIndex)
+void ElementFit::FitTotalIntegralHistos(Int_t cycleIndex, Int_t runIndex)
 {
     Double_t valueN0, errorN0, valueDecayConst, errorDecayConst, valueHalfLife, errorHalfLife, startFitOffset, startFit, endFitOffset, endFit;
-    TH1D* tempBatemanHisto, *deleteTempHisto;
-    Int_t deleteBinNum = binNumArr[0];
-    Double_t* deleteBinWidths = new Double_t[deleteBinNum+1];
-    Double_t deleteBinWidth = binWidth[0];
-    Double_t deleteValue = 0.0;
-    cout << "BIN WIDTHS: " << deleteBinWidth << endl;
-    TGraph* tempGraph;
+    TFitResultPtr fitResult = nullptr;
+    TH1D* tempHisto;
 
     timeRunStart = timeStartArr[cycleIndex];
     if(inputHistoExecutionType == 1)
@@ -786,37 +777,13 @@ void ElementFit::FitTotalIntegralGraph(Int_t cycleIndex, Int_t runIndex)
     startFit = startFitOffset + timeRunStart;
     endFitOffset = leaveOutEndBinsSim * binWidth[cycleIndex];
     endFit = timeRunEnd - endFitOffset;
+    startFit = startFit + (binWidth[cycleIndex]/2.0);
+    endFit = endFit + (binWidth[cycleIndex]/2.0);
 
-    //tempGraph = integralGraph->GetAGraph(cycleIndex, runIndex);
-    //test
-    tempBatemanHisto = batemanHisto->GetAHisto(cycleIndex, runIndex);
-    deleteBinWidths[0] = 0;
-    deleteBinWidths[1] = deleteBinWidth / 2.0;
-    for(int i = 2; i < deleteBinNum+1; i++)
-    {
-        deleteBinWidths[i] = (i-1) * deleteBinWidth + (deleteBinWidth/2.0);
-    }
-    deleteTempHisto = new TH1D(("Temp name " + to_string(runIndex)).c_str(), ("Temp name" + to_string(runIndex)).c_str(), deleteBinNum, deleteBinWidths);
-    deleteTempHisto->SetBinContent(1, 0);
-    deleteTempHisto->SetBinContent(2, tempBatemanHisto->GetBinContent(1));
-    for(int i = 3; i <= deleteBinNum; i++)
-    {
-        deleteValue = deleteTempHisto->GetBinContent(i-1) + tempBatemanHisto->GetBinContent(i-1);
-        deleteTempHisto->SetBinContent(i, deleteValue);
-    }
-
+    tempHisto = integralHisto->GetAHisto(cycleIndex, runIndex);
 
     cout << "FITTING TOTAL INTEGRAL CYCLE: " << cycleIndex << " RUN: " << runIndex << endl;
-
-    //----------->>>>>>HEY, MAKE SURE TO CHANGE THIS WHEN YOU ARE DONE TESTING<<<<<<-------------------------
-
-
-    TFitResultPtr fitResult;
-    int fitStatus = 1;
-    //fitResult = tempGraph->Fit(integralFunction, "S", "", startFit, endFit);
-    fitResult = deleteTempHisto->Fit(integralFunction, "LSMULTITHREAD", "", startFit + (deleteBinWidth/2.0), endFit + (deleteBinWidth/2.0));
-    test->cd();
-    deleteTempHisto->Draw();
+    fitResult = tempHisto->Fit(integralFunction, "LSMULTITHREAD", "", startFit, endFit);
 
     for(int i = 0; i < numElements; i++)
     {   
@@ -825,10 +792,6 @@ void ElementFit::FitTotalIntegralGraph(Int_t cycleIndex, Int_t runIndex)
         valueDecayConst = integralFunction->GetParameter((i*2)+1);
         errorDecayConst = integralFunction->GetParError((i*2)+1);
         valueHalfLife = log(2)/(valueDecayConst);
-        if(fitResult->Status() != 0)
-        {
-            valueHalfLife = 0.000000000000;
-        }
         errorHalfLife = ((log(2)/valueDecayConst)*(errorDecayConst/valueDecayConst));
         if((inputHistoExecutionType == 2 || inputHistoExecutionType == 3) && (paraVals[i]->GetFixDecayConst() == false))
         {
@@ -837,6 +800,12 @@ void ElementFit::FitTotalIntegralGraph(Int_t cycleIndex, Int_t runIndex)
             valueHalfLife = log(2)/(valueDecayConst);
             errorHalfLife = ((log(2)/valueDecayConst)*(errorDecayConst/valueDecayConst));
         }
+        //if fit fails
+        if(fitResult->Status() != 0)
+        {
+            valueHalfLife = 0.000000000000;
+        }
+
         //used to get either the N0 value or half life value
         totalIntegralFitValues->SetAnN0(i, valueN0);
         totalIntegralFitValues->SetAnN0Error(i, errorN0);
@@ -859,15 +828,16 @@ void ElementFit::GenSingleIntegralHistos()
         tempNumBins = binNumArr[cycleIndex];
         for(int runIndex = 0; runIndex < numRuns; runIndex++)
         {
-            for(int i = 0; i < numElements; i++)
+            for(int elementIndex = 0; elementIndex < numElements; elementIndex++)
             {   
-                tempIntegralHisto = singleIntegralHisto->GetAHisto(cycleIndex, runIndex, i);
-                tempBatemanHisto = singleBatemanHisto->GetAHisto(cycleIndex, runIndex, i);
+                tempIntegralHisto = singleIntegralHisto->GetAHisto(cycleIndex, runIndex, elementIndex);
+                tempBatemanHisto = singleBatemanHisto->GetAHisto(cycleIndex, runIndex, elementIndex);
 
-                tempIntegralHisto->SetBinContent(1, tempBatemanHisto->GetBinContent(1));
-                for(int k = 2; k <= tempNumBins; k++)
+                tempIntegralHisto->SetBinContent(1, 0.0);
+                tempIntegralHisto->SetBinContent(2, tempBatemanHisto->GetBinContent(1));
+                for(int binIndex = 3; binIndex <= (tempNumBins+1); binIndex++)
                 {
-                    tempIntegralHisto->SetBinContent(k, tempIntegralHisto->GetBinContent(k-1) + tempBatemanHisto->GetBinContent(k));
+                    tempIntegralHisto->SetBinContent(binIndex, tempIntegralHisto->GetBinContent(binIndex-1) + tempBatemanHisto->GetBinContent(binIndex-1));
                 }
             }
         }
@@ -987,10 +957,11 @@ void ElementFit::GenTotalIntegralHisto()
             tempIntegralHisto = integralHisto->GetAHisto(cycleIndex, runIndex);
             tempBatemanHisto = batemanHisto->GetAHisto(cycleIndex, runIndex);
 
-            tempIntegralHisto->SetBinContent(1, tempBatemanHisto->GetBinContent(1));
-            for(int i = 2; i<= tempNumBins; i++)
+            tempIntegralHisto->SetBinContent(1, 0.0);
+            tempIntegralHisto->SetBinContent(2, tempBatemanHisto->GetBinContent(1));
+            for(int binIndex = 3; binIndex <= (tempNumBins+1); binIndex++)
             {
-                tempIntegralHisto->SetBinContent(i, tempBatemanHisto->GetBinContent(i) + tempIntegralHisto->GetBinContent(i-1));
+                tempIntegralHisto->SetBinContent(binIndex, tempBatemanHisto->GetBinContent(binIndex-1) + tempIntegralHisto->GetBinContent(binIndex-1));
             }
         }
     }

@@ -18,7 +18,7 @@ public:
 };
 
 /// Constructor for class. Dynaically allocates histograms and names them properly.
-RunIntegralHistoHolder::RunIntegralHistoHolder(Int_t cycleNum, Int_t numRuns, string histoName, Int_t numBins, Double_t* binEnd)
+RunIntegralHistoHolder::RunIntegralHistoHolder(Int_t cycleNum, Int_t numRuns, string histoName, Int_t numBins, Double_t* binEdges)
 {
     string tempHistoName;
 
