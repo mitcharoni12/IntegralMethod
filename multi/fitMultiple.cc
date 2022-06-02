@@ -207,10 +207,12 @@ void fitMultiple()
             paraVals[i]->SetFixHalfLife(false);
         }
     }
+
     //gets option to create the fit functions if need be
     inFile.ignore(256,':');
     inFile >> createFitFunctionsChoice;
     fitOptions->SetElementNames(elementNames);
+    fitOptions->SetCreateFitFunctions(createFitFunctionsChoice);
     inFile.close();
 
     //creates the fit functions in FitFunction.h

@@ -23,6 +23,7 @@ private:
     Int_t binTimeFitInc = 0;            ///< Bin increment when changing time fit for simulation of the program. Want to keep bin width same to to change time fit add on bin to end.
     Int_t inputHistoExecutionType = 1;  ///< Determines the execution type reguarding the input histogram. 1 = no input histogram, 2 = monte carlo type error evaluation, 3 = input histogram changing time fit.
     Int_t singleElementDataChoice = 1;  ///< Determines if the program will generates and fit single Bateman/integral histograms. 1 = don't generate single histogram, 2 = generate single histograms.
+    Int_t createFitFunctions = 2;       ///< Choice for creating fit functions, 1 = yes, 2 = no. Only use is in destructor.
     Double_t timeRunEndSimulated;       ///< Inital time in which data will stop generating/fitting for the simulation execution type of program.(S)
     Double_t timeRunStartInput;         ///< Inital time to start fitting the input histogram(10^-8S).
     Double_t timeRunEndInput;           ///< Inital time to end fitting the input histogram(10^-8S).
@@ -64,6 +65,7 @@ public:
     void SetInputHistoExecutionType(Int_t inputHistoExecutionType){this->inputHistoExecutionType = inputHistoExecutionType;}
     void SetSingleElementDataChoice(Int_t singleElementDataChoice){this->singleElementDataChoice = singleElementDataChoice;}
     void SetInputHistoBinNum(Int_t inputHistoBinNum){this->inputHistoBinNum = inputHistoBinNum;}
+    void SetCreateFitFunctions(Int_t createFitFunctions){this->createFitFunctions = createFitFunctions;}
     void SetTimeRunEndSimulated(Double_t timeRunEndSimulated){this->timeRunEndSimulated = timeRunEndSimulated;}
     void SetTimeRunEndInput(Double_t timeRunEndInput){this->timeRunEndInput = timeRunEndInput;}
     void SetTimeRunStartInput(Double_t timeRunStartInput){this->timeRunStartInput = timeRunStartInput;}
@@ -95,6 +97,7 @@ public:
     Int_t GetInputHistoExecutionType(){return inputHistoExecutionType;}
     Int_t GetInputHistoBinNum(){return inputHistoBinNum;}
     Int_t GetSingleElementDataChoice(){return singleElementDataChoice;}
+    Int_t GetCreateFitFunctions(){return createFitFunctions;}
     Int_t* GetBinNumArr(){return binNumArr;}
     Double_t GetTimeRunEndSimulated(){return timeRunEndSimulated;}
     Double_t GetTimeRunEndInput(){return timeRunEndInput;}
@@ -283,9 +286,12 @@ FitOption::~FitOption()
     delete [] timeLengthArr;
     delete [] fitStartBinArr;
     delete [] fitEndBinArr;
-    for(int i = 0; i < numCycles; i++)
+    if(createFitFunctions == 2)
     {
-        delete [] binEdgesArr[i];
+        for(int i = 0; i < numCycles; i++)
+        {
+            delete [] binEdgesArr[i];
+        }
     }
     delete [] binEdgesArr;
 }
