@@ -1,4 +1,4 @@
-number of runs:1000
+number of runs:100
 show data via histogram(1) or graph(2):1
 display individual fits(1) dont display individual fits(2):2
 lower run histo index(0 based):0
