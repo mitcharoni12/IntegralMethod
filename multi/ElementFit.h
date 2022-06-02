@@ -615,7 +615,7 @@ void ElementFit::FitSingleBatemanHistos(Int_t cycleIndex, Int_t runIndex)
         tempSingleBatemanHisto = singleBatemanHisto->GetAHisto(cycleIndex, runIndex, elementIndex);
 
         cout << "FITTING SINGLE BATEMAN " << elementNames[elementIndex] << " CYCLE: " << cycleIndex << " RUN: " << runIndex << endl;
-        fitResult = tempSingleBatemanHisto->Fit(singleBatemanFitFunctions[elementIndex], "LSMULTITHREAD", "", startFit, endFit);
+        fitResult = tempSingleBatemanHisto->Fit(singleBatemanFitFunctions[elementIndex], "QLSMULTITHREAD", "", startFit, endFit);
 
         for(int subElementIndex = 0; subElementIndex < (elementIndex+1); subElementIndex++)
         {
@@ -666,7 +666,7 @@ void ElementFit::FitSingleIntegralHistos(Int_t cycleIndex, Int_t runIndex)
         tempSingleHisto = singleIntegralHisto->GetAHisto(cycleIndex, runIndex, elementIndex);
 
         cout << "FITTING SINGLE INTEGRAL " << elementNames[elementIndex] << " CYCLE: " << cycleIndex << " RUN: " << runIndex << endl;
-        fitResult = tempSingleHisto->Fit(singleIntegralFitFunctions[elementIndex], "LSMULTITHREAD", "", startFit, endFit);
+        fitResult = tempSingleHisto->Fit(singleIntegralFitFunctions[elementIndex], "QLSMULTITHREAD", "", startFit, endFit);
 
         for(int elementSubIndex = 0; elementSubIndex < (elementIndex+1); elementSubIndex++)
         {
@@ -722,7 +722,7 @@ void ElementFit::FitTotalBatemanHistos(Int_t cycleIndex, Int_t runIndex)
     //retry fit if it fails
     for(int i = 0; i < 1; i++)
     {
-        fitResult = tempHisto->Fit(batemanFunction, "LSMULTITHREAD", "", startFit, endFit);
+        fitResult = tempHisto->Fit(batemanFunction, "QLSMULTITHREAD", "", startFit, endFit);
     }
     
     for(int elementIndex = 0; elementIndex < numElements; elementIndex++)
@@ -783,7 +783,7 @@ void ElementFit::FitTotalIntegralHistos(Int_t cycleIndex, Int_t runIndex)
     tempHisto = integralHisto->GetAHisto(cycleIndex, runIndex);
 
     cout << "FITTING TOTAL INTEGRAL CYCLE: " << cycleIndex << " RUN: " << runIndex << endl;
-    fitResult = tempHisto->Fit(integralFunction, "LSMULTITHREAD", "", startFit, endFit);
+    fitResult = tempHisto->Fit(integralFunction, "QLSMULTITHREAD", "", startFit, endFit);
 
     for(int i = 0; i < numElements; i++)
     {   
