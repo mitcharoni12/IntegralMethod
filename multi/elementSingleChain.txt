@@ -49,7 +49,7 @@ element 3 half life lower(s):.000001
 element 3 half life upper(s):100000.0
 element 3 fix half life(1) don't fix(2):1
 
-element 4 Name:Test1
+element 4 Name:Test4
 
 element 4 Bateman N0 value:10
 element 4 Bateman N0 lower:0
