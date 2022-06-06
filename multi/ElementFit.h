@@ -783,7 +783,7 @@ void ElementFit::FitTotalIntegralHistos(Int_t cycleIndex, Int_t runIndex)
     tempHisto = integralHisto->GetAHisto(cycleIndex, runIndex);
 
     cout << "FITTING TOTAL INTEGRAL CYCLE: " << cycleIndex << " RUN: " << runIndex << endl;
-    fitResult = tempHisto->Fit(integralFunction, "QLSMULTITHREAD", "", startFit, endFit);
+    fitResult = tempHisto->Fit(integralFunction, "LSMULTITHREAD", "", startFit, endFit);
 
     for(int i = 0; i < numElements; i++)
     {   
