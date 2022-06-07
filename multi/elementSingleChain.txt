@@ -34,7 +34,7 @@ element 2 fix half life(1) don't fix(2):1
 
 element 3 Name:Test3
 
-element 3 Bateman N0 value:10
+element 3 Bateman N0 value:0
 element 3 Bateman N0 lower:0
 element 3 Bateman N0 upper:10000000
 element 3 fix N0(1) don't fix(2):2
@@ -51,7 +51,7 @@ element 3 fix half life(1) don't fix(2):1
 
 element 4 Name:Test4
 
-element 4 Bateman N0 value:10
+element 4 Bateman N0 value:0
 element 4 Bateman N0 lower:0
 element 4 Bateman N0 upper:10000000
 element 4 fix N0(1) don't fix(2):2
@@ -68,7 +68,7 @@ element 4 fix half life(1) don't fix(2):1
 
 element 5 Name:Test5
 
-element 5 Bateman N0 value:10
+element 5 Bateman N0 value:0
 element 5 Bateman N0 lower:0
 element 5 Bateman N0 upper:10000000
 element 5 fix N0(1) don't fix(2):2
