@@ -1,4 +1,4 @@
-Number of Elements:2
+Number of Elements:1
 Histo events:10
 Histo Bins(only if rebin):5
 Input Histo Bin Number:12000
