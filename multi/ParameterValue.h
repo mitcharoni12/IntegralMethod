@@ -17,6 +17,9 @@ class ParameterValue{
         Double_t lowerRangeBatemanN0, upperRangeBatemanN0, batemanN0;
         Double_t lowerRangeIntegralN0, upperRangeIntegralN0, integralN0;
         bool fixBatemanN0, fixIntegralN0;
+
+        Double_t lowerRangeBackgroundValue, upperRangeBackgroundValue, backgroundValue;
+        bool fixBackgroundValue;
     public:
         void SetLowerRangeHalfLife(Double_t lower){lowerRangeHalfLife = lower;}
         void SetUpperRangeHalfLife(Double_t upper){upperRangeHalfLife = upper;}
@@ -36,6 +39,11 @@ class ParameterValue{
         void SetUpperRangeIntegralN0(Double_t upper){upperRangeIntegralN0 = upper;}
         void SetIntegralN0(Double_t val){integralN0 = val;}
         void SetFixIntegralN0(bool fixN0){this->fixIntegralN0 = fixN0;}
+
+        void SetLowerRangeBackgroundValue(Double_t lower){lowerRangeBackgroundValue = lower;}
+        void SetUpperRangeBackgroundValue(Double_t upper){upperRangeBackgroundValue = upper;}
+        void SetBackgroundValue(Double_t val){backgroundValue = val;}
+        void SetFixBackgroundValue(bool fixBackgroundValue){this->fixBackgroundValue = fixBackgroundValue;}
 
         Double_t GetLowerRangeHalfLife(){return lowerRangeHalfLife;}
         Double_t GetUpperRangeHalfLife(){return upperRangeHalfLife;}
@@ -63,6 +71,11 @@ class ParameterValue{
         Double_t GetIntegralN0(){return integralN0;}
         bool GetFixIntegralN0(){return fixIntegralN0;}
 
+        Double_t GetLowerRangeBackgroundValue(){return lowerRangeBackgroundValue;}
+        Double_t GetUpperRangeBackgroundValue(){return upperRangeBackgroundValue;}
+        Double_t GetBackgroundValue(){return backgroundValue;}
+        bool GetFixBackgroundValue(){return fixBackgroundValue;}
+
         ParameterValue();
 };
 
@@ -80,5 +93,8 @@ ParameterValue::ParameterValue()
     lowerRangeIntegralN0 = 0;
     upperRangeIntegralN0 = 0;
     integralN0 = 0;
+    lowerRangeBackgroundValue = 0;
+    upperRangeBackgroundValue = 0;
+    backgroundValue = 0;
 }
 #endif

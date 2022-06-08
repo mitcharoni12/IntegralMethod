@@ -1,3 +1,8 @@
+background value:10
+background value lower:0
+background value upper:100
+background fix value(1) don't fix(2):2
+
 element 1 Name:CS
 
 element 1 Bateman N0 value:10000

@@ -101,7 +101,7 @@ class ElementFit{
         //private variables
         FitOption* fitOptions;                                                      ///< Contains fit options for program
         string* elementNames;                                                       ///< Contains element names for every element in the decay chain
-        Int_t numEvents, numElements, numParameters, numRuns, numCycles, inputHistoExecutionType, singleElementDataChoice;
+        Int_t numEvents, numBackgroundEvents, numElements, numParameters, numRuns, numCycles, inputHistoExecutionType, singleElementDataChoice;
         bool multiSourceChoice;                                                     ///< True = generate multiple sets of histograms for the different cyles. False = generate a single set of histograms for the diiferent cyles.
         bool rebinChoice;                                                           ///< True = Have program execute with changing bin number between cylces and keeping time fit constant. False = Dont do rebin
         bool numEventChangeChoice;                                                  ///< True = Change number of events between cylces
@@ -150,12 +150,13 @@ ElementFit::ElementFit(Double_t (*batemanFunc)(Double_t*, Double_t*), Double_t (
     this->fitOptions = fitOptions;
     this->numEvents = fitOptions->GetNumEvents();
     this->numRuns = fitOptions->GetNumRuns();
+    this->numBackgroundEvents = fitOptions->GetNumBackgroundEvents();
     this->numCycles = fitOptions->GetNumCycles();
     this->elementNames = fitOptions->GetElementNames();
     this->batemanFitFunctions = batemanFitFunctions;
     this->integralFitFunctions = integralFitFunctions;
     this->numElements = fitOptions->GetNumElements();
-    this->numParameters = numElements*2;
+    this->numParameters = numElements*2 + 1; //+1 for background parameter
     this->passedBatemanFunction = batemanFunc;
     this->passedIntegralFunction = integralFunc;
     this->timeRunEnd = fitOptions->GetTimeRunEndSimulated();
@@ -221,7 +222,7 @@ ElementFit::ElementFit(Double_t (*batemanFunc)(Double_t*, Double_t*), Double_t (
     this->batemanFitFunctions = batemanFitFunctions;
     this->integralFitFunctions = integralFitFunctions;
     this->numElements = fitOptions->GetNumElements();
-    this->numParameters = numElements*2;
+    this->numParameters = numElements*2 + 1; //+1 for background parameter
     this->passedBatemanFunction = batemanFunc;
     this->passedIntegralFunction = integralFunc;
     this->timeRunEnd = fitOptions->GetTimeRunEndInput();
@@ -716,6 +717,13 @@ void ElementFit::FitTotalBatemanHistos(Int_t cycleIndex, Int_t runIndex)
     endFitOffset = leaveOutEndBinsSim * binWidth[cycleIndex];
     endFit = timeRunEnd - endFitOffset;
 
+    for(int i = 0; i < numElements; i++)
+    {
+        cout << "parameter " << i << ": " << batemanFunction->GetParameter(i) << endl;
+        cout << "parameter " << (i+1) << ": " << batemanFunction->GetParameter(i+1) << endl;
+    }
+    cout << "parameter " << (numElements*2) << ": " << batemanFunction->GetParameter(numElements*2) << endl;
+
     tempHisto = batemanHisto->GetAHisto(cycleIndex, runIndex);
 
     cout << "FITTING TOTAL BATEMAN CYCLE: " << cycleIndex << " RUN: " << runIndex << endl;
@@ -855,6 +863,8 @@ void ElementFit::GenBatemanHistograms()
     singleTempHisto = new TH1D* [numElements];
     Double_t hold = 0.0f;
     Double_t stack = 0.0f;
+    Double_t backgroundTime = 0.0f;
+    Double_t timeGen; //time to generate background until
     //case for generating the single histogram for the single source histogram choice
     if(!rebinChoice && !multiSourceChoice)
     {
@@ -863,6 +873,19 @@ void ElementFit::GenBatemanHistograms()
         tempSingleHisto = new TH1D* [numElements];
 
         ChangeSeed();
+        
+        //generating background events
+        for(int backgroundIndex = 0; backgroundIndex < numBackgroundEvents; backgroundIndex++)
+        {
+            backgroundTime = rand.Uniform();
+            for(int cycleIndex = 0; cycleIndex < numCycles; cycleIndex++)
+            {
+                tempHisto = batemanHisto->GetAHisto(cycleIndex, 0);
+                timeGen = (fitOptions->GetBinNumArr()[cycleIndex]) * (fitOptions->GetBinWidthArr()[cycleIndex]) + (fitOptions->GetBinWidthArr()[cycleIndex] * 0.5);
+                backgroundTime = (backgroundTime * timeGen);
+                tempHisto->Fill(backgroundTime);
+            }
+        }
 
         //generates events for the single and total histograms symotaniously
         for(int i = 0; i < numEvents; i++)
@@ -889,7 +912,7 @@ void ElementFit::GenBatemanHistograms()
                     tempHisto->Fill(stack);
                 }
             }
-            stack = 0.0f; 
+            stack = 0.0f;
         }
 
         delete [] tempSingleHisto;
@@ -901,19 +924,32 @@ void ElementFit::GenBatemanHistograms()
         {
             //change seed for generation between each run
             ChangeSeed();
+
+            //generating background events
+            for(int backgroundIndex = 0; backgroundIndex < numBackgroundEvents; backgroundIndex++)
+            {
+                backgroundTime = rand.Uniform();
+                for(int cycleIndex = 0; cycleIndex < numCycles; cycleIndex++)
+                {
+                    tempHisto = batemanHisto->GetAHisto(cycleIndex, runIndex);
+                    timeGen = (fitOptions->GetBinNumArr()[cycleIndex]) * (fitOptions->GetBinWidthArr()[cycleIndex]) + (fitOptions->GetBinWidthArr()[cycleIndex] * 0.5);
+                    backgroundTime = (backgroundTime * timeGen);
+                    tempHisto->Fill(backgroundTime);
+                }
+            }
             //generates events for the single and total histograms symotaniously
-            for(int i = 0; i < numEvents; i++)
+            for(int eventIndex = 0; eventIndex < numEvents; eventIndex++)
             {
                 //generating the times the events occured
-                for(int j = 0; j < numElements; j++)
+                for(int elementIndex = 0; elementIndex < numElements; elementIndex++)
                 {
                     hold = rand.Uniform();
-                    randArr[j] = (-TMath::Log(hold)) / (paraVals[j]->GetDecayConst());
+                    randArr[elementIndex] = (-TMath::Log(hold)) / (paraVals[elementIndex]->GetDecayConst());
                 }
                 //putting events in repsective histograms
-                for(int k = 0; k < numElements; k++)
+                for(int elementIndex = 0; elementIndex < numElements; elementIndex++)
                 {
-                    stack += randArr[k];
+                    stack += randArr[elementIndex];
                     //puts same events in all the cycles
                     //Ex: if we have 10 cycles, all the run 0's of all the cycles will have the same exact events.
                     for(int cycleIndex = 0; cycleIndex < numCycles; cycleIndex++)
@@ -921,8 +957,8 @@ void ElementFit::GenBatemanHistograms()
                         tempHisto = batemanHisto->GetAHisto(cycleIndex, runIndex);
                         if(singleElementDataChoice == 2)
                         {
-                            singleTempHisto[k] = singleBatemanHisto->GetAHisto(cycleIndex, runIndex, k);
-                            singleTempHisto[k]->Fill(stack);
+                            singleTempHisto[elementIndex] = singleBatemanHisto->GetAHisto(cycleIndex, runIndex, elementIndex);
+                            singleTempHisto[elementIndex]->Fill(stack);
                         }
                         tempHisto->Fill(stack);
                     }
@@ -1009,6 +1045,14 @@ void ElementFit::SetTotalBatemanFunctionParameters()
             batemanFunction->SetParameter((i*2)+1, paraVals[i]->GetDecayConst10Ns());
         }
     }
+    batemanFunction->SetParameter(numElements*2, paraVals[0]->GetBackgroundValue());
+
+    for(int i = 0; i < numElements; i++)
+    {
+        cout << "parameter " << i << ": " << batemanFunction->GetParameter(i) << endl;
+        cout << "parameter " << (i+1) << ": " << batemanFunction->GetParameter(i+1) << endl;
+    }
+    cout << "parameter " << (numElements*2) << ": " << batemanFunction->GetParameter(numElements*2) << endl;
 }
 
 /// \brief sets function parameters for total integral function
@@ -1027,6 +1071,7 @@ void ElementFit::SetTotalIntegralFunctionParameters()
             integralFunction->SetParameter((i*2)+1, paraVals[i]->GetDecayConst10Ns());
         }
     }
+    integralFunction->SetParameter(numElements*2, paraVals[0]->GetBackgroundValue());
 }
 
 /// \brief Displays the parameters used to set the fit functions
@@ -1035,11 +1080,12 @@ void ElementFit::DisplayTotalFunctionParameters()
     cout << "INITIAL FIT FUNCTION PARAMETERS" << endl;
     for(int i = 0; i < numElements; i++)
     {
-        cout << elementNames[i] << ":\tBateman init value: " << paraVals[i]->GetBatemanN0();
-        cout << elementNames[i] << "\tIntegral init value: " << paraVals[i]->GetIntegralN0();
+        cout << elementNames[i] << ":\tBateman init value: " << paraVals[i]->GetBatemanN0() << endl;
+        cout << elementNames[i] << ":\tIntegral init value: " << paraVals[i]->GetIntegralN0() << endl;
         cout << "\tHalf Life: " << paraVals[i]->GetHalfLife();
         cout << endl;
     }
+    cout << "Background: " << paraVals[0]->GetBackgroundValue() << endl;
     cout << endl;
 }
 
@@ -1129,6 +1175,13 @@ void ElementFit::SetTotalBatemanParameterLimits()
             }
         }
     }
+    //Setting background parameters
+    if(paraVals[0]->GetFixBackgroundValue())
+    {
+        batemanFunction->FixParameter(numElements*2, paraVals[0]->GetBackgroundValue());
+    }else{
+        batemanFunction->SetParLimits(numElements*2, (paraVals[0]->GetLowerRangeBackgroundValue()), (paraVals[0]->GetUpperRangeBackgroundValue()));
+    }
 }
 
 /// \brief Sets the limits for the total integral function.
@@ -1167,6 +1220,13 @@ void ElementFit::SetTotalIntegralParameterLimits()
                 integralFunction->SetParLimits((i*2)+1, (paraVals[i]->GetLowerRangeDecayConst10Ns()), (paraVals[i]->GetUpperRangeDecayConst10Ns()));
             }
         }
+    }
+    //Setting background parameters
+    if(paraVals[0]->GetFixBackgroundValue())
+    {
+        integralFunction->FixParameter(numElements*2, paraVals[0]->GetBackgroundValue());
+    }else{
+        integralFunction->SetParLimits(numElements*2, (paraVals[0]->GetLowerRangeBackgroundValue()), (paraVals[0]->GetUpperRangeBackgroundValue()));
     }
 }
 

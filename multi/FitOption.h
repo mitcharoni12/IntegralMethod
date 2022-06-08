@@ -28,6 +28,7 @@ private:
     Double_t timeRunStartInput;         ///< Inital time to start fitting the input histogram(10^-8S).
     Double_t timeRunEndInput;           ///< Inital time to end fitting the input histogram(10^-8S).
     Double_t events;                    ///< Number of events generated for EACH ELEMENT in the decay chain.
+    Double_t backgroundEvents;          ///< Number of background events generated for data set (NOT FOR EACH ELEMENT)
     Double_t binWidth;                  ///< Width of the bins for the simulation execution type of the program.
     Double_t inputHistoTimeEnd;         ///< Time in which the input histogram ends(10^-8s).
     Double_t inputTimeInc;              ///< Increment in which time fit will change between cycles of the input histogram.
@@ -71,6 +72,7 @@ public:
     void SetTimeRunStartInput(Double_t timeRunStartInput){this->timeRunStartInput = timeRunStartInput;}
     void SetTimeFitBinInc(Double_t binTimeFitInc){this->binTimeFitInc = binTimeFitInc;}
     void SetNumEvents(Double_t events){this->events = events;}
+    void SetNumBackgroundEvents(Double_t backgroundEvents){this->backgroundEvents = backgroundEvents;}
     void SetBinWidth(Double_t binWidth){this->binWidth = binWidth;}
     void SetInputHistoTimeEnd(Double_t inputHistoTimeEnd){this->inputHistoTimeEnd = inputHistoTimeEnd;}
     void SetInputTimeInc(Double_t inputTimeInc){this->inputTimeInc = inputTimeInc;}
@@ -104,6 +106,7 @@ public:
     Double_t GetTimeRunStartInput(){return timeRunStartInput;}
     Double_t GetTimeFitBinInc(){return binTimeFitInc;}
     Double_t GetNumEvents(){return events;}
+    Double_t GetNumBackgroundEvents(){return backgroundEvents;}
     Double_t GetBinWidth(){return binWidth;}
     Double_t GetInputHistoTimeEnd(){return inputHistoTimeEnd;}
     Double_t GetInputTimeInc(){return inputTimeInc;}

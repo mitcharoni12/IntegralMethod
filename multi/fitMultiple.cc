@@ -37,7 +37,7 @@ int main()
 
 void fitMultiple()
 {
-    Int_t numBins, rebinBinInc, createFitFunctionsChoice, events, programExecutionType, histoSimulateChoice, rangeValueChoice,
+    Int_t numBins, rebinBinInc, createFitFunctionsChoice, events, backgroundEvents, programExecutionType, histoSimulateChoice, rangeValueChoice,
           displayIndividualFitsChoice, rebinChoice, inputHistoExecutionType, inputHistoBinNum, singleElementDataChoice;
     Double_t timeRunEndSimulated, timeRunEndInput, timeRunStartInput, inputHistoTimeEnd, valueHolder, leaveOutStartBinsSim, leaveOutEndBinsSim, binWidth, leaveOutStartBinsInput, leaveOutEndBinsInput;
     FitOption* fitOptions = new FitOption();
@@ -75,6 +75,8 @@ void fitMultiple()
     inFile >> numElements;
     inFile.ignore(256,':');
     inFile >> events;
+    inFile.ignore(256,':');
+    inFile >> backgroundEvents;
     inFile.ignore(256,':');
     inFile >> numBins;
     inFile.ignore(256,':');
@@ -114,6 +116,7 @@ void fitMultiple()
 
     //setting data read in from simulate.txt to the fitOption object.
     fitOptions->SetNumEvents(events);
+    fitOptions->SetNumBackgroundEvents(backgroundEvents);
     fitOptions->SetNumBins(numBins);
     fitOptions->SetBinWidth(binWidth);
     fitOptions->SetTimeRunEndSimulated(timeRunEndSimulated);
@@ -141,6 +144,26 @@ void fitMultiple()
         paraVals[i] = new ParameterValue();
     }
     string* elementNames = new string [numElements];
+
+    inFile.ignore(256,':');
+    inFile >> valueHolder;
+    paraVals[0]->SetBackgroundValue(valueHolder);
+    inFile.ignore(256,':');
+    inFile >> valueHolder;
+    paraVals[0]->SetLowerRangeBackgroundValue(valueHolder);
+    inFile.ignore(256,':');
+    inFile >> valueHolder;
+    paraVals[0]->SetUpperRangeBackgroundValue(valueHolder);
+    inFile.ignore(256,':');
+    inFile >> valueHolder;
+    if(valueHolder == 1)
+    {
+        paraVals[0]->SetFixBackgroundValue(true);
+    }else
+    {
+        paraVals[0]->SetFixBackgroundValue(false);
+    }
+
     for(int i = 0; i < numElements; i++)
     {
         //name of element
@@ -959,20 +982,31 @@ void fitMultiple()
 Double_t BatemanDecaybyActivity(Double_t *x, Double_t *par)
 {
     Double_t hold = 0.0;
+    Double_t background = par[(numElements * 2)];
+
     for(int i = 0; i < numElements; i++)
     {
         hold += batemanFitFunctions[i](x, par);
     }
+
+    hold += background;
+
     return hold;
 }
 
 Double_t IntegralDecaybyActivity(Double_t *x, Double_t *par)
 {
     Double_t hold = 0.0;
+    Float_t timeVar = x[0];
+    Double_t background = par[(numElements * 2)];
+
     for(int i = 0; i < numElements; i++)
     {
         hold += integralFitFunctions[i](x, par);
     }
+
+    hold += (background * timeVar);
+
     return hold;
 }
 
