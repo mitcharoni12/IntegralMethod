@@ -717,13 +717,6 @@ void ElementFit::FitTotalBatemanHistos(Int_t cycleIndex, Int_t runIndex)
     endFitOffset = leaveOutEndBinsSim * binWidth[cycleIndex];
     endFit = timeRunEnd - endFitOffset;
 
-    for(int i = 0; i < numElements; i++)
-    {
-        cout << "parameter " << i << ": " << batemanFunction->GetParameter(i) << endl;
-        cout << "parameter " << (i+1) << ": " << batemanFunction->GetParameter(i+1) << endl;
-    }
-    cout << "parameter " << (numElements*2) << ": " << batemanFunction->GetParameter(numElements*2) << endl;
-
     tempHisto = batemanHisto->GetAHisto(cycleIndex, runIndex);
 
     cout << "FITTING TOTAL BATEMAN CYCLE: " << cycleIndex << " RUN: " << runIndex << endl;
@@ -1046,13 +1039,6 @@ void ElementFit::SetTotalBatemanFunctionParameters()
         }
     }
     batemanFunction->SetParameter(numElements*2, paraVals[0]->GetBackgroundValue());
-
-    for(int i = 0; i < numElements; i++)
-    {
-        cout << "parameter " << i << ": " << batemanFunction->GetParameter(i) << endl;
-        cout << "parameter " << (i+1) << ": " << batemanFunction->GetParameter(i+1) << endl;
-    }
-    cout << "parameter " << (numElements*2) << ": " << batemanFunction->GetParameter(numElements*2) << endl;
 }
 
 /// \brief sets function parameters for total integral function
