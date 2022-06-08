@@ -147,21 +147,40 @@ void fitMultiple()
 
     inFile.ignore(256,':');
     inFile >> valueHolder;
-    paraVals[0]->SetBackgroundValue(valueHolder);
+    paraVals[0]->SetBatemanBackgroundValue(valueHolder);
     inFile.ignore(256,':');
     inFile >> valueHolder;
-    paraVals[0]->SetLowerRangeBackgroundValue(valueHolder);
+    paraVals[0]->SetLowerRangeBatemanBackgroundValue(valueHolder);
     inFile.ignore(256,':');
     inFile >> valueHolder;
-    paraVals[0]->SetUpperRangeBackgroundValue(valueHolder);
+    paraVals[0]->SetUpperRangeBatemanBackgroundValue(valueHolder);
     inFile.ignore(256,':');
     inFile >> valueHolder;
     if(valueHolder == 1)
     {
-        paraVals[0]->SetFixBackgroundValue(true);
+        paraVals[0]->SetFixBatemanBackgroundValue(true);
     }else
     {
-        paraVals[0]->SetFixBackgroundValue(false);
+        paraVals[0]->SetFixBatemanBackgroundValue(false);
+    }
+
+    inFile.ignore(256,':');
+    inFile >> valueHolder;
+    paraVals[0]->SetIntegralBackgroundValue(valueHolder);
+    inFile.ignore(256,':');
+    inFile >> valueHolder;
+    paraVals[0]->SetLowerRangeIntegralBackgroundValue(valueHolder);
+    inFile.ignore(256,':');
+    inFile >> valueHolder;
+    paraVals[0]->SetUpperRangeIntegralBackgroundValue(valueHolder);
+    inFile.ignore(256,':');
+    inFile >> valueHolder;
+    if(valueHolder == 1)
+    {
+        paraVals[0]->SetFixIntegralBackgroundValue(true);
+    }else
+    {
+        paraVals[0]->SetFixIntegralBackgroundValue(false);
     }
 
     for(int i = 0; i < numElements; i++)

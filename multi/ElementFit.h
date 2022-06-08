@@ -1038,7 +1038,7 @@ void ElementFit::SetTotalBatemanFunctionParameters()
             batemanFunction->SetParameter((i*2)+1, paraVals[i]->GetDecayConst10Ns());
         }
     }
-    batemanFunction->SetParameter(numElements*2, paraVals[0]->GetBackgroundValue());
+    batemanFunction->SetParameter(numElements*2, paraVals[0]->GetBatemanBackgroundValue());
 }
 
 /// \brief sets function parameters for total integral function
@@ -1057,7 +1057,7 @@ void ElementFit::SetTotalIntegralFunctionParameters()
             integralFunction->SetParameter((i*2)+1, paraVals[i]->GetDecayConst10Ns());
         }
     }
-    integralFunction->SetParameter(numElements*2, paraVals[0]->GetBackgroundValue());
+    integralFunction->SetParameter(numElements*2, paraVals[0]->GetIntegralBackgroundValue());
 }
 
 /// \brief Displays the parameters used to set the fit functions
@@ -1071,7 +1071,8 @@ void ElementFit::DisplayTotalFunctionParameters()
         cout << "\tHalf Life: " << paraVals[i]->GetHalfLife();
         cout << endl;
     }
-    cout << "Background: " << paraVals[0]->GetBackgroundValue() << endl;
+    cout << "Bateman Background: " << paraVals[0]->GetBatemanBackgroundValue() << endl;
+    cout << "Integral Background: " << paraVals[0]->GetIntegralBackgroundValue() << endl;
     cout << endl;
 }
 
@@ -1162,11 +1163,11 @@ void ElementFit::SetTotalBatemanParameterLimits()
         }
     }
     //Setting background parameters
-    if(paraVals[0]->GetFixBackgroundValue())
+    if(paraVals[0]->GetFixBatemanBackgroundValue())
     {
-        batemanFunction->FixParameter(numElements*2, paraVals[0]->GetBackgroundValue());
+        batemanFunction->FixParameter(numElements*2, paraVals[0]->GetBatemanBackgroundValue());
     }else{
-        batemanFunction->SetParLimits(numElements*2, (paraVals[0]->GetLowerRangeBackgroundValue()), (paraVals[0]->GetUpperRangeBackgroundValue()));
+        batemanFunction->SetParLimits(numElements*2, (paraVals[0]->GetLowerRangeBatemanBackgroundValue()), (paraVals[0]->GetUpperRangeBatemanBackgroundValue()));
     }
 }
 
@@ -1208,11 +1209,11 @@ void ElementFit::SetTotalIntegralParameterLimits()
         }
     }
     //Setting background parameters
-    if(paraVals[0]->GetFixBackgroundValue())
+    if(paraVals[0]->GetFixIntegralBackgroundValue())
     {
-        integralFunction->FixParameter(numElements*2, paraVals[0]->GetBackgroundValue());
+        integralFunction->FixParameter(numElements*2, paraVals[0]->GetIntegralBackgroundValue());
     }else{
-        integralFunction->SetParLimits(numElements*2, (paraVals[0]->GetLowerRangeBackgroundValue()), (paraVals[0]->GetUpperRangeBackgroundValue()));
+        integralFunction->SetParLimits(numElements*2, (paraVals[0]->GetLowerRangeIntegralBackgroundValue()), (paraVals[0]->GetUpperRangeIntegralBackgroundValue()));
     }
 }
 

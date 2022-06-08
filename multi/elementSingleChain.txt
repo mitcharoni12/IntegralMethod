@@ -1,16 +1,21 @@
-background value:0
-background value lower:0
-background value upper:100
-background fix value(1) don't fix(2):1
+bateman background value:100
+bateman background value lower:0
+bateman background value upper:10000
+bateman background fix value(1) don't fix(2):2
+
+integral background value:10000
+integral background value lower:0
+integral background value upper:1000000
+integral background fix value(1) don't fix(2):2
 
 element 1 Name:Test1
 
-element 1 Bateman N0 value:10
+element 1 Bateman N0 value:0.1
 element 1 Bateman N0 lower:0
 element 1 Bateman N0 upper:10000000
 element 1 fix N0(1) don't fix(2):2
 
-element 1 Integral N0 value:10000
+element 1 Integral N0 value:100
 element 1 Integral N0 lower:0
 element 1 Integral N0 upper:10000000
 element 1 fix N0(1) don't fix(2):2
