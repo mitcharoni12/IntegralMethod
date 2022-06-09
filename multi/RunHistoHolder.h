@@ -25,8 +25,11 @@ RunHistoHolder::RunHistoHolder(Int_t cycleNum, Int_t numRuns, string histoName, 
     histoArr = new TH1D* [numRuns];
     for(int i = 0; i < numRuns; i++)
     {
-        tempHistoName = histoName + " " + "Run: " + (to_string(i+1)).c_str() + " Cycle: " + (to_string(cycleNum+1)).c_str();
+        //tempHistoName = histoName + " " + "Run: " + (to_string(i+1)).c_str() + " Cycle: " + (to_string(cycleNum+1)).c_str();
+        tempHistoName = "Decay Histogram";
         histoArr[i] = new TH1D(tempHistoName.c_str(), tempHistoName.c_str(), numBins, 0.0, timeRunEnd);
+        histoArr[i]->GetXaxis()->SetTitle("Time(S)");
+        histoArr[i]->GetYaxis()->SetTitle("Counts");
     }
 }
 
