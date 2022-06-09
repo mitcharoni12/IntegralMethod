@@ -1,3 +1,9 @@
+/*
+1: FitOptions::CreateShiftedBins()
+2: ElementFit::GenTotalIntegralHisto()
+3: ElementFit::FitTotalIntegralHistos()
+
+*/
 #include <fstream>
 
 #include "TMath.h"
