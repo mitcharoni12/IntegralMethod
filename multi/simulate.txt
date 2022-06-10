@@ -1,4 +1,4 @@
-Number of Elements:3
+Number of Elements:1
 Histo events:10000
 Background events:0
 Histo Bins(only if rebin):5
