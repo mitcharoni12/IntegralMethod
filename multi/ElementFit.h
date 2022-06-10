@@ -743,7 +743,7 @@ void ElementFit::FitTotalBatemanHistos(Int_t cycleIndex, Int_t runIndex)
         //if fit fails
         if(fitResult->Status() != 0)
         {
-            valueHalfLife = 0.000000000000;
+            //valueHalfLife = 0.000000000000;
         }
 
         //used to get either the N0 value or half life value
@@ -804,7 +804,7 @@ void ElementFit::FitTotalIntegralHistos(Int_t cycleIndex, Int_t runIndex)
         //if fit fails
         if(fitResult->Status() != 0)
         {
-            valueHalfLife = 0.000000000000;
+            //valueHalfLife = 0.000000000000;
         }
 
         //used to get either the N0 value or half life value
