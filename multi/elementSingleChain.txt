@@ -10,7 +10,7 @@ integral background fix value(1) don't fix(2):1
 
 element 1 Name:Test1
 
-element 1 Bateman N0 value:0.01
+element 1 Bateman N0 value:10.0
 element 1 Bateman N0 lower:0
 element 1 Bateman N0 upper:10000000
 element 1 fix N0(1) don't fix(2):2
