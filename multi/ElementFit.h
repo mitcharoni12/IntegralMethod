@@ -778,8 +778,8 @@ void ElementFit::FitTotalIntegralHistos(Int_t cycleIndex, Int_t runIndex)
     endFitOffset = leaveOutEndBinsSim * binWidth[cycleIndex];
     endFit = timeRunEnd - endFitOffset;
     //CHANGE HERE
-    //startFit = startFit + (binWidth[cycleIndex]/2.0);
-    //endFit = endFit + (binWidth[cycleIndex]/2.0);
+    startFit = startFit + (binWidth[cycleIndex]/2.0);
+    endFit = endFit + (binWidth[cycleIndex]/2.0);
 
     tempHisto = integralHisto->GetAHisto(cycleIndex, runIndex);
 
@@ -986,18 +986,18 @@ void ElementFit::GenTotalIntegralHisto()
             tempIntegralHisto = integralHisto->GetAHisto(cycleIndex, runIndex);
             tempBatemanHisto = batemanHisto->GetAHisto(cycleIndex, runIndex);
 
-            //tempIntegralHisto->SetBinContent(1, 0.0);
-            //tempIntegralHisto->SetBinContent(2, tempBatemanHisto->GetBinContent(1));
-            //for(int binIndex = 3; binIndex <= (tempNumBins+1); binIndex++)
-            //{
-            //    tempIntegralHisto->SetBinContent(binIndex, tempBatemanHisto->GetBinContent(binIndex-1) + tempIntegralHisto->GetBinContent(binIndex-1));
-            //}
-
-            tempIntegralHisto->SetBinContent(1, tempBatemanHisto->GetBinContent(1));
-            for(int binIndex = 2; binIndex <= tempNumBins; binIndex++)
+            tempIntegralHisto->SetBinContent(1, 0.0);
+            tempIntegralHisto->SetBinContent(2, tempBatemanHisto->GetBinContent(1));
+            for(int binIndex = 3; binIndex <= (tempNumBins+1); binIndex++)
             {
-                tempIntegralHisto->SetBinContent(binIndex, tempBatemanHisto->GetBinContent(binIndex) + tempIntegralHisto->GetBinContent(binIndex-1));
+                tempIntegralHisto->SetBinContent(binIndex, tempBatemanHisto->GetBinContent(binIndex-1) + tempIntegralHisto->GetBinContent(binIndex-1));
             }
+
+            //tempIntegralHisto->SetBinContent(1, tempBatemanHisto->GetBinContent(1));
+            //for(int binIndex = 2; binIndex <= tempNumBins; binIndex++)
+            //{
+            //    tempIntegralHisto->SetBinContent(binIndex, tempBatemanHisto->GetBinContent(binIndex) + tempIntegralHisto->GetBinContent(binIndex-1));
+            //}
         }
     }
 }
