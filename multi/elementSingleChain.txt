@@ -10,7 +10,7 @@ integral background fix value(1) don't fix(2):1
 
 element 1 Name:Test1
 
-element 1 Bateman N0 value:10.0
+element 1 Bateman N0 value:1000.0
 element 1 Bateman N0 lower:0
 element 1 Bateman N0 upper:10000000
 element 1 fix N0(1) don't fix(2):2
@@ -20,7 +20,7 @@ element 1 Integral N0 lower:0
 element 1 Integral N0 upper:10000000
 element 1 fix N0(1) don't fix(2):2
 
-element 1 half life value(s):0.1
+element 1 half life value(s):1.0
 element 1 half life lower(s):.000001
 element 1 half life upper(s):100000.0
 element 1 fix half life(1) don't fix(2):2
