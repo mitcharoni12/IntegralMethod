@@ -662,12 +662,12 @@ void Cycle::RunSingleBatemanCycles()
         {
             tempMeanVal = tempFitHisto[k]->GetMean();
             singleBatemanFitValues->SetAnHalfLife(i, k, k, tempMeanVal);
+            tempErrorVal = tempFitHisto[k]->GetMeanError();
             singleBatemanFitValues->SetAnHalfLifeError(i, k, k, tempErrorVal);
             if(displayFitAverages)
             {
                 runningSingleBateman[k] += tempMeanVal;
             }
-            tempErrorVal = tempFitHisto[k]->GetMeanError();
         }
     }
 

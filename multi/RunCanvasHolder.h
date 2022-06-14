@@ -31,7 +31,7 @@ RunCanvasHolder::RunCanvasHolder(Int_t lowerRunIndex, Int_t upperRunIndex, Int_t
     canvasArr = new TCanvas* [numRuns];
     for(int i = 0; i < numRuns; i++)
     {
-        totalHistoName = name + " Run: " + (to_string(i + 1 + lowerRunIndex)).c_str() + " Cycle: " + (to_string(cycleIndex)).c_str();
+        totalHistoName = name + " Run: " + (to_string(i + lowerRunIndex)).c_str() + " Cycle: " + (to_string(cycleIndex)).c_str();
         canvasArr[i] = new TCanvas(totalHistoName.c_str(), totalHistoName.c_str(), 500, 500);
     }
 }

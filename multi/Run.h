@@ -225,8 +225,7 @@ void Run::CreateTotalIntegralMultiRunHistos()
     for(int i = 0; i < numElements; i++)
     {
         parameterValue = TMath::LogE()/(element->GetElementParameters(i));
-        //totalIntegralMultiRunFitHisto[i] = new TH1D((elementNameStrs[i] + " Fit Result Total Integral Histo").c_str(), (elementNameStrs[i] + " Fit Result Total Integral Histo").c_str(), 500, parameterValue*0, parameterValue*2.5);
-        totalIntegralMultiRunFitHisto[i] = new TH1D("Integral Method Fitted Values", "Integral Method Fitted Values", 500, parameterValue*0, parameterValue*2.5);
+        totalIntegralMultiRunFitHisto[i] = new TH1D((elementNameStrs[i] + " Fit Result Total Integral Histo").c_str(), (elementNameStrs[i] + " Fit Result Total Integral Histo").c_str(), 500, parameterValue*0, parameterValue*2.5);
         totalIntegralMultiRunFitHisto[i]->GetXaxis()->SetTitle("Fitted Half-Life(S)");
         totalIntegralMultiRunFitHisto[i]->GetYaxis()->SetTitle("Counts");
     }

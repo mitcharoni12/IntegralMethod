@@ -44,8 +44,8 @@ class ElementFit{
         //getter function
         Double_t GetElementParameters(int i){return paraVals[i]->GetDecayConst();}              ///< Returns decay constant values used to set starting point for fit functions
         FitOption* GetFitOptions(){return fitOptions;}                                          ///< Returns options the user chose to fit with
-        ChainFitValues* GetBatemanFitValues(){return totalBatemanFitValues;}                ///< Returns fitted values for the fit of the total Bateman histogram
-        ChainFitValues* GetIntegralFitValues(){return totalIntegralFitValues;}              ///< Returns fitted values for the fit of the total Integral histogram
+        ChainFitValues* GetBatemanFitValues(){return totalBatemanFitValues;}                    ///< Returns fitted values for the fit of the total Bateman histogram
+        ChainFitValues* GetIntegralFitValues(){return totalIntegralFitValues;}                  ///< Returns fitted values for the fit of the total Integral histogram
         SingleElementFitValues* GetSingleBatemanFitValues(){return singleBatemanFitValues;}     ///< Returns fitted values for the fit of all the single Bateman histograms
         SingleElementFitValues* GetSingleIntegralFitValues(){return singleIntegralFitValues;}   ///< Returns fitted values for the fit of all the single Integral histograms
         //setter function
@@ -629,7 +629,7 @@ void ElementFit::FitSingleBatemanHistos(Int_t cycleIndex, Int_t runIndex)
             //if fait fails
             if(fitResult->Status() != 0)
             {
-                valueHalfLife = 0.000000000000;
+                //valueHalfLife = 0.000000000000;
             }
 
             singleBatemanFitValues->SetAnN0(elementIndex, subElementIndex, valueN0);
@@ -680,7 +680,7 @@ void ElementFit::FitSingleIntegralHistos(Int_t cycleIndex, Int_t runIndex)
             //if fit fails
             if(fitResult->Status() != 0)
             {
-                valueHalfLife = 0.000000000000;
+                //valueHalfLife = 0.000000000000;
             }
 
             singleIntegralFitValues->SetAnN0(elementIndex, elementSubIndex, valueN0);
@@ -722,7 +722,7 @@ void ElementFit::FitTotalBatemanHistos(Int_t cycleIndex, Int_t runIndex)
     //retry fit if it fails
     for(int i = 0; i < 1; i++)
     {
-        fitResult = tempHisto->Fit(batemanFunction, "LSMULTITHREAD", "", startFit, endFit);
+        fitResult = tempHisto->Fit(batemanFunction, "QLSMULTITHREAD", "", startFit, endFit);
     }
     
     for(int elementIndex = 0; elementIndex < numElements; elementIndex++)
@@ -784,7 +784,7 @@ void ElementFit::FitTotalIntegralHistos(Int_t cycleIndex, Int_t runIndex)
     tempHisto = integralHisto->GetAHisto(cycleIndex, runIndex);
 
     cout << "FITTING TOTAL INTEGRAL CYCLE: " << cycleIndex << " RUN: " << runIndex << endl;
-    fitResult = tempHisto->Fit(integralFunction, "LSMULTITHREAD", "", startFit, endFit);
+    fitResult = tempHisto->Fit(integralFunction, "QLSMULTITHREAD", "", startFit, endFit);
 
     for(int i = 0; i < numElements; i++)
     {   

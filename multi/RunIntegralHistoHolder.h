@@ -25,8 +25,8 @@ RunIntegralHistoHolder::RunIntegralHistoHolder(Int_t cycleNum, Int_t numRuns, st
     histoArr = new TH1D* [numRuns];
     for(int i = 0; i < numRuns; i++)
     {
-        tempHistoName = histoName + " " + "Run: " + (to_string(i+1)).c_str() + " Cycle: " + (to_string(cycleNum+1)).c_str();
-        //tempHistoName = "Cumulative Sum Histogram";
+        tempHistoName = histoName + " " + "Run: " + (to_string(i)).c_str() + " Cycle: " + (to_string(cycleNum)).c_str();
+        //tempHistoName = "Cumulative Sum Histogram"
         histoArr[i] = new TH1D(tempHistoName.c_str(), tempHistoName.c_str(), numBins, binEdges);
         histoArr[i]->GetXaxis()->SetTitle("Time(S)");
         histoArr[i]->GetYaxis()->SetTitle("Counts");
