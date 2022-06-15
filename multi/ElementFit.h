@@ -626,7 +626,7 @@ void ElementFit::FitSingleBatemanHistos(Int_t cycleIndex, Int_t runIndex)
             errorDecayConst = singleBatemanFitFunctions[elementIndex]->GetParError((subElementIndex*2)+1);
             valueHalfLife = log(2)/(valueDecayConst);
             errorHalfLife = ((log(2)/valueDecayConst)*(errorDecayConst/valueDecayConst));
-            //if fait fails
+            //if fit fails
             if(fitResult->Status() != 0)
             {
                 //valueHalfLife = 0.000000000000;
@@ -859,7 +859,7 @@ void ElementFit::GenBatemanHistograms()
     Double_t backgroundTime = 0.0f;
     Double_t timeGen; //time to generate background until
     //case for generating the single histogram for the single source histogram choice
-    if(!rebinChoice && !multiSourceChoice)
+    if(!multiSourceChoice)
     {
         TH1D* tempHisto;
         TH1D** tempSingleHisto;

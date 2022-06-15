@@ -1,5 +1,5 @@
-number of runs:4
-show data via histogram(1) or graph(2):2
+number of runs:5
+show data via histogram(1) or graph(2):1
 display individual fits(1) dont display individual fits(2):1
 lower run histo index(0 based):1
 upper run histo index(0 based):2

@@ -522,6 +522,7 @@ void fitMultiple()
 
             fitOptions->SetNumRuns(numRuns);
             fitOptions->SetMultiSourceChoice(true);
+            singleElementDataChoice = fitOptions->GetSingleElementDataChoice();
             
             element = new ElementFit(BatemanDecaybyActivity, IntegralDecaybyActivity, batemanFitFunctions, integralFitFunctions, paraVals, fitOptions);
             Run* elementRun = new Run(element); 
@@ -745,11 +746,11 @@ void fitMultiple()
                     {
                         if(singleElementDataChoice != 2)
                         {
-                            canvasArr[i] = new TCanvas((elementNames[i] + " Single Source Mean Difference").c_str(), (elementNames[i] + " Single Source Mean Difference").c_str(), 500, 500);
+                            canvasArr[i] = new TCanvas((elementNames[i] + " Single Source Time Change Mean Difference").c_str(), (elementNames[i] + " Single Source Time Change Mean Difference").c_str(), 500, 500);
                             canvasArr[i]->Divide(1,1,.02,.02);
                         }else if(singleElementDataChoice == 2)
                         {
-                            canvasArr[i] = new TCanvas((elementNames[i] + " Single Source Mean Difference").c_str(), (elementNames[i] + " Single Source Mean Difference").c_str(), 1100, 500);
+                            canvasArr[i] = new TCanvas((elementNames[i] + " Single Source Time Change Mean Difference").c_str(), (elementNames[i] + " Single Source Time Change Mean Difference").c_str(), 1100, 500);
                             canvasArr[i]->Divide(2,1,.02,.02);
                         }
                     }
@@ -783,11 +784,11 @@ void fitMultiple()
                     {
                         if(singleElementDataChoice != 2)
                         {
-                            canvasArr[i] = new TCanvas((elementNames[i] + " Single Source Seperate Mean").c_str(), (elementNames[i] + " Single Source Seperate Mean").c_str(), 1100, 500);
+                            canvasArr[i] = new TCanvas((elementNames[i] + " Single Source Time Change Seperate Mean").c_str(), (elementNames[i] + " Single Source Time Change Seperate Mean").c_str(), 1100, 500);
                             canvasArr[i]->Divide(2,1,.02,.02);
                         }else if(singleElementDataChoice == 2)
                         {
-                            canvasArr[i] = new TCanvas((elementNames[i] + " Single Source Seperate Mean").c_str(), (elementNames[i] + " Single Source Seperate Mean").c_str(), 1100, 1100);
+                            canvasArr[i] = new TCanvas((elementNames[i] + " Single Source Time Change Seperate Mean").c_str(), (elementNames[i] + " Single Source Time Change Seperate Mean").c_str(), 1100, 1100);
                             canvasArr[i]->Divide(2,2,.02,.02);
                         }
                     }
@@ -823,11 +824,11 @@ void fitMultiple()
                     {
                         if(singleElementDataChoice != 2)
                         {
-                            canvasArr[i] = new TCanvas((elementNames[i] + " Multi Source Mean Difference").c_str(), (elementNames[i] + " Multi Source Mean Difference").c_str(), 500, 500);
+                            canvasArr[i] = new TCanvas((elementNames[i] + " Multi Source Time Change Mean Difference").c_str(), (elementNames[i] + " Multi Source Time Change Mean Difference").c_str(), 500, 500);
                             canvasArr[i]->Divide(1,1,.02,.02);
                         }else if(singleElementDataChoice == 2)
                         {
-                            canvasArr[i] = new TCanvas((elementNames[i] + " Multi Source Mean Difference").c_str(), (elementNames[i] + " Multi Source Mean Difference").c_str(), 1100, 500);
+                            canvasArr[i] = new TCanvas((elementNames[i] + " Multi Source Time Change Mean Difference").c_str(), (elementNames[i] + " Multi Source Mean Time Change Difference").c_str(), 1100, 500);
                             canvasArr[i]->Divide(2,1,.02,.02);
                         }
                     }
@@ -859,11 +860,11 @@ void fitMultiple()
                     {
                         if(singleElementDataChoice != 2)
                         {
-                            canvasArr[i] = new TCanvas((elementNames[i] + " Multi Source Seperate Mean").c_str(), (elementNames[i] + " Multi Source Seperate Mean").c_str(), 1100, 500);
+                            canvasArr[i] = new TCanvas((elementNames[i] + " Multi Source Time Change Seperate Mean").c_str(), (elementNames[i] + " Multi Source Time Change Seperate Mean").c_str(), 1100, 500);
                             canvasArr[i]->Divide(2,1,.02,.02);
                         }else if(singleElementDataChoice == 2)
                         {
-                            canvasArr[i] = new TCanvas((elementNames[i] + " Multi Source Seperate Mean").c_str(), (elementNames[i] + " Multi Source Seperate Mean").c_str(), 1100, 1100);
+                            canvasArr[i] = new TCanvas((elementNames[i] + " Multi Source Time Change Seperate Mean").c_str(), (elementNames[i] + " Multi Source Time Change Seperate Mean").c_str(), 1100, 1100);
                             canvasArr[i]->Divide(2,2,.02,.02);
                         }
                     }
@@ -877,8 +878,92 @@ void fitMultiple()
                     }
                     delete [] canvasArr;
                 }
-            //rebinning option
-            }else if(fitOptions->GetRebinChoice() == true)
+            //single source rebinning
+            }else if(fitOptions->GetRebinChoice() == true && fitOptions->GetMultiSourceChoice() == false)
+            {
+                //mean difference
+                if(runMeanDifference == 1)
+                {   //runs the cycles
+                    cout << "REBINNING" << endl;
+                    cycle->RunTotalBatemanCyclesSingleGen();
+                    cycle->RunTotalIntegralCyclesSingleGen();
+                    //calculates the difference between the bateman and integral halflife fit means for each cycle
+                    cycle->GenTotalMeanDifference();
+                    //puts the differences in a graph
+                    cycle->GenTotalMeanDifferenceGraphsRebin();
+                    if(singleElementDataChoice == 2)
+                    {   //runs the cycles
+                        cycle->RunSingleBatemanCyclesSingleGen();
+                        cycle->RunSingleIntegralCyclesSingleGen();
+                        //calculates the difference between the bateman and integral halflife fit means for each cycle
+                        cycle->GenSingleMeanDifference();
+                        //puts the differences in a graph
+                        cycle->GenSingleMeanDifferenceGraphsRebin();
+                    }
+
+                    canvasArr = new TCanvas* [numElements];
+                    for(int i = 0; i < numElements; i++)
+                    {
+                        if(singleElementDataChoice != 2)
+                        {
+                            canvasArr[i] = new TCanvas((elementNames[i] + " Single Source Rebin Mean Difference").c_str(), (elementNames[i] + " Single Source Rebin Mean Difference").c_str(), 500, 500);
+                            canvasArr[i]->Divide(1,1,.02,.02);
+                        }else if(singleElementDataChoice == 2)
+                        {
+                            canvasArr[i] = new TCanvas((elementNames[i] + " Single Source Rebin Mean Difference").c_str(), (elementNames[i] + " Single Source Rebin Mean Difference").c_str(), 1100, 500);
+                            canvasArr[i]->Divide(2,1,.02,.02);
+                        }
+                    }
+                    //displays halflife mean difference data
+                    cycle->DisplayTotalMeanDifferenceGraphs(canvasArr);
+                    if(singleElementDataChoice == 2)
+                    {
+                        cycle->DisplaySingleMeanDifferenceGraphs(canvasArr);
+                    }
+                    delete [] canvasArr;
+                //seperate mean
+                }else if(runMeanDifference == 2)
+                {   //runs the cycles
+                    cycle->RunTotalBatemanCyclesSingleGen();
+                    cycle->RunTotalIntegralCyclesSingleGen();
+                    //puts the halflife mean fit data in respective graph
+                    cycle->GenTotalBatemanMeanGraphsRebin();
+                    cycle->GenTotalIntegralMeanGraphsRebin();
+
+                    if(singleElementDataChoice == 2)
+                    {   //runs the cycles
+                        cycle->RunSingleBatemanCyclesSingleGen();
+                        cycle->RunSingleIntegralCyclesSingleGen();
+                        //puts the halflife mean fit data in respective graph
+                        cycle->GenSingleBatemanMeanGraphsRebin();
+                        cycle->GenSingleIntegralMeanGraphsRebin();
+                    }
+
+                    canvasArr = new TCanvas* [numElements];
+                    for(int i = 0; i < numElements; i++)
+                    {
+                        if(singleElementDataChoice != 2)
+                        {
+                            canvasArr[i] = new TCanvas((elementNames[i] + " Single Source Rebin Seperate Mean").c_str(), (elementNames[i] + " Single Source Rebin Seperate Mean").c_str(), 1100, 500);
+                            canvasArr[i]->Divide(2,1,.02,.02);
+                        }else if(singleElementDataChoice == 2)
+                        {
+                            canvasArr[i] = new TCanvas((elementNames[i] + " Single Source Rebin Seperate Mean").c_str(), (elementNames[i] + " Single Source Rebin Seperate Mean").c_str(), 1100, 1100);
+                            canvasArr[i]->Divide(2,2,.02,.02);
+                        }
+                    }
+                    //displays halflife fit data
+                    cycle->DisplayTotalBatemanMeanGraphs(canvasArr);
+                    cycle->DisplayTotalIntegralMeanGraphs(canvasArr);
+                    if(singleElementDataChoice == 2)
+                    {
+                        cycle->DisplaySingleBatemanMeanGraphs(canvasArr);
+                        cycle->DisplaySingleIntegralMeanGraphs(canvasArr);
+                    }
+                    delete [] canvasArr;
+                }
+            //multi source rebinning
+            }else if(fitOptions->GetRebinChoice() == true && fitOptions->GetMultiSourceChoice() == true)
             {
                 //mean difference
                 if(runMeanDifference == 1)
@@ -960,15 +1045,6 @@ void fitMultiple()
                     }
                     delete [] canvasArr;
                 }
-            //Changing events between cycles
-            }else if(fitOptions->GetNumEventChangeChoice() == true)
-            {
-                Double_t* eventNums = fitOptions->GetEventNumArr();
-                for(int i = 0; i < numCycles; i++)
-                {
-                    cout << eventNums[i] << endl;
-                }
-
             }
 
             //case for displaying the individual fits for runs

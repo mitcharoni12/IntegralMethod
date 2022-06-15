@@ -14,7 +14,7 @@ Multaplicative Increment(1) Linear Increment(2):1
 Increment factor:10
 
 Single Source Histo (1) Mutli Source Histo (2):1
-Mean Difference(1) Seperate mean(2):2
+Mean Difference(1) Seperate mean(2):1
 
 Display Individual Fits(1) Dont Display Individual Fits(2):1
 Display Fit Averages(1) Dont Display Fit Averages(2):1
