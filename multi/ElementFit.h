@@ -626,11 +626,6 @@ void ElementFit::FitSingleBatemanHistos(Int_t cycleIndex, Int_t runIndex)
             errorDecayConst = singleBatemanFitFunctions[elementIndex]->GetParError((subElementIndex*2)+1);
             valueHalfLife = log(2)/(valueDecayConst);
             errorHalfLife = ((log(2)/valueDecayConst)*(errorDecayConst/valueDecayConst));
-            //if fit fails
-            if(fitResult->Status() != 0)
-            {
-                //valueHalfLife = 0.000000000000;
-            }
 
             singleBatemanFitValues->SetAnN0(elementIndex, subElementIndex, valueN0);
             singleBatemanFitValues->SetAnN0Error(elementIndex, subElementIndex, errorN0);
@@ -677,11 +672,6 @@ void ElementFit::FitSingleIntegralHistos(Int_t cycleIndex, Int_t runIndex)
             errorDecayConst = singleIntegralFitFunctions[elementIndex]->GetParError((elementSubIndex*2)+1);
             valueHalfLife = log(2)/(valueDecayConst);
             errorHalfLife = ((log(2)/valueDecayConst)*(errorDecayConst/valueDecayConst));
-            //if fit fails
-            if(fitResult->Status() != 0)
-            {
-                //valueHalfLife = 0.000000000000;
-            }
 
             singleIntegralFitValues->SetAnN0(elementIndex, elementSubIndex, valueN0);
             singleIntegralFitValues->SetAnN0Error(elementIndex, elementSubIndex, errorN0);
@@ -740,11 +730,6 @@ void ElementFit::FitTotalBatemanHistos(Int_t cycleIndex, Int_t runIndex)
             valueHalfLife = log(2)/(valueDecayConst);
             errorHalfLife = ((log(2)/valueDecayConst)*(errorDecayConst/valueDecayConst));
         }
-        //if fit fails
-        if(fitResult->Status() != 0)
-        {
-            //valueHalfLife = 0.000000000000;
-        }
 
         //used to get either the N0 value or half life value
         totalBatemanFitValues->SetAnN0(elementIndex, valueN0);
@@ -777,7 +762,6 @@ void ElementFit::FitTotalIntegralHistos(Int_t cycleIndex, Int_t runIndex)
     startFit = startFitOffset + timeRunStart;
     endFitOffset = leaveOutEndBinsSim * binWidth[cycleIndex];
     endFit = timeRunEnd - endFitOffset;
-    //CHANGE HERE
     startFit = startFit + (binWidth[cycleIndex]/2.0);
     endFit = endFit + (binWidth[cycleIndex]/2.0);
 
@@ -800,11 +784,6 @@ void ElementFit::FitTotalIntegralHistos(Int_t cycleIndex, Int_t runIndex)
             errorDecayConst = errorDecayConst / 1e-8;
             valueHalfLife = log(2)/(valueDecayConst);
             errorHalfLife = ((log(2)/valueDecayConst)*(errorDecayConst/valueDecayConst));
-        }
-        //if fit fails
-        if(fitResult->Status() != 0)
-        {
-            //valueHalfLife = 0.000000000000;
         }
 
         //used to get either the N0 value or half life value
@@ -992,12 +971,6 @@ void ElementFit::GenTotalIntegralHisto()
             {
                 tempIntegralHisto->SetBinContent(binIndex, tempBatemanHisto->GetBinContent(binIndex-1) + tempIntegralHisto->GetBinContent(binIndex-1));
             }
-
-            //tempIntegralHisto->SetBinContent(1, tempBatemanHisto->GetBinContent(1));
-            //for(int binIndex = 2; binIndex <= tempNumBins; binIndex++)
-            //{
-            //    tempIntegralHisto->SetBinContent(binIndex, tempBatemanHisto->GetBinContent(binIndex) + tempIntegralHisto->GetBinContent(binIndex-1));
-            //}
         }
     }
 }

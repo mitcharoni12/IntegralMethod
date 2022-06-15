@@ -341,47 +341,29 @@ void Run::FillSingleIntegralMultiRunHistos()
 /// \brief Fills the data storage histograms with fitted total bateman half lives from the runs.
 void Run::FillTotalBatemanMultiRunHistos()
 {
-    //delete later
     Int_t failedRuns = 0;
     for(int i = 0; i < numElements; i++)
     {
         totalBatemanMultiRunFitHisto[i]->Reset("ICES");
         for(int j = 0; j < numRuns; j++)
         {
-            //IMPORTANT TO CHANGE LATER
-            if(batemanFitValues->GetAnHalfLife(j, i) < -0.00001 || batemanFitValues->GetAnHalfLife(j, i) > 0.00001)
-            {
-                totalBatemanMultiRunFitHisto[i]->Fill(batemanFitValues->GetAnHalfLife(j, i));
-            }else{
-                failedRuns++;
-            }
+            totalBatemanMultiRunFitHisto[i]->Fill(batemanFitValues->GetAnHalfLife(j, i));
         }
-        cout << "Element " << i << " Bateman mean: " << totalBatemanMultiRunFitHisto[i]->GetMean() << endl;
     }
-        cout << "Bateman failed runs: " << failedRuns/numElements << endl;
 }
 
 /// \brief Fills the data storage histograms with fitted total integral half lives from the runs.
 void Run::FillTotalIntegralMultiRunHistos()
 {
-    //delete later
     Int_t failedRuns = 0;
     for(int i = 0; i < numElements; i++)
     {
         totalIntegralMultiRunFitHisto[i]->Reset("ICES");
         for(int j = 0; j < numRuns; j++)
         {
-            //IMPORTANT TO CHANGE LATER
-            if(integralFitValues->GetAnHalfLife(j, i) < -0.00001 || integralFitValues->GetAnHalfLife(j, i) > 0.00001)
-            {
-                totalIntegralMultiRunFitHisto[i]->Fill(integralFitValues->GetAnHalfLife(j, i));
-            }else{
-                failedRuns++;
-            }
+            totalIntegralMultiRunFitHisto[i]->Fill(integralFitValues->GetAnHalfLife(j, i));
         }
-        cout << "Element " << i << " integral mean: " << totalIntegralMultiRunFitHisto[i]->GetMean() << endl;
     }
-        cout << "Integral failed runs " << failedRuns/numElements << endl;
 }
 
 /// \brief Dynamically allocates the graphs to display the fit values of the single bateman histograms for the different runs.
