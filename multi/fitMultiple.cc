@@ -1,17 +1,3 @@
-/*
-End Bin Code
-1: FitOptions::CreateShiftedBins()
-2: ElementFit::GenTotalIntegralHisto()
-3: ElementFit::FitTotalIntegralHistos()
-
-Failed Runs Code
-ElementFit::FitTotalBatemanHistos()
-ElementFit::FitTotalIntegralHistos()
-ElementFit::FitSingleBatemanHistos()
-ElementFit::FitSingleIntegralHistos()
-Run::FillTotalBatemanMultiRunHistos()
-Run::FillTotalIntegralMultiRunHistos()
-*/
 #include <fstream>
 
 #include "TMath.h"
