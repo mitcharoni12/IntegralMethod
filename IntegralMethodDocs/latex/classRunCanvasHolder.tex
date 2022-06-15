@@ -1,0 +1,38 @@
+\hypertarget{classRunCanvasHolder}{}\doxysection{Run\+Canvas\+Holder Class Reference}
+\label{classRunCanvasHolder}\index{RunCanvasHolder@{RunCanvasHolder}}
+
+
+{\ttfamily \#include $<$Run\+Canvas\+Holder.\+h$>$}
+
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classRunCanvasHolder_a4fa136da1037dec454ddc56c78b9b585}\label{classRunCanvasHolder_a4fa136da1037dec454ddc56c78b9b585}} 
+{\bfseries Run\+Canvas\+Holder} (Int\+\_\+t \mbox{\hyperlink{classRunCanvasHolder_a50f2fca7355b5b0ec29cfd8758b750a6}{lower\+Run\+Index}}, Int\+\_\+t upper\+Run\+Index, Int\+\_\+t cycle\+Index, string name)
+\item 
+\mbox{\Hypertarget{classRunCanvasHolder_a0fac95df024954bf257f1726fd1ac042}\label{classRunCanvasHolder_a0fac95df024954bf257f1726fd1ac042}} 
+{\bfseries $\sim$\+Run\+Canvas\+Holder} ()
+\item 
+\mbox{\Hypertarget{classRunCanvasHolder_a67f4f701019c61e897ae726761b624bb}\label{classRunCanvasHolder_a67f4f701019c61e897ae726761b624bb}} 
+TCanvas $\ast$ {\bfseries Get\+ACanvas} (Int\+\_\+t canvas\+Index)
+\begin{DoxyCompactList}\small\item\em Gets a canvas at a specific run index. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classRunCanvasHolder_a285261cc9ae0648608ef0260bfeba4de}\label{classRunCanvasHolder_a285261cc9ae0648608ef0260bfeba4de}} 
+TCanvas $\ast$$\ast$ {\bfseries canvas\+Arr}
+\item 
+\mbox{\Hypertarget{classRunCanvasHolder_a50f2fca7355b5b0ec29cfd8758b750a6}\label{classRunCanvasHolder_a50f2fca7355b5b0ec29cfd8758b750a6}} 
+Int\+\_\+t {\bfseries lower\+Run\+Index}
+\item 
+\mbox{\Hypertarget{classRunCanvasHolder_a0081d224c87bdd3e9a106ac27ab4f168}\label{classRunCanvasHolder_a0081d224c87bdd3e9a106ac27ab4f168}} 
+Int\+\_\+t {\bfseries num\+Runs}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Used to store the canvases which will display each individual histogram if the user wishes to display each individual histogram. This class stores the canvases of each run in one cycle for a single element. EX\+: if we do 20 cycles of 20 runs of the decay chain 144Cs-\/$>$144Ba-\/$>$144 La there are 20 histograms per cycle. This class would store the canvases for one cycle of La. 
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{RunCanvasHolder_8h}{Run\+Canvas\+Holder.\+h}}\end{DoxyCompactItemize}

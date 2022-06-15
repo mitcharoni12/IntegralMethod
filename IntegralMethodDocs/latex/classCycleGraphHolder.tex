@@ -1,0 +1,38 @@
+\hypertarget{classCycleGraphHolder}{}\doxysection{Cycle\+Graph\+Holder Class Reference}
+\label{classCycleGraphHolder}\index{CycleGraphHolder@{CycleGraphHolder}}
+
+
+{\ttfamily \#include $<$Cycle\+Graph\+Holder.\+h$>$}
+
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classCycleGraphHolder_ad85fefbc8ff13d487d08fa9712ec54b2}\label{classCycleGraphHolder_ad85fefbc8ff13d487d08fa9712ec54b2}} 
+{\bfseries Cycle\+Graph\+Holder} (Int\+\_\+t \mbox{\hyperlink{classCycleGraphHolder_a1af209f0c2af939efd0cbd35516b51b5}{num\+Cycles}}, Int\+\_\+t num\+Runs, string graph\+Name, Int\+\_\+t $\ast$num\+Points)
+\item 
+\mbox{\Hypertarget{classCycleGraphHolder_ac0e8ff4d8e25252f365c9d9433c806b7}\label{classCycleGraphHolder_ac0e8ff4d8e25252f365c9d9433c806b7}} 
+{\bfseries $\sim$\+Cycle\+Graph\+Holder} ()
+\item 
+\mbox{\Hypertarget{classCycleGraphHolder_ada7dd5ce194410fd5a4cae1021ac6f9a}\label{classCycleGraphHolder_ada7dd5ce194410fd5a4cae1021ac6f9a}} 
+TGraph $\ast$ {\bfseries Get\+AGraph} (Int\+\_\+t cycle\+Index, Int\+\_\+t run\+Index)
+\begin{DoxyCompactList}\small\item\em Gets a graph at a specific cycle and run index. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classCycleGraphHolder_a6c3d1ceec15bae68490954badaf7b122}\label{classCycleGraphHolder_a6c3d1ceec15bae68490954badaf7b122}} 
+void {\bfseries Set\+AGraph} (Int\+\_\+t cycle\+Index, Int\+\_\+t run\+Index, TGraph $\ast$graph)
+\begin{DoxyCompactList}\small\item\em Sets a graph at a specific cycle and run index. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classCycleGraphHolder_a1af209f0c2af939efd0cbd35516b51b5}\label{classCycleGraphHolder_a1af209f0c2af939efd0cbd35516b51b5}} 
+Int\+\_\+t {\bfseries num\+Cycles}
+\item 
+\mbox{\Hypertarget{classCycleGraphHolder_a28a9bc911ac17dc4f01a4839b7e39354}\label{classCycleGraphHolder_a28a9bc911ac17dc4f01a4839b7e39354}} 
+\mbox{\hyperlink{classRunGraphHolder}{Run\+Graph\+Holder}} $\ast$$\ast$ {\bfseries graph\+Arr}
+\begin{DoxyCompactList}\small\item\em Holds all the graphss, array of \mbox{\hyperlink{classRunGraphHolder}{Run\+Graph\+Holder}} objects. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Used to store the graphs for the multiple cycles of a single element. These graphs are derived from a coresponding integral histogram. EX\+: If we are doing 20 cycles of 20 runs for the decay chain 144Cs-\/$>$144Ba-\/$>$144La this class would hold all the histograms for the 20 cycles of La, each cycle held by a \mbox{\hyperlink{classRunHistoHolder}{Run\+Histo\+Holder}} class. 
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{CycleGraphHolder_8h}{Cycle\+Graph\+Holder.\+h}}\end{DoxyCompactItemize}

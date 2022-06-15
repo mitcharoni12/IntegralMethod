@@ -1,0 +1,271 @@
+\hypertarget{classRun}{}\doxysection{Run Class Reference}
+\label{classRun}\index{Run@{Run}}
+
+
+Class will handle multiple runs of the program. Used extensively in the \mbox{\hyperlink{classCycle}{Cycle}} class.  
+
+
+
+
+{\ttfamily \#include $<$Run.\+h$>$}
+
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classRun_ac587bc5da3d81d5bfdc208c89198a94f}{Run}} (\mbox{\hyperlink{classElementFit}{Element\+Fit}} $\ast$\mbox{\hyperlink{classRun_a4ec5240fed1caf9afbe9895fc7653963}{element}})
+\begin{DoxyCompactList}\small\item\em Constructor for \mbox{\hyperlink{classRun}{Run}}. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classRun_a7fa0ac1770a5067113aaa1928be3d742}\label{classRun_a7fa0ac1770a5067113aaa1928be3d742}} 
+{\bfseries $\sim$\+Run} ()
+\item 
+\mbox{\Hypertarget{classRun_a1f86c90b7c0c6f807c9f1e3ee49ae87b}\label{classRun_a1f86c90b7c0c6f807c9f1e3ee49ae87b}} 
+void {\bfseries Create\+Single\+Bateman\+Multi\+Run\+Histos} ()
+\begin{DoxyCompactList}\small\item\em Dynamically allocates histograms for the storage of the fit values for the multiple runs of the single bateman histograms. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classRun_a33e662ebcac278dd3b0921179119802a}\label{classRun_a33e662ebcac278dd3b0921179119802a}} 
+void {\bfseries Display\+Single\+Bateman\+Fit\+Values\+Graphs} (TCanvas $\ast$$\ast$canvas\+Array)
+\begin{DoxyCompactList}\small\item\em Displays a graph of the fit values of the multiple runs for the single bateman histograms. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classRun_a723979302e2c96eadf1eefe32dbf33ec}\label{classRun_a723979302e2c96eadf1eefe32dbf33ec}} 
+void {\bfseries Display\+Single\+Bateman\+Fit\+Values\+Histos} (TCanvas $\ast$$\ast$canvas\+Array)
+\begin{DoxyCompactList}\small\item\em Displays a histogram of the fit values of the multiple runs for the single bateman histograms. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classRun_a6869769c86bfa93c91cee35958ed6b9d}\label{classRun_a6869769c86bfa93c91cee35958ed6b9d}} 
+void {\bfseries Fill\+Single\+Bateman\+Multi\+Run\+Histos} ()
+\begin{DoxyCompactList}\small\item\em Fills the data storage histograms with fitted single bateman half lives from the runs. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classRun_ad2b32d514b13c7babdf95d4bfc16d1e4}\label{classRun_ad2b32d514b13c7babdf95d4bfc16d1e4}} 
+void {\bfseries Gen\+Single\+Bateman\+Graphs\+No\+Change} ()
+\begin{DoxyCompactList}\small\item\em Dynamically allocates the graphs to display the fit values of the single bateman histograms for the different runs. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classRun_acc7ee3b13451a2256ec735920c1b1255}{Run\+Single\+Bateman\+Runs\+Gen\+Once}} (Int\+\_\+t cycle\+Index, Int\+\_\+t run\+Index)
+\begin{DoxyCompactList}\small\item\em Preforms the multiple runs of the program for the single bateman data not changing anything setting between runs and only generating a single set of histograms to fit with for each cycle. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classRun_af34e50880df6194bd845ad49a29ceefd}\label{classRun_af34e50880df6194bd845ad49a29ceefd}} 
+void {\bfseries Run\+Single\+Bateman\+Runs\+No\+Change} (Int\+\_\+t cycle\+Index)
+\begin{DoxyCompactList}\small\item\em Preforms the multiple runs of the program for the single bateman data not changing anything setting between runs. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classRun_ae016ad3e6ae02940d940ca68736c8cce}\label{classRun_ae016ad3e6ae02940d940ca68736c8cce}} 
+void {\bfseries Create\+Single\+Integral\+Multi\+Run\+Histos} ()
+\begin{DoxyCompactList}\small\item\em Dynamically allocates histograms for the storage of the fit values for the multiple runs of the single integral histograms. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classRun_a8debc6c7bf163ecfafab23a874523038}\label{classRun_a8debc6c7bf163ecfafab23a874523038}} 
+void {\bfseries Display\+Single\+Integral\+Fit\+Values\+Graphs} (TCanvas $\ast$$\ast$canvas\+Array)
+\begin{DoxyCompactList}\small\item\em Displays a graph of the fit values of the multiple runs for the single integral histograms. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classRun_a777fae0231958a46a9b89ab566c1d98c}\label{classRun_a777fae0231958a46a9b89ab566c1d98c}} 
+void {\bfseries Display\+Single\+Integral\+Fit\+Values\+Histos} (TCanvas $\ast$$\ast$canvas\+Array)
+\begin{DoxyCompactList}\small\item\em Displays a histogram of the fit values of the multiple runs for the single integral histograms. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classRun_a7fbc109236b8a48a60a75bc8e637689a}\label{classRun_a7fbc109236b8a48a60a75bc8e637689a}} 
+void {\bfseries Fill\+Single\+Integral\+Multi\+Run\+Histos} ()
+\begin{DoxyCompactList}\small\item\em Fills the data storage histograms with fitted single integral half lives from the runs. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classRun_a4e4806965ad4403628b4c512fe0104d5}\label{classRun_a4e4806965ad4403628b4c512fe0104d5}} 
+void {\bfseries Gen\+Single\+Integral\+Graphs\+No\+Change} ()
+\begin{DoxyCompactList}\small\item\em Dynamically allocates the graphs to display the fit values of the single integral histograms for the different runs. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classRun_af926974ad3f96d383f332e6a00b64563}{Run\+Single\+Integral\+Runs\+Gen\+Once}} (Int\+\_\+t cycle\+Index, Int\+\_\+t run\+Index)
+\begin{DoxyCompactList}\small\item\em Preforms the multiple runs of the program for the single integral data not changing anything setting between runs and only generating a single set of histograms to fit with for each cycle. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classRun_af476b7afcd26a3ce2126013495b7fa27}\label{classRun_af476b7afcd26a3ce2126013495b7fa27}} 
+void {\bfseries Run\+Single\+Integral\+Runs\+No\+Change} (Int\+\_\+t cycle\+Index)
+\begin{DoxyCompactList}\small\item\em Preforms the multiple runs of the program for the single integral data not changing anything setting between runs. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classRun_af9cfa788c17ce9d0719ec26447caaf31}\label{classRun_af9cfa788c17ce9d0719ec26447caaf31}} 
+void {\bfseries Create\+Total\+Bateman\+Multi\+Run\+Histos} ()
+\begin{DoxyCompactList}\small\item\em Dynamically allocates histograms for the storage of the fit values for the multiple runs of the total bateman histograms. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classRun_a8ce95d8689dfb926529c5ff0eb790fd9}\label{classRun_a8ce95d8689dfb926529c5ff0eb790fd9}} 
+void {\bfseries Display\+Total\+Bateman\+Fit\+Values\+Graphs} (TCanvas $\ast$$\ast$canvas\+Array)
+\begin{DoxyCompactList}\small\item\em Displays a graph of the fit values of the multiple runs for the total bateman histograms. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classRun_aba98faea8a6a53b9ea256a1a3ba4b13f}\label{classRun_aba98faea8a6a53b9ea256a1a3ba4b13f}} 
+void {\bfseries Display\+Total\+Bateman\+Fit\+Values\+Histos} (TCanvas $\ast$$\ast$canvas\+Array)
+\begin{DoxyCompactList}\small\item\em Displays a histogram of the fit values of the multiple runs for the total bateman histograms. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classRun_a18642c211d97fba1e0292a281850ab8a}\label{classRun_a18642c211d97fba1e0292a281850ab8a}} 
+void {\bfseries Fill\+Total\+Bateman\+Multi\+Run\+Histos} ()
+\begin{DoxyCompactList}\small\item\em Fills the data storage histograms with fitted total bateman half lives from the runs. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classRun_aa3641519b9610cafdbe7b09972302f71}\label{classRun_aa3641519b9610cafdbe7b09972302f71}} 
+void {\bfseries Gen\+Total\+Bateman\+Graphs\+No\+Change} ()
+\begin{DoxyCompactList}\small\item\em Dynamically allocates the graphs to display the fit values of the total bateman histograms for the different runs. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classRun_aea5fef2d948c7f3ad96bdcb5c5d824d2}{Run\+Total\+Bateman\+Runs\+Gen\+Once}} (Int\+\_\+t cycle\+Index, Int\+\_\+t run\+Index)
+\begin{DoxyCompactList}\small\item\em Preforms the multiple runs of the program for the total bateman data not changing anything setting between runs and only generating a single set of histograms to fit with for each cycle. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classRun_a7c8f662bf853acadb52aa0334af76e71}\label{classRun_a7c8f662bf853acadb52aa0334af76e71}} 
+void {\bfseries Run\+Total\+Bateman\+Runs\+No\+Change} (Int\+\_\+t cycle\+Index)
+\begin{DoxyCompactList}\small\item\em Preforms the multiple runs of the program for the total bateman data not changing anything setting between runs. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classRun_af3fc74ecdc4449fc42ea38763288cf11}\label{classRun_af3fc74ecdc4449fc42ea38763288cf11}} 
+void {\bfseries Create\+Total\+Integral\+Multi\+Run\+Histos} ()
+\begin{DoxyCompactList}\small\item\em Dynamically allocates histograms for the storage of the fit values for the multiple runs of the total integral histograms. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classRun_a212d3f4f46ceaf4610c8374283a9d376}\label{classRun_a212d3f4f46ceaf4610c8374283a9d376}} 
+void {\bfseries Display\+Total\+Integral\+Fit\+Values\+Graphs} (TCanvas $\ast$$\ast$canvas\+Array)
+\begin{DoxyCompactList}\small\item\em Displays a graph of the fit values of the multiple runs for the total integral histograms. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classRun_a0e403566286369346a71e6ebc74676d8}\label{classRun_a0e403566286369346a71e6ebc74676d8}} 
+void {\bfseries Display\+Total\+Integral\+Fit\+Values\+Histos} (TCanvas $\ast$$\ast$canvas\+Array)
+\begin{DoxyCompactList}\small\item\em Displays a histogram of the fit values of the multiple runs for the total integral histograms. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classRun_a11d3a51fc13a28ccf58d4dbd3da9768d}\label{classRun_a11d3a51fc13a28ccf58d4dbd3da9768d}} 
+void {\bfseries Fill\+Total\+Integral\+Multi\+Run\+Histos} ()
+\begin{DoxyCompactList}\small\item\em Fills the data storage histograms with fitted total integral half lives from the runs. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classRun_a219b99daa4416ee32023e60247117a38}\label{classRun_a219b99daa4416ee32023e60247117a38}} 
+void {\bfseries Gen\+Total\+Integral\+Graphs\+No\+Change} ()
+\begin{DoxyCompactList}\small\item\em Dynamically allocates the graphs to display the fit values of the total integral histograms for the different runs. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classRun_ab109d37def0ed22f53c2f74e28f4def5}{Run\+Total\+Integral\+Runs\+Gen\+Once}} (Int\+\_\+t cycle\+Index, Int\+\_\+t run\+Index)
+\begin{DoxyCompactList}\small\item\em Preforms the multiple runs of the program for the total integral data not changing anything setting between runs and only generating a single set of histograms to fit with for each cycle. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classRun_a5dacc77875fddb39eba06592799981f8}\label{classRun_a5dacc77875fddb39eba06592799981f8}} 
+void {\bfseries Run\+Total\+Integral\+Runs\+No\+Change} (Int\+\_\+t cycle\+Index)
+\begin{DoxyCompactList}\small\item\em Preforms the multiple runs of the program for the total integral data not changing anything setting between runs. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classRun_a28b404fb844c9443ac41e94263e73eb3}\label{classRun_a28b404fb844c9443ac41e94263e73eb3}} 
+\mbox{\hyperlink{classChainRunFitValues}{Chain\+Run\+Fit\+Values}} $\ast$ {\bfseries Get\+Bateman\+Fit\+Values} ()
+\item 
+\mbox{\Hypertarget{classRun_a980f2cc5d4e18b975a32214b6738d4f3}\label{classRun_a980f2cc5d4e18b975a32214b6738d4f3}} 
+\mbox{\hyperlink{classChainRunFitValues}{Chain\+Run\+Fit\+Values}} $\ast$ {\bfseries Get\+Integral\+Fit\+Values} ()
+\item 
+\mbox{\Hypertarget{classRun_ac668919bb92b2d15476cca39370bbc0a}\label{classRun_ac668919bb92b2d15476cca39370bbc0a}} 
+\mbox{\hyperlink{classSingleChainRunFitValues}{Single\+Chain\+Run\+Fit\+Values}} $\ast$ {\bfseries Get\+Single\+Bateman\+Fit\+Values} ()
+\item 
+\mbox{\Hypertarget{classRun_aa8bc64d577c03ebd0f55c0c5e055b897}\label{classRun_aa8bc64d577c03ebd0f55c0c5e055b897}} 
+\mbox{\hyperlink{classSingleChainRunFitValues}{Single\+Chain\+Run\+Fit\+Values}} $\ast$ {\bfseries Get\+Single\+Integral\+Fit\+Values} ()
+\item 
+\mbox{\Hypertarget{classRun_a92d93d6968bbe8bb8c3c4db2d33d17d0}\label{classRun_a92d93d6968bbe8bb8c3c4db2d33d17d0}} 
+TH1D $\ast$$\ast$ {\bfseries Get\+Single\+Bateman\+Multi\+Run\+Fit\+Histo} ()
+\item 
+\mbox{\Hypertarget{classRun_ad0e36d76c1a2f32ebceab3da3ea72d41}\label{classRun_ad0e36d76c1a2f32ebceab3da3ea72d41}} 
+TH1D $\ast$$\ast$ {\bfseries Get\+Single\+Integral\+Multi\+Run\+Fit\+Histo} ()
+\item 
+\mbox{\Hypertarget{classRun_a54ba8afcda0ba78f150bab9b8c93492a}\label{classRun_a54ba8afcda0ba78f150bab9b8c93492a}} 
+TH1D $\ast$$\ast$ {\bfseries Get\+Total\+Bateman\+Multi\+Run\+Fit\+Histo} ()
+\item 
+\mbox{\Hypertarget{classRun_afa37e4264e265350175237e7b139d595}\label{classRun_afa37e4264e265350175237e7b139d595}} 
+TH1D $\ast$$\ast$ {\bfseries Get\+Total\+Integral\+Multi\+Run\+Fit\+Histo} ()
+\item 
+\mbox{\Hypertarget{classRun_a66b76e91867411c76ba2be2e6688227f}\label{classRun_a66b76e91867411c76ba2be2e6688227f}} 
+string $\ast$ {\bfseries Get\+Element\+String\+Names} ()
+\item 
+\mbox{\Hypertarget{classRun_a7408f09b6fd1d5c1f417d625f5f09ddf}\label{classRun_a7408f09b6fd1d5c1f417d625f5f09ddf}} 
+Int\+\_\+t {\bfseries Get\+Num\+Runs} ()
+\item 
+\mbox{\Hypertarget{classRun_ac589033dc7a9e91d6d00e5d2212eef2f}\label{classRun_ac589033dc7a9e91d6d00e5d2212eef2f}} 
+void {\bfseries set\+Num\+Runs} (Int\+\_\+t \mbox{\hyperlink{classRun_abbbc25d78ee9882f42c997b413e22e1b}{num\+Runs}})
+\end{DoxyCompactItemize}
+\doxysubsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classRun_abbbc25d78ee9882f42c997b413e22e1b}\label{classRun_abbbc25d78ee9882f42c997b413e22e1b}} 
+Int\+\_\+t {\bfseries num\+Runs}
+\item 
+\mbox{\Hypertarget{classRun_ab7e8acc6a0e1f334a0c6326936f92912}\label{classRun_ab7e8acc6a0e1f334a0c6326936f92912}} 
+Int\+\_\+t {\bfseries num\+Elements}
+\item 
+\mbox{\Hypertarget{classRun_a72df72fdf9e4c10f0f5367881d0fa91d}\label{classRun_a72df72fdf9e4c10f0f5367881d0fa91d}} 
+Int\+\_\+t {\bfseries input\+Histo\+Execution\+Type}
+\item 
+\mbox{\Hypertarget{classRun_a03e7583910fa32882518dd73a42022e8}\label{classRun_a03e7583910fa32882518dd73a42022e8}} 
+Int\+\_\+t {\bfseries single\+Element\+Data\+Choice}
+\item 
+\mbox{\Hypertarget{classRun_aa36197fe0d8face8bb398e1a4667f75a}\label{classRun_aa36197fe0d8face8bb398e1a4667f75a}} 
+\mbox{\hyperlink{classFitOption}{Fit\+Option}} $\ast$ {\bfseries fit\+Options}
+\begin{DoxyCompactList}\small\item\em Contains fit options for program. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classRun_a4ec5240fed1caf9afbe9895fc7653963}\label{classRun_a4ec5240fed1caf9afbe9895fc7653963}} 
+\mbox{\hyperlink{classElementFit}{Element\+Fit}} $\ast$ {\bfseries element}
+\begin{DoxyCompactList}\small\item\em Element fit object. Used to do individual runs. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classRun_ae881d3da1ce5f6aa590880639e4f2ef3}\label{classRun_ae881d3da1ce5f6aa590880639e4f2ef3}} 
+\mbox{\hyperlink{classChainRunFitValues}{Chain\+Run\+Fit\+Values}} $\ast$ {\bfseries bateman\+Fit\+Values}
+\begin{DoxyCompactList}\small\item\em Stores fit values of different runs of the total Bateman histograms. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classRun_a9cd587d3d27d7d6c50bcee664a3ef15d}\label{classRun_a9cd587d3d27d7d6c50bcee664a3ef15d}} 
+\mbox{\hyperlink{classChainRunFitValues}{Chain\+Run\+Fit\+Values}} $\ast$ {\bfseries integral\+Fit\+Values}
+\begin{DoxyCompactList}\small\item\em Stores fit values of different runs of the total integral histograms. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classRun_a2d1c098a90999745033487d8489c7618}\label{classRun_a2d1c098a90999745033487d8489c7618}} 
+\mbox{\hyperlink{classSingleChainRunFitValues}{Single\+Chain\+Run\+Fit\+Values}} $\ast$ {\bfseries single\+Bateman\+Fit\+Values}
+\begin{DoxyCompactList}\small\item\em Stores fit values of different runs of the single Bateman histograms. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classRun_a3b150f64f36868618ec41b51c063e626}\label{classRun_a3b150f64f36868618ec41b51c063e626}} 
+\mbox{\hyperlink{classSingleChainRunFitValues}{Single\+Chain\+Run\+Fit\+Values}} $\ast$ {\bfseries single\+Integral\+Fit\+Values}
+\begin{DoxyCompactList}\small\item\em Stores fit values of different runs of the single integral histograms. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classRun_a92f0307b9999a2fcbd82393b88dba14c}\label{classRun_a92f0307b9999a2fcbd82393b88dba14c}} 
+Double\+\_\+t $\ast$ {\bfseries events\+XAxis}
+\item 
+\mbox{\Hypertarget{classRun_a1c048fd0bb51fed6e98d3a38c1e8e9f9}\label{classRun_a1c048fd0bb51fed6e98d3a38c1e8e9f9}} 
+Double\+\_\+t $\ast$ {\bfseries time\+Fit\+End}
+\begin{DoxyCompactList}\small\item\em Array containing fit end values for the input histogram. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classRun_a4ced2009612d7b1f465d11969f869aa0}\label{classRun_a4ced2009612d7b1f465d11969f869aa0}} 
+Double\+\_\+t $\ast$ {\bfseries runs\+XAxis}
+\begin{DoxyCompactList}\small\item\em Array containing the runs indexes. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classRun_ae312548e3e3bfbf0242d5dbdfc5ee4b0}\label{classRun_ae312548e3e3bfbf0242d5dbdfc5ee4b0}} 
+Double\+\_\+t $\ast$ {\bfseries zero}
+\begin{DoxyCompactList}\small\item\em Array of 0\textquotesingle{}s, used for setting 0 error in the x values. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classRun_a99a17b5cb6012f7155b32864e10b52a5}\label{classRun_a99a17b5cb6012f7155b32864e10b52a5}} 
+string $\ast$ {\bfseries element\+Name\+Strs}
+\begin{DoxyCompactList}\small\item\em Contains element names for each element in the decay chain. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classRun_ab8f3fedb66d7c08448a0be7ab4db49b0}\label{classRun_ab8f3fedb66d7c08448a0be7ab4db49b0}} 
+TH1D $\ast$$\ast$ {\bfseries single\+Bateman\+Multi\+Run\+Fit\+Histo}
+\begin{DoxyCompactList}\small\item\em Histogram used to store the fit values for the multiple runs of the run class for the single bateman fit values. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classRun_aa8b54053983d000adef45b83a6e68147}\label{classRun_aa8b54053983d000adef45b83a6e68147}} 
+TH1D $\ast$$\ast$ {\bfseries single\+Integral\+Multi\+Run\+Fit\+Histo}
+\begin{DoxyCompactList}\small\item\em Histogram used to store the fit values for the multiple runs of the run class for the single integral fit values. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classRun_af74340e2be9e5b53a24f2fb88a0b9a7e}\label{classRun_af74340e2be9e5b53a24f2fb88a0b9a7e}} 
+TH1D $\ast$$\ast$ {\bfseries total\+Bateman\+Multi\+Run\+Fit\+Histo}
+\begin{DoxyCompactList}\small\item\em Histogram used to store the fit values for the multiple runs of the run class for the total bateman fit values. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classRun_a395ec1fcd935027dc5e1d38453f3dcc7}\label{classRun_a395ec1fcd935027dc5e1d38453f3dcc7}} 
+TH1D $\ast$$\ast$ {\bfseries total\+Integral\+Multi\+Run\+Fit\+Histo}
+\begin{DoxyCompactList}\small\item\em Histogram used to store the fit values for the multiple runs of the run class for the total integral fit values. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classRun_a9d52ea9c1031f65b064e20c60099c0f4}\label{classRun_a9d52ea9c1031f65b064e20c60099c0f4}} 
+TGraph\+Errors $\ast$$\ast$ {\bfseries total\+Bateman\+Graphs}
+\begin{DoxyCompactList}\small\item\em Stores graphs of fit values for the total Bateman histograms. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classRun_aa4d4a36a0e95c1c777d1535d9570289b}\label{classRun_aa4d4a36a0e95c1c777d1535d9570289b}} 
+TGraph\+Errors $\ast$$\ast$ {\bfseries total\+Integral\+Graphs}
+\begin{DoxyCompactList}\small\item\em Stores graphs of fit values for the total integral histograms. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classRun_a15baac57495f3274470d665bf2a48ee8}\label{classRun_a15baac57495f3274470d665bf2a48ee8}} 
+TGraph\+Errors $\ast$$\ast$ {\bfseries single\+Bateman\+Graphs}
+\begin{DoxyCompactList}\small\item\em Stores graphs of fit values for the single Bateman histograms. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classRun_a1c6fb80ad615452e28136f97f9f360a2}\label{classRun_a1c6fb80ad615452e28136f97f9f360a2}} 
+TGraph\+Errors $\ast$$\ast$ {\bfseries single\+Integral\+Graphs}
+\begin{DoxyCompactList}\small\item\em Stores graphs of fit values for the single integral histograms. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classRun_a1b9ee2a39d0251012f3cb9c800cf633b}\label{classRun_a1b9ee2a39d0251012f3cb9c800cf633b}} 
+TCanvas $\ast$ {\bfseries test\+Can}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Class will handle multiple runs of the program. Used extensively in the \mbox{\hyperlink{classCycle}{Cycle}} class. 
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classRun_ac587bc5da3d81d5bfdc208c89198a94f}\label{classRun_ac587bc5da3d81d5bfdc208c89198a94f}} 
+\index{Run@{Run}!Run@{Run}}
+\index{Run@{Run}!Run@{Run}}
+\doxysubsubsection{\texorpdfstring{Run()}{Run()}}
+{\footnotesize\ttfamily Run\+::\+Run (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classElementFit}{Element\+Fit}} $\ast$}]{element }\end{DoxyParamCaption})}
+
+
+
+Constructor for \mbox{\hyperlink{classRun}{Run}}. 
+
+Constructor for the run class. Dynamical allocation for the data storage objects for the fit values of the runs happens here. 
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classRun_acc7ee3b13451a2256ec735920c1b1255}\label{classRun_acc7ee3b13451a2256ec735920c1b1255}} 
+\index{Run@{Run}!RunSingleBatemanRunsGenOnce@{RunSingleBatemanRunsGenOnce}}
+\index{RunSingleBatemanRunsGenOnce@{RunSingleBatemanRunsGenOnce}!Run@{Run}}
+\doxysubsubsection{\texorpdfstring{RunSingleBatemanRunsGenOnce()}{RunSingleBatemanRunsGenOnce()}}
+{\footnotesize\ttfamily void Run\+::\+Run\+Single\+Bateman\+Runs\+Gen\+Once (\begin{DoxyParamCaption}\item[{Int\+\_\+t}]{cycle\+Index,  }\item[{Int\+\_\+t}]{run\+Index }\end{DoxyParamCaption})}
+
+
+
+Preforms the multiple runs of the program for the single bateman data not changing anything setting between runs and only generating a single set of histograms to fit with for each cycle. 
+
+Only used with the cycle program execution type. It would not make sense to do this with the run program execution type becuase then it would be the same as just generating and fitting a single histogram. \mbox{\Hypertarget{classRun_af926974ad3f96d383f332e6a00b64563}\label{classRun_af926974ad3f96d383f332e6a00b64563}} 
+\index{Run@{Run}!RunSingleIntegralRunsGenOnce@{RunSingleIntegralRunsGenOnce}}
+\index{RunSingleIntegralRunsGenOnce@{RunSingleIntegralRunsGenOnce}!Run@{Run}}
+\doxysubsubsection{\texorpdfstring{RunSingleIntegralRunsGenOnce()}{RunSingleIntegralRunsGenOnce()}}
+{\footnotesize\ttfamily void Run\+::\+Run\+Single\+Integral\+Runs\+Gen\+Once (\begin{DoxyParamCaption}\item[{Int\+\_\+t}]{cycle\+Index,  }\item[{Int\+\_\+t}]{run\+Index }\end{DoxyParamCaption})}
+
+
+
+Preforms the multiple runs of the program for the single integral data not changing anything setting between runs and only generating a single set of histograms to fit with for each cycle. 
+
+Only used with the cycle program execution type. It would not make sense to do this with the run program execution type becuase then it would be the same as just generating and fitting a single histogram. \mbox{\Hypertarget{classRun_aea5fef2d948c7f3ad96bdcb5c5d824d2}\label{classRun_aea5fef2d948c7f3ad96bdcb5c5d824d2}} 
+\index{Run@{Run}!RunTotalBatemanRunsGenOnce@{RunTotalBatemanRunsGenOnce}}
+\index{RunTotalBatemanRunsGenOnce@{RunTotalBatemanRunsGenOnce}!Run@{Run}}
+\doxysubsubsection{\texorpdfstring{RunTotalBatemanRunsGenOnce()}{RunTotalBatemanRunsGenOnce()}}
+{\footnotesize\ttfamily void Run\+::\+Run\+Total\+Bateman\+Runs\+Gen\+Once (\begin{DoxyParamCaption}\item[{Int\+\_\+t}]{cycle\+Index,  }\item[{Int\+\_\+t}]{run\+Index }\end{DoxyParamCaption})}
+
+
+
+Preforms the multiple runs of the program for the total bateman data not changing anything setting between runs and only generating a single set of histograms to fit with for each cycle. 
+
+Only used with the cycle program execution type. It would not make sense to do this with the run program execution type becuase then it would be the same as just generating and fitting a single histogram. \mbox{\Hypertarget{classRun_ab109d37def0ed22f53c2f74e28f4def5}\label{classRun_ab109d37def0ed22f53c2f74e28f4def5}} 
+\index{Run@{Run}!RunTotalIntegralRunsGenOnce@{RunTotalIntegralRunsGenOnce}}
+\index{RunTotalIntegralRunsGenOnce@{RunTotalIntegralRunsGenOnce}!Run@{Run}}
+\doxysubsubsection{\texorpdfstring{RunTotalIntegralRunsGenOnce()}{RunTotalIntegralRunsGenOnce()}}
+{\footnotesize\ttfamily void Run\+::\+Run\+Total\+Integral\+Runs\+Gen\+Once (\begin{DoxyParamCaption}\item[{Int\+\_\+t}]{cycle\+Index,  }\item[{Int\+\_\+t}]{run\+Index }\end{DoxyParamCaption})}
+
+
+
+Preforms the multiple runs of the program for the total integral data not changing anything setting between runs and only generating a single set of histograms to fit with for each cycle. 
+
+Only used with the cycle program execution type. It would not make sense to do this with the run program execution type becuase then it would be the same as just generating and fitting a single histogram. 
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{Run_8h}{Run.\+h}}\end{DoxyCompactItemize}

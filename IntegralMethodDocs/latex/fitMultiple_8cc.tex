@@ -1,0 +1,53 @@
+\hypertarget{fitMultiple_8cc}{}\doxysection{fit\+Multiple.\+cc File Reference}
+\label{fitMultiple_8cc}\index{fitMultiple.cc@{fitMultiple.cc}}
+{\ttfamily \#include $<$fstream$>$}\newline
+{\ttfamily \#include \char`\"{}TMath.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}TCanvas.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}TGraph.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}TF1.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}TH1\+D.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}TGraph\+Errors.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}TFile.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Element\+Fit.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Run.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Cycle.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Parameter\+Value.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Cycle\+Canvas\+Holder.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Single\+Cycle\+Canvas\+Holder.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Fit\+Function.\+h\char`\"{}}\newline
+\doxysubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{fitMultiple_8cc_a8527617cac3c58f66fee769eacb6c717}\label{fitMultiple_8cc_a8527617cac3c58f66fee769eacb6c717}} 
+typedef Double\+\_\+t($\ast$ {\bfseries decay\+Function}) (Double\+\_\+t $\ast$x, Double\+\_\+t $\ast$par)
+\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{fitMultiple_8cc_a4913e3dd41a8000093d59d91f19015a7}\label{fitMultiple_8cc_a4913e3dd41a8000093d59d91f19015a7}} 
+Double\+\_\+t {\bfseries Integral\+Decayby\+Activity} (Double\+\_\+t $\ast$x, Double\+\_\+t $\ast$par)
+\item 
+\mbox{\Hypertarget{fitMultiple_8cc_ac0f36aad8f889d69f1c368c3c2e096e9}\label{fitMultiple_8cc_ac0f36aad8f889d69f1c368c3c2e096e9}} 
+Double\+\_\+t {\bfseries Bateman\+Decayby\+Activity} (Double\+\_\+t $\ast$x, Double\+\_\+t $\ast$par)
+\item 
+\mbox{\Hypertarget{fitMultiple_8cc_a424191780b8f01ab43e605d947ba2c76}\label{fitMultiple_8cc_a424191780b8f01ab43e605d947ba2c76}} 
+void {\bfseries Create\+Fit\+Functions} (string $\ast$element\+Names)
+\item 
+\mbox{\Hypertarget{fitMultiple_8cc_ab6165a1ac8b5011a550d4938faaebf95}\label{fitMultiple_8cc_ab6165a1ac8b5011a550d4938faaebf95}} 
+void {\bfseries fit\+Multiple} ()
+\item 
+\mbox{\Hypertarget{fitMultiple_8cc_ae66f6b31b5ad750f1fe042a706a4e3d4}\label{fitMultiple_8cc_ae66f6b31b5ad750f1fe042a706a4e3d4}} 
+int {\bfseries main} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{fitMultiple_8cc_a1664e669a6965b8270101953bcf4c9f9}\label{fitMultiple_8cc_a1664e669a6965b8270101953bcf4c9f9}} 
+\mbox{\hyperlink{fitMultiple_8cc_a8527617cac3c58f66fee769eacb6c717}{decay\+Function}} $\ast$ {\bfseries bateman\+Fit\+Functions}
+\item 
+\mbox{\Hypertarget{fitMultiple_8cc_afb505e85b55f38f33d511f94b9913f81}\label{fitMultiple_8cc_afb505e85b55f38f33d511f94b9913f81}} 
+\mbox{\hyperlink{fitMultiple_8cc_a8527617cac3c58f66fee769eacb6c717}{decay\+Function}} $\ast$ {\bfseries integral\+Fit\+Functions}
+\item 
+\mbox{\Hypertarget{fitMultiple_8cc_a55b854b48cdfc63d8e49a5e7e9bcf87f}\label{fitMultiple_8cc_a55b854b48cdfc63d8e49a5e7e9bcf87f}} 
+Int\+\_\+t {\bfseries num\+Elements}
+\end{DoxyCompactItemize}

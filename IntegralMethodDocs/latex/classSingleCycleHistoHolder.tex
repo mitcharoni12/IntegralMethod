@@ -1,0 +1,41 @@
+\hypertarget{classSingleCycleHistoHolder}{}\doxysection{Single\+Cycle\+Histo\+Holder Class Reference}
+\label{classSingleCycleHistoHolder}\index{SingleCycleHistoHolder@{SingleCycleHistoHolder}}
+
+
+{\ttfamily \#include $<$Single\+Cycle\+Histo\+Holder.\+h$>$}
+
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classSingleCycleHistoHolder_aaecb3f6b043c47dc1937e1305f8cdf17}\label{classSingleCycleHistoHolder_aaecb3f6b043c47dc1937e1305f8cdf17}} 
+{\bfseries Single\+Cycle\+Histo\+Holder} (Int\+\_\+t num\+Cycles, Int\+\_\+t \mbox{\hyperlink{classSingleCycleHistoHolder_a51fd12aa9789076a559eb13d7803f4f9}{num\+Elements}}, Int\+\_\+t num\+Runs, string histo\+Name, Int\+\_\+t $\ast$bin\+Arr, Double\+\_\+t $\ast$time\+End\+Arr, string $\ast$element\+Names)
+\item 
+\mbox{\Hypertarget{classSingleCycleHistoHolder_a8c20943569a9d937cf4e1687a351d732}\label{classSingleCycleHistoHolder_a8c20943569a9d937cf4e1687a351d732}} 
+{\bfseries $\sim$\+Single\+Cycle\+Histo\+Holder} ()
+\item 
+\mbox{\Hypertarget{classSingleCycleHistoHolder_aa36174e356c41f7cedc91006e58deeac}\label{classSingleCycleHistoHolder_aa36174e356c41f7cedc91006e58deeac}} 
+TH1D $\ast$ {\bfseries Get\+AHisto} (Int\+\_\+t cycle\+Index, Int\+\_\+t run\+Index, Int\+\_\+t element\+Index)
+\begin{DoxyCompactList}\small\item\em Gets a histogram for a specific run, cycle, and element index. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classSingleCycleHistoHolder_ad1d744c0e28598d89be1f726be9481e6}\label{classSingleCycleHistoHolder_ad1d744c0e28598d89be1f726be9481e6}} 
+void {\bfseries Set\+AHisto} (Int\+\_\+t cycle\+Index, Int\+\_\+t run\+Index, Int\+\_\+t element\+Index, TH1D $\ast$histo)
+\begin{DoxyCompactList}\small\item\em Sets a histogram for a specific run, cycle, and element index. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classSingleCycleHistoHolder_a51fd12aa9789076a559eb13d7803f4f9}\label{classSingleCycleHistoHolder_a51fd12aa9789076a559eb13d7803f4f9}} 
+Int\+\_\+t {\bfseries num\+Elements}
+\item 
+\mbox{\Hypertarget{classSingleCycleHistoHolder_a4c5906d5a1984b20717124d534b88522}\label{classSingleCycleHistoHolder_a4c5906d5a1984b20717124d534b88522}} 
+\mbox{\hyperlink{classCycleHistoHolder}{Cycle\+Histo\+Holder}} $\ast$$\ast$ {\bfseries histo\+Arr}
+\begin{DoxyCompactList}\small\item\em array of size num\+Elements of \mbox{\hyperlink{classCycleHistoHolder}{Cycle\+Histo\+Holder}} objects. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classSingleCycleHistoHolder_aa83f9a24a3509d06947b289834aee43c}\label{classSingleCycleHistoHolder_aa83f9a24a3509d06947b289834aee43c}} 
+string {\bfseries histo\+Parameter}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Holds all the histograms for all the single Bateman histograms of the program. EX\+: If we are doing 20 cycles of 20 runs for the decay chain 144Cs-\/$>$144Ba-\/$>$144La we have single histograms for each element in the decay chain and a total integral and bateman histogram. The total integral and Bateman histograms for the 20 cycles of 20 runs are held by the Cylce\+Histo\+Holder class but the single histograms for Cs, Ba, and La are all held by this class. 
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{SingleCycleHistoHolder_8h}{Single\+Cycle\+Histo\+Holder.\+h}}\end{DoxyCompactItemize}

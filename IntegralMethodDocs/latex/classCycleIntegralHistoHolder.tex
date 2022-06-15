@@ -1,0 +1,38 @@
+\hypertarget{classCycleIntegralHistoHolder}{}\doxysection{Cycle\+Integral\+Histo\+Holder Class Reference}
+\label{classCycleIntegralHistoHolder}\index{CycleIntegralHistoHolder@{CycleIntegralHistoHolder}}
+
+
+{\ttfamily \#include $<$Cycle\+Integral\+Histo\+Holder.\+h$>$}
+
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classCycleIntegralHistoHolder_a1ee9e00285b930d1290b7aa951a5fd9e}\label{classCycleIntegralHistoHolder_a1ee9e00285b930d1290b7aa951a5fd9e}} 
+{\bfseries Cycle\+Integral\+Histo\+Holder} (Int\+\_\+t \mbox{\hyperlink{classCycleIntegralHistoHolder_af807de4dab3a0f19c8486bcecd4271c1}{num\+Cycles}}, Int\+\_\+t num\+Runs, string histo\+Name, Int\+\_\+t $\ast$bin\+Arr, Double\+\_\+t $\ast$$\ast$bin\+Edges\+Arr)
+\item 
+\mbox{\Hypertarget{classCycleIntegralHistoHolder_a4e397074312ddffe056c8fbb9bc91ee0}\label{classCycleIntegralHistoHolder_a4e397074312ddffe056c8fbb9bc91ee0}} 
+{\bfseries $\sim$\+Cycle\+Integral\+Histo\+Holder} ()
+\item 
+\mbox{\Hypertarget{classCycleIntegralHistoHolder_adf019c7723b84e05a9c49eb057b3e6b6}\label{classCycleIntegralHistoHolder_adf019c7723b84e05a9c49eb057b3e6b6}} 
+TH1D $\ast$ {\bfseries Get\+AHisto} (Int\+\_\+t cycle\+Index, Int\+\_\+t run\+Index)
+\begin{DoxyCompactList}\small\item\em Gets a histogram at a specific run and cycle index. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classCycleIntegralHistoHolder_aaaaa89776ce83d481f9add0a86c12b00}\label{classCycleIntegralHistoHolder_aaaaa89776ce83d481f9add0a86c12b00}} 
+void {\bfseries Set\+AHisto} (Int\+\_\+t cycle\+Index, Int\+\_\+t run\+Index, TH1D $\ast$histo)
+\begin{DoxyCompactList}\small\item\em Sets a histogram at a specific run and cycle index. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classCycleIntegralHistoHolder_af807de4dab3a0f19c8486bcecd4271c1}\label{classCycleIntegralHistoHolder_af807de4dab3a0f19c8486bcecd4271c1}} 
+Int\+\_\+t {\bfseries num\+Cycles}
+\item 
+\mbox{\Hypertarget{classCycleIntegralHistoHolder_a779dc67e2170f356867bdea6706558a1}\label{classCycleIntegralHistoHolder_a779dc67e2170f356867bdea6706558a1}} 
+\mbox{\hyperlink{classRunIntegralHistoHolder}{Run\+Integral\+Histo\+Holder}} $\ast$$\ast$ {\bfseries histo\+Arr}
+\begin{DoxyCompactList}\small\item\em Holds all the histograms, array of \mbox{\hyperlink{classRunIntegralHistoHolder}{Run\+Integral\+Histo\+Holder}} objects. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Used to store the histograms for the multiple integral cycles of a single element. These histograms contain the simulated data and the ones that are fit. EX\+: If we are doing 20 cycles of 20 runs for the decay chain 144Cs-\/$>$144Ba-\/$>$144La this class would hold all the histograms for the 20 cycles of La, each cycle held by a \mbox{\hyperlink{classRunIntegralHistoHolder}{Run\+Integral\+Histo\+Holder}} class. 
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{CycleIntegralHistoHolder_8h}{Cycle\+Integral\+Histo\+Holder.\+h}}\end{DoxyCompactItemize}

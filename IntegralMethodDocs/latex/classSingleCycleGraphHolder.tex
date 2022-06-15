@@ -1,0 +1,38 @@
+\hypertarget{classSingleCycleGraphHolder}{}\doxysection{Single\+Cycle\+Graph\+Holder Class Reference}
+\label{classSingleCycleGraphHolder}\index{SingleCycleGraphHolder@{SingleCycleGraphHolder}}
+
+
+{\ttfamily \#include $<$Single\+Cycle\+Graph\+Holder.\+h$>$}
+
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classSingleCycleGraphHolder_aeb9feeb45e4ca995f4f92ba26ab7d6e1}\label{classSingleCycleGraphHolder_aeb9feeb45e4ca995f4f92ba26ab7d6e1}} 
+{\bfseries Single\+Cycle\+Graph\+Holder} (Int\+\_\+t num\+Cycles, Int\+\_\+t \mbox{\hyperlink{classSingleCycleGraphHolder_a24290605386176ad0bd8f0ac92b9cd9e}{num\+Elements}}, Int\+\_\+t num\+Runs, string Graph\+Name, Int\+\_\+t $\ast$num\+Points, string $\ast$element\+Names)
+\item 
+\mbox{\Hypertarget{classSingleCycleGraphHolder_a2f664fae9b345b081d108160c3deea1b}\label{classSingleCycleGraphHolder_a2f664fae9b345b081d108160c3deea1b}} 
+{\bfseries $\sim$\+Single\+Cycle\+Graph\+Holder} ()
+\item 
+\mbox{\Hypertarget{classSingleCycleGraphHolder_ab333bfead951a0dcebdc12c16233cb1e}\label{classSingleCycleGraphHolder_ab333bfead951a0dcebdc12c16233cb1e}} 
+TGraph $\ast$ {\bfseries Get\+AGraph} (Int\+\_\+t cycle\+Index, Int\+\_\+t run\+Index, Int\+\_\+t element\+Index)
+\begin{DoxyCompactList}\small\item\em Gets a graph for a specific run, cycle, and element index. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classSingleCycleGraphHolder_a61ce9ff1567625b6a420554e9a637c1b}\label{classSingleCycleGraphHolder_a61ce9ff1567625b6a420554e9a637c1b}} 
+void {\bfseries Set\+AGraph} (Int\+\_\+t cycle\+Index, Int\+\_\+t run\+Index, Int\+\_\+t element\+Index, TGraph $\ast$Graph)
+\begin{DoxyCompactList}\small\item\em Sets a graph for a specific run, cycle, and element index. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classSingleCycleGraphHolder_a24290605386176ad0bd8f0ac92b9cd9e}\label{classSingleCycleGraphHolder_a24290605386176ad0bd8f0ac92b9cd9e}} 
+Int\+\_\+t {\bfseries num\+Elements}
+\item 
+\mbox{\Hypertarget{classSingleCycleGraphHolder_a4f7d1ee101095041352bebf3efa755dd}\label{classSingleCycleGraphHolder_a4f7d1ee101095041352bebf3efa755dd}} 
+\mbox{\hyperlink{classCycleGraphHolder}{Cycle\+Graph\+Holder}} $\ast$$\ast$ {\bfseries Graph\+Arr}
+\begin{DoxyCompactList}\small\item\em array of size num\+Elements of \mbox{\hyperlink{classCycleHistoHolder}{Cycle\+Histo\+Holder}} objects. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Holds all the graphs for all the single histograms of the program. EX\+: If we are doing 20 cycles of 20 runs for the decay chain 144Cs-\/$>$144Ba-\/$>$144La we have single graphs for each element in the decay chain and a total integral graph. The total integral graph for the 20 cycles of 20 runs are held by the Cylce\+Graph\+Holder class but the single graphs for Cs, Ba, and La are all held by this class. 
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{SingleCycleGraphHolder_8h}{Single\+Cycle\+Graph\+Holder.\+h}}\end{DoxyCompactItemize}

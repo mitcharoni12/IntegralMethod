@@ -1,0 +1,35 @@
+\hypertarget{classSingleCycleCanvasHolder}{}\doxysection{Single\+Cycle\+Canvas\+Holder Class Reference}
+\label{classSingleCycleCanvasHolder}\index{SingleCycleCanvasHolder@{SingleCycleCanvasHolder}}
+
+
+{\ttfamily \#include $<$Single\+Cycle\+Canvas\+Holder.\+h$>$}
+
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classSingleCycleCanvasHolder_a063f3870d8bd4b941dd358c06f93ca08}\label{classSingleCycleCanvasHolder_a063f3870d8bd4b941dd358c06f93ca08}} 
+{\bfseries Single\+Cycle\+Canvas\+Holder} (Int\+\_\+t lower\+Run\+Index, Int\+\_\+t upper\+Run\+Index, Int\+\_\+t lower\+Cycle\+Index, Int\+\_\+t upper\+Cycle\+Index, Int\+\_\+t \mbox{\hyperlink{classSingleCycleCanvasHolder_a5319972ee8ea77444663749be7377163}{num\+Elements}}, string $\ast$element\+Names, string name)
+\item 
+\mbox{\Hypertarget{classSingleCycleCanvasHolder_a84d3cfb315e4ad1e8dbce01fa66e976e}\label{classSingleCycleCanvasHolder_a84d3cfb315e4ad1e8dbce01fa66e976e}} 
+{\bfseries $\sim$\+Single\+Cycle\+Canvas\+Holder} ()
+\item 
+\mbox{\Hypertarget{classSingleCycleCanvasHolder_a36f76174fa49dc4f67a7755cf6068f0c}\label{classSingleCycleCanvasHolder_a36f76174fa49dc4f67a7755cf6068f0c}} 
+TCanvas $\ast$ {\bfseries Get\+ACanvas} (Int\+\_\+t element\+Index, Int\+\_\+t cycle\+Index, Int\+\_\+t canvas\+Index)
+\begin{DoxyCompactList}\small\item\em Get a canvas at a specific cycle, run and element index. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classSingleCycleCanvasHolder_a770e9c4044ea8c53a10c2e119d42376b}\label{classSingleCycleCanvasHolder_a770e9c4044ea8c53a10c2e119d42376b}} 
+\mbox{\hyperlink{classCycleCanvasHolder}{Cycle\+Canvas\+Holder}} $\ast$$\ast$ {\bfseries single\+Cycle\+Canvas\+Holder}
+\begin{DoxyCompactList}\small\item\em array of size num\+Elements of \mbox{\hyperlink{classCycleCanvasHolder}{Cycle\+Canvas\+Holder}} objects. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classSingleCycleCanvasHolder_a5319972ee8ea77444663749be7377163}\label{classSingleCycleCanvasHolder_a5319972ee8ea77444663749be7377163}} 
+Int\+\_\+t {\bfseries num\+Elements}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Used to store the canvases which will display each individual histogram if the user wishes to display each individual histogram. This class is used to store the canvases which will display the single element histograms. EX\+: If we are doing 20 cycles of 20 runs of the decay chain 144Cs-\/$>$144Ba-\/$>$144La we will have single element histograms and total and integral and Bateman histograms to display. The total integral and bateman canvases for the 20 cycles and runs are stored by the \mbox{\hyperlink{classCycleCanvasHolder}{Cycle\+Canvas\+Holder}} class. This class holds single element canvases for each element in the decay chain. 
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{SingleCycleCanvasHolder_8h}{Single\+Cycle\+Canvas\+Holder.\+h}}\end{DoxyCompactItemize}

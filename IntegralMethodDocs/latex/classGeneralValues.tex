@@ -1,0 +1,44 @@
+\hypertarget{classGeneralValues}{}\doxysection{General\+Values Class Reference}
+\label{classGeneralValues}\index{GeneralValues@{GeneralValues}}
+
+
+{\ttfamily \#include $<$General\+Values.\+h$>$}
+
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classGeneralValues_a47f477c541b8bb56499add8f61ef93de}\label{classGeneralValues_a47f477c541b8bb56499add8f61ef93de}} 
+{\bfseries General\+Values} (Int\+\_\+t \mbox{\hyperlink{classGeneralValues_aa422e0d4076139f91cd22a883d88c77f}{num\+Runs}})
+\item 
+\mbox{\Hypertarget{classGeneralValues_a9be3c71025ac0f60a7351637849ad98b}\label{classGeneralValues_a9be3c71025ac0f60a7351637849ad98b}} 
+{\bfseries $\sim$\+General\+Values} ()
+\item 
+\mbox{\Hypertarget{classGeneralValues_a260284228af251e6c221a43ba0286d81}\label{classGeneralValues_a260284228af251e6c221a43ba0286d81}} 
+Int\+\_\+t {\bfseries Get\+Num\+Runs} ()
+\item 
+\mbox{\Hypertarget{classGeneralValues_ae3dc4986910d5a746363e6f02803cdb0}\label{classGeneralValues_ae3dc4986910d5a746363e6f02803cdb0}} 
+void {\bfseries Set\+Val} (Int\+\_\+t index, Double\+\_\+t val)
+\begin{DoxyCompactList}\small\item\em sets an array value \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classGeneralValues_ab09699f6fb15393e2c2a44c394d12804}\label{classGeneralValues_ab09699f6fb15393e2c2a44c394d12804}} 
+Double\+\_\+t {\bfseries Get\+Val} (Int\+\_\+t index)
+\begin{DoxyCompactList}\small\item\em gets an array value \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classGeneralValues_aba3519569baa4aca9bd381b28a4d42cb}\label{classGeneralValues_aba3519569baa4aca9bd381b28a4d42cb}} 
+Double\+\_\+t $\ast$ {\bfseries Get\+Fit\+Arr} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classGeneralValues_a505542855ae97655262440e72989440d}\label{classGeneralValues_a505542855ae97655262440e72989440d}} 
+Double\+\_\+t $\ast$ {\bfseries fit\+Values}
+\item 
+\mbox{\Hypertarget{classGeneralValues_aa422e0d4076139f91cd22a883d88c77f}\label{classGeneralValues_aa422e0d4076139f91cd22a883d88c77f}} 
+Int\+\_\+t {\bfseries num\+Runs}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Like a glorified array, purpose is to store values extracted from multiple runs. Ex\+: if we do 20x runs, we want a way to store each half life in an array life format. To graph the fitted values for the 20x runs we have to have it in this array life format. 
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{GeneralValues_8h}{General\+Values.\+h}}\end{DoxyCompactItemize}

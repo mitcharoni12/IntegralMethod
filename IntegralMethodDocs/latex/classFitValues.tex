@@ -1,0 +1,56 @@
+\hypertarget{classFitValues}{}\doxysection{Fit\+Values Class Reference}
+\label{classFitValues}\index{FitValues@{FitValues}}
+
+
+{\ttfamily \#include $<$Fit\+Values.\+h$>$}
+
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classFitValues_acb6fa1f7ef1901f247468857d664e3a2}\label{classFitValues_acb6fa1f7ef1901f247468857d664e3a2}} 
+void {\bfseries Set\+N0} (Double\+\_\+t \mbox{\hyperlink{classFitValues_a971a33b7a39f8ca4ea29e7a94f338096}{N0}})
+\item 
+\mbox{\Hypertarget{classFitValues_a64bc1e3c32da817559fa2a8c21872afe}\label{classFitValues_a64bc1e3c32da817559fa2a8c21872afe}} 
+void {\bfseries Set\+N0\+Error} (Double\+\_\+t \mbox{\hyperlink{classFitValues_ad322b1d0e62f370fc87ad6431a699345}{N0\+Error}})
+\item 
+\mbox{\Hypertarget{classFitValues_a70c944b9606ac729e2c79d994b03acc1}\label{classFitValues_a70c944b9606ac729e2c79d994b03acc1}} 
+void {\bfseries Set\+Half\+Life} (Double\+\_\+t \mbox{\hyperlink{classFitValues_a23c4dc683df2440e64ef99ed390787ea}{half\+Life}})
+\item 
+\mbox{\Hypertarget{classFitValues_a585e3ebaf652535162151edf4b535b27}\label{classFitValues_a585e3ebaf652535162151edf4b535b27}} 
+void {\bfseries Set\+Half\+Life\+Error} (Double\+\_\+t \mbox{\hyperlink{classFitValues_aa271d4f4ac39588b88fa745bf518f755}{half\+Life\+Error}})
+\item 
+\mbox{\Hypertarget{classFitValues_a4a1075bacbda142942afaf48739cb83d}\label{classFitValues_a4a1075bacbda142942afaf48739cb83d}} 
+Double\+\_\+t {\bfseries Get\+N0} ()
+\item 
+\mbox{\Hypertarget{classFitValues_a21ffcee7c078bacfadcca28b3dd12d63}\label{classFitValues_a21ffcee7c078bacfadcca28b3dd12d63}} 
+Double\+\_\+t {\bfseries Get\+N0\+Error} ()
+\item 
+\mbox{\Hypertarget{classFitValues_a292f039a102a539ed16510828a773595}\label{classFitValues_a292f039a102a539ed16510828a773595}} 
+Double\+\_\+t {\bfseries Get\+Half\+Life} ()
+\item 
+\mbox{\Hypertarget{classFitValues_a2d88b3b43ddb11f280b84444b8c0135a}\label{classFitValues_a2d88b3b43ddb11f280b84444b8c0135a}} 
+Double\+\_\+t {\bfseries Get\+Half\+Life\+Error} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classFitValues_a971a33b7a39f8ca4ea29e7a94f338096}\label{classFitValues_a971a33b7a39f8ca4ea29e7a94f338096}} 
+Double\+\_\+t {\bfseries N0}
+\item 
+\mbox{\Hypertarget{classFitValues_ad322b1d0e62f370fc87ad6431a699345}\label{classFitValues_ad322b1d0e62f370fc87ad6431a699345}} 
+Double\+\_\+t {\bfseries N0\+Error}
+\item 
+\mbox{\Hypertarget{classFitValues_a23c4dc683df2440e64ef99ed390787ea}\label{classFitValues_a23c4dc683df2440e64ef99ed390787ea}} 
+Double\+\_\+t {\bfseries half\+Life}
+\item 
+\mbox{\Hypertarget{classFitValues_aa271d4f4ac39588b88fa745bf518f755}\label{classFitValues_aa271d4f4ac39588b88fa745bf518f755}} 
+Double\+\_\+t {\bfseries half\+Life\+Error}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Used for storing fitted values for a single element componet in a decay chain. EX\+: Decay chain 144Cs-\/$>$144Ba-\/$>$144La, each element componet in that chain have parameters values for N0, N0\+Error, half life, and half life error. Lets look at the values extracted in the single La histogram, the bateman equation for La also has parameters for N0, and half life of Cs and Ba. So this class would for example store the N0, N0\+Error, half life, and half life error of Ba in the single La histogram. 
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{FitValues_8h}{Fit\+Values.\+h}}\end{DoxyCompactItemize}

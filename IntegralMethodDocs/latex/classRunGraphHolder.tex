@@ -1,0 +1,35 @@
+\hypertarget{classRunGraphHolder}{}\doxysection{Run\+Graph\+Holder Class Reference}
+\label{classRunGraphHolder}\index{RunGraphHolder@{RunGraphHolder}}
+
+
+{\ttfamily \#include $<$Run\+Graph\+Holder.\+h$>$}
+
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classRunGraphHolder_a343563fe1cfce64d752995ec5c3ba62a}\label{classRunGraphHolder_a343563fe1cfce64d752995ec5c3ba62a}} 
+{\bfseries Run\+Graph\+Holder} (Int\+\_\+t cycle\+Num, Int\+\_\+t num\+Runs, string Graph\+Name, Int\+\_\+t num\+Points)
+\begin{DoxyCompactList}\small\item\em Constructor for class. Dynaically allocates graphs and names them properly. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classRunGraphHolder_ac49bebd37c1b5e80b17a270889716df3}\label{classRunGraphHolder_ac49bebd37c1b5e80b17a270889716df3}} 
+{\bfseries $\sim$\+Run\+Graph\+Holder} ()
+\item 
+\mbox{\Hypertarget{classRunGraphHolder_ab57ea4e986baede53032d4e46d3e96a6}\label{classRunGraphHolder_ab57ea4e986baede53032d4e46d3e96a6}} 
+TGraph $\ast$ {\bfseries Get\+AGraph} (Int\+\_\+t Graph\+Index)
+\begin{DoxyCompactList}\small\item\em Gets a graph at a specific run index. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classRunGraphHolder_aff1fff2d7484cbe22ee83515c074dc24}\label{classRunGraphHolder_aff1fff2d7484cbe22ee83515c074dc24}} 
+void {\bfseries Set\+AGraph} (Int\+\_\+t run\+Index, TGraph $\ast$Graph)
+\begin{DoxyCompactList}\small\item\em Sets a graph at a specific run index. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classRunGraphHolder_a2b55ef8a4f16e8d9909cae34dc0a790b}\label{classRunGraphHolder_a2b55ef8a4f16e8d9909cae34dc0a790b}} 
+TGraph $\ast$$\ast$ {\bfseries graph\+Arr}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Used to store all the graphs for the multiple runs in a single cycle for a single element. These graphs are derived from a coresponding integral histogram. EX\+: If we are doing 20 cycles and 20 runs per cycles of the decay chain 144Cs-\/$>$144Ba-\/$>$144La. This would hold the 20 graphs of a single cycle for the element La. 
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{RunGraphHolder_8h}{Run\+Graph\+Holder.\+h}}\end{DoxyCompactItemize}
