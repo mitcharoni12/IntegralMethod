@@ -210,7 +210,8 @@ void Run::CreateTotalBatemanMultiRunHistos()
     for(int i = 0; i < numElements; i++)
     {
         parameterValue = TMath::LogE()/(element->GetElementParameters(i));
-        totalBatemanMultiRunFitHisto[i] = new TH1D((elementNameStrs[i] + " Fit Result Total Bateman Histo").c_str(), (elementNameStrs[i] + " Fit Result Total Bateman Histo").c_str(), 500, parameterValue*0, parameterValue*2.5);
+        //totalBatemanMultiRunFitHisto[i] = new TH1D((elementNameStrs[i] + " Fit Result Total Bateman Histo").c_str(), (elementNameStrs[i] + " Fit Result Total Bateman Histo").c_str(), 500, parameterValue*0, parameterValue*2.5);
+        totalBatemanMultiRunFitHisto[i] = new TH1D(("Fitted Bateman Method Values").c_str(), (elementNameStrs[i] + " Fit Result Total Bateman Histo").c_str(), 500, parameterValue*0, parameterValue*2.5);
         totalBatemanMultiRunFitHisto[i]->GetXaxis()->SetTitle("Fitted Half-Life(S)");
         totalBatemanMultiRunFitHisto[i]->GetYaxis()->SetTitle("Counts");
     }
@@ -225,7 +226,8 @@ void Run::CreateTotalIntegralMultiRunHistos()
     for(int i = 0; i < numElements; i++)
     {
         parameterValue = TMath::LogE()/(element->GetElementParameters(i));
-        totalIntegralMultiRunFitHisto[i] = new TH1D((elementNameStrs[i] + " Fit Result Total Integral Histo").c_str(), (elementNameStrs[i] + " Fit Result Total Integral Histo").c_str(), 500, parameterValue*0, parameterValue*2.5);
+        //totalIntegralMultiRunFitHisto[i] = new TH1D((elementNameStrs[i] + " Fit Result Total Integral Histo").c_str(), (elementNameStrs[i] + " Fit Result Total Integral Histo").c_str(), 500, parameterValue*0, parameterValue*2.5);
+        totalIntegralMultiRunFitHisto[i] = new TH1D(("Fitted Integral Method Values").c_str(), (elementNameStrs[i] + " Fit Result Total Integral Histo").c_str(), 500, parameterValue*0, parameterValue*2.5);
         totalIntegralMultiRunFitHisto[i]->GetXaxis()->SetTitle("Fitted Half-Life(S)");
         totalIntegralMultiRunFitHisto[i]->GetYaxis()->SetTitle("Counts");
     }
