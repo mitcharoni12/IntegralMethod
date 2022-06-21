@@ -1,16 +1,16 @@
-Number of Elements:3
+Number of Elements:2
 Histo events:10000
 Background events:0
 Histo Bins(only if rebin):100
 Input Histo Bin Number:12000
 Bin Width(S):0.01
-Inital Time Fit Simulated Histograms(S):10
+Inital Time Fit Simulated Histograms(S):100
 Inital Time Fit Start Input Histogram(10^-8s):350000000
 Inital Time Fit End Input Histograms(10^-8s):450000000
 Input Histogram Time End(10^-8s):500000000
-Don't simulate single element data(1) Simulate single element data(2):2
-single run(1) multi run(2) multiple cycle(3):2
-No Input Histogram(1) Input Histogram Monte Carlo(2) Input histogram change fit time(3):3
+Don't simulate single element data(1) Simulate single element data(2):1
+single run(1) multi run(2) multiple cycle(3):1
+No Input Histogram(1) Input Histogram Monte Carlo(2) Input histogram change fit time(3):1
 leave out x first bins of simulated histograms:0
 leave out x last bins of simulated histograms:0
 leave out x first bins of input histograms:0
