@@ -722,9 +722,7 @@ void ElementFit::FitTotalBatemanHistos(Int_t cycleIndex, Int_t runIndex)
     //retry fit if it fails
     for(int i = 0; i < 1; i++)
     {
-        cout << "IM GOING" << endl;
         fitResult = tempHisto->Fit(batemanFunction, "QLSMULTITHREAD", "", startFit, endFit);
-        cout << "IM DONE" << endl;
     }
     
     for(int elementIndex = 0; elementIndex < numElements; elementIndex++)
