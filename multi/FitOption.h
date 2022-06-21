@@ -2,6 +2,7 @@
 #define FITOPTION_H
 
 #include <math.h>
+#include <iostream>
 #include "TMath.h"
 
 using namespace std;
@@ -270,6 +271,8 @@ void FitOption::CreateRequiredDataSets()
 void FitOption::CreateShiftedBinEdges(Int_t numBins, Double_t binWidth, Double_t* binEdges)
 {
     Double_t tempBinEdge = 0.0;
+    //ofstream outfile;
+    //outfile.open("integralBinData.txt");
 
     binEdges[0] = 0.0;
     //CHANGE BELOW HERE
@@ -277,7 +280,10 @@ void FitOption::CreateShiftedBinEdges(Int_t numBins, Double_t binWidth, Double_t
     for(int i = 2; i < (numBins + 2); i++)
     {
         binEdges[i] = ((i-1) * binWidth) + (binWidth / 2.0);
+        //outfile << (binEdges[i] - (binWidth/2.0)) << endl;
     }
+
+    //outfile.close();
 
     //for(int i = 2; i < (numBins+2); i++)
     //{

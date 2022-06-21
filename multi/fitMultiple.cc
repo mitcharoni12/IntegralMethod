@@ -11,6 +11,10 @@ ElementFit::FitSingleBatemanHistos()
 ElementFit::FitSingleIntegralHistos()
 Run::FillTotalBatemanMultiRunHistos()
 Run::FillTotalIntegralMultiRunHistos()
+
+Output fit code
+ElementFit::GenTotalIntegralHisto()
+FitOption::CreateShiftedBinEdges()
 */
 #include <fstream>
 

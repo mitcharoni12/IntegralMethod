@@ -1,9 +1,11 @@
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
+from scipy.optimize import minimize
+from scipy import stats
 from drawnow import *
 import numpy as np
 import math
-from decimal import Decimal
+from decimal import *
 
 Cs0, Ba0, La0 = 10000, 0, 0
 lambdaCs, lambdaBa, lambdaLa = .69733, .060273, .016988
@@ -32,27 +34,27 @@ def LADecayInegral(x, Cs0, lambdaCs, Ba0, lambdaBa, La0, lambdaLa):
 
     return f
 
-def totalIntegral(x, Cs0, lambdaCs, Ba0, lambdaBa, La0, lambdaLa):
-    #Cs part of decay
-    f = Cs0 * (1 - np.exp(-lambdaCs * x))
-
-    #Ba part of decay
-    f += Ba0 * (1 - np.exp(-lambdaBa * x))
-
-    f += (((Cs0*lambdaBa)/(lambdaBa-lambdaCs))*(1 - np.exp(-lambdaCs * x)))
-    f += (((Cs0*lambdaCs)/(lambdaCs-lambdaBa))*(1 - np.exp(-lambdaBa * x)))
-
-    #La part of decay
-    f += La0 * ( 1.0 - np.exp(1 - lambdaLa * x ))
-
-    f += Ba0 * lambdaLa / (lambdaLa - lambdaBa ) * ( 1.0 - np.exp( - lambdaBa * x ))
-    f += Ba0 * lambdaBa / (lambdaBa - lambdaLa ) * ( 1.0 - np.exp( - lambdaLa * x ))
-
-    f += Cs0 * lambdaCs * lambdaBa / (lambdaCs - lambdaLa ) / ( lambdaBa - lambdaLa ) * ( 1.0 - np.exp( - lambdaLa * x ))
-    f += Cs0 * lambdaCs * lambdaLa / (lambdaCs - lambdaBa ) / ( lambdaLa - lambdaBa ) * ( 1.0 - np.exp( - lambdaBa * x ))
-    f += Cs0 * lambdaBa * lambdaLa / (lambdaBa - lambdaCs ) / ( lambdaLa - lambdaCs ) * ( 1.0 - np.exp( - lambdaCs * x ))
-
-    return f
+#def totalIntegral(x, Cs0, lambdaCs, Ba0, lambdaBa, La0, lambdaLa):
+#    #Cs part of decay
+#    f = Cs0 * (1 - np.exp(-lambdaCs * x))
+#
+#    #Ba part of decay
+#    f += Ba0 * (1 - np.exp(-lambdaBa * x))
+#
+#    f += (((Cs0*lambdaBa)/(lambdaBa-lambdaCs))*(1 - np.exp(-lambdaCs * x)))
+#    f += (((Cs0*lambdaCs)/(lambdaCs-lambdaBa))*(1 - np.exp(-lambdaBa * x)))
+#
+#    #La part of decay
+#    f += La0 * ( 1.0 - np.exp(1 - lambdaLa * x ))
+#
+#    f += Ba0 * lambdaLa / (lambdaLa - lambdaBa ) * ( 1.0 - np.exp( - lambdaBa * x ))
+#    f += Ba0 * lambdaBa / (lambdaBa - lambdaLa ) * ( 1.0 - np.exp( - lambdaLa * x ))
+#
+#    f += Cs0 * lambdaCs * lambdaBa / (lambdaCs - lambdaLa ) / ( lambdaBa - lambdaLa ) * ( 1.0 - np.exp( - lambdaLa * x ))
+#    f += Cs0 * lambdaCs * lambdaLa / (lambdaCs - lambdaBa ) / ( lambdaLa - lambdaBa ) * ( 1.0 - np.exp( - lambdaBa * x ))
+#    f += Cs0 * lambdaBa * lambdaLa / (lambdaBa - lambdaCs ) / ( lambdaLa - lambdaCs ) * ( 1.0 - np.exp( - lambdaCs * x ))
+#
+#    return f
 
 def CsDecayRegular(x, Cs0, lambdaCs):
     f = Cs0*lambdaCs*np.exp(- lambdaCs* x)
@@ -100,21 +102,61 @@ def totalRegular(x, Cs0, lambdaCs, Ba0, lambdaBa, La0, lambdaLa):
 
     return f
 
-myFile = open("/home/rlmitchell43/integralMethod/IntegralMethod/multi/LaRegularValues.txt", "r")
+
+
+integralDataFile = open("/home/rlmitchell43/integralMethod/IntegralMethod/multi/integralData.txt", "r")
 eventYAxis = []
-for x in range(10000):
-    binData = myFile.readline()
-    binData = Decimal(binData)
+for x in range(100):
+    binData = integralDataFile.readline()
+    binData = float(binData)
     eventYAxis.append(binData)
 
-binCenters = []
-center = .2
-for x in range(1000):
-    binCenters.append(center)
-    center = center + .4
+integralBinDataFile = open("/home/rlmitchell43/integralMethod/IntegralMethod/multi/integralBinData.txt", "r")
+binPoints = []
+for x in range(100):
+    binData = integralBinDataFile.readline()
+    binData = float(binData)
+    binPoints.append(binData)
 
-#fig, axs = plt.subplots(1, 1, sharey = True, tight_layout = True)
-(n, bins, patches) = plt.hist(eventYAxis, bins = 1000, range = (0, 400))
+def totalIntegral(params):
+    Cs0 = params[0]
+    lambdaCs = params[1]
+    Ba0 = params[2]
+    lambdaBa = params[3]
+    La0 = params[4]
+    lambdaLa = params[5]
+    sd = params[6]
+
+    #Cs part of decay
+    f = Cs0 * (1.0 - np.exp(-lambdaCs * binPoints))
+
+    #Ba part of decay
+    f += Ba0 * (1.0 - np.exp(-lambdaBa * binPoints))
+
+    f += (((Cs0*lambdaBa)/(lambdaBa-lambdaCs))*(1.0 - np.exp(-lambdaCs * binPoints)))
+    f += (((Cs0*lambdaCs)/(lambdaCs-lambdaBa))*(1.0 - np.exp(-lambdaBa * binPoints)))
+
+    #La part of decay
+    f += La0 * ( 1.0 - np.exp(1.0 - lambdaLa * binPoints ))
+
+    f += Ba0 * lambdaLa / (lambdaLa - lambdaBa ) * ( 1.0 - np.exp( - lambdaBa * binPoints ))
+    f += Ba0 * lambdaBa / (lambdaBa - lambdaLa ) * ( 1.0 - np.exp( - lambdaLa * binPoints ))
+
+    f += Cs0 * lambdaCs * lambdaBa / (lambdaCs - lambdaLa ) / ( lambdaBa - lambdaLa ) * ( 1.0 - np.exp( - lambdaLa * binPoints ))
+    f += Cs0 * lambdaCs * lambdaLa / (lambdaCs - lambdaBa ) / ( lambdaLa - lambdaBa ) * ( 1.0 - np.exp( - lambdaBa * binPoints ))
+    f += Cs0 * lambdaBa * lambdaLa / (lambdaBa - lambdaCs ) / ( lambdaLa - lambdaCs ) * ( 1.0 - np.exp( - lambdaCs * binPoints ))
+
+    LL = -np.sum( stats.norm.logpdf(eventYAxis, loc=f, scale=sd ) )
+
+    return (LL)
+
+initParams = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+
+results = minimize(totalIntegral, initParams, method = 'Nelder-Mead')
+print(results.x)
+
+plt.plot(binPoints, eventYAxis)
+plt.show()
 
 boundArr = (
             (0, .01 * lambdaCs, 0, .01 * lambdaBa, 0, .01 * lambdaLa),
@@ -126,19 +168,19 @@ boundArr = (
             (2 * Cs0, 100 * lambdaCs, 2 * Cs0, 100 * lambdaBa)
             )
 '''
-fitData, conv = curve_fit(LaDecayRegular, binCenters, n, bounds = boundArr, method = 'trf', maxfev = 10000000000000000000)
-Cs0Fit, lambdaCsFit, Ba0Fit, lambdaBaFit, La0Fit, lambdaLaFit = fitData
+#fitData, conv = curve_fit(LaDecayRegular, binCenters, n, bounds = boundArr, method = 'trf', maxfev = 10000000000000000000)
+#Cs0Fit, lambdaCsFit, Ba0Fit, lambdaBaFit, La0Fit, lambdaLaFit = fitData
 #Cs0Fit, lambdaCsFit, Ba0Fit, lambdaBaFit = fitData
 
-print("Cs0:           " + str(Cs0Fit))
-print("Cs Half Life:  " + str(np.log(2)/lambdaCsFit))
-print("Ba0:           " + str(Ba0Fit))
-print("Ba Half Life:  " + str(np.log(2)/lambdaBaFit))
-print("La0:           " + str(La0Fit))
-print("La Half Life:  " + str(np.log(2)/lambdaLaFit))
+#print("Cs0:           " + str(Cs0Fit))
+#print("Cs Half Life:  " + str(np.log(2)/lambdaCsFit))
+#print("Ba0:           " + str(Ba0Fit))
+#print("Ba Half Life:  " + str(np.log(2)/lambdaBaFit))
+#print("La0:           " + str(La0Fit))
+#print("La Half Life:  " + str(np.log(2)/lambdaLaFit))
 
-plt.plot(binCenters, n)
-plt.show()
+#plt.plot(binCenters, n)
+#plt.show()
 
 '''
 x = np.linspace(0, 400, 10000)

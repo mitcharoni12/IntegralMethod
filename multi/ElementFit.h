@@ -977,6 +977,8 @@ void ElementFit::GenTotalIntegralHisto()
     //resets histogram so it can be used between runs
     TH1D* tempIntegralHisto, *tempBatemanHisto;
     Int_t tempNumBins;
+    //ofstream outfile;
+    //outfile.open("integralData.txt");
 
     for(int cycleIndex = 0; cycleIndex < numCycles; cycleIndex++)
     {
@@ -988,9 +990,11 @@ void ElementFit::GenTotalIntegralHisto()
 
             tempIntegralHisto->SetBinContent(1, 0.0);
             tempIntegralHisto->SetBinContent(2, tempBatemanHisto->GetBinContent(1));
+            //outfile << tempBatemanHisto->GetBinContent(1) << endl;
             for(int binIndex = 3; binIndex <= (tempNumBins+1); binIndex++)
             {
                 tempIntegralHisto->SetBinContent(binIndex, tempBatemanHisto->GetBinContent(binIndex-1) + tempIntegralHisto->GetBinContent(binIndex-1));
+                //outfile << tempIntegralHisto->GetBinContent(binIndex) << endl;
             }
 
             //tempIntegralHisto->SetBinContent(1, tempBatemanHisto->GetBinContent(1));
@@ -1000,6 +1004,7 @@ void ElementFit::GenTotalIntegralHisto()
             //}
         }
     }
+    //outfile.close();
 }
 
 /// \brief Sets the parameters for the single Bateman fit functions
