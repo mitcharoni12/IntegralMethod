@@ -1,0 +1,3 @@
+fileID = fopen("integralData.txt", "r");
+integralVals = fscanf(fileID, '%d', 100);
+
