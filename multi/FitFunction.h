@@ -16,8 +16,8 @@ public:
 	static Double_t Test3DecayByActivityIntegral(Double_t *x, Double_t* par);
 	static Double_t Test4DecayByActivity(Double_t *x, Double_t* par);
 	static Double_t Test4DecayByActivityIntegral(Double_t *x, Double_t* par);
-	static Double_t Test2DecayByActivity(Double_t *x, Double_t* par);
-	static Double_t Test2DecayByActivityIntegral(Double_t *x, Double_t* par);
+	static Double_t Test5DecayByActivity(Double_t *x, Double_t* par);
+	static Double_t Test5DecayByActivityIntegral(Double_t *x, Double_t* par);
 	FitFunction(Int_t numElements);
 	decayFunction* GetBatemanFitFunctions(){return batemanFitFunctions;}
 	decayFunction* GetIntegralFitFunctions(){return integralFitFunctions;}
@@ -40,8 +40,8 @@ FitFunction::FitFunction(Int_t numElements)
 	integralFitFunctions[2] = Test3DecayByActivityIntegral;
 	batemanFitFunctions[3] = Test4DecayByActivity;
 	integralFitFunctions[3] = Test4DecayByActivityIntegral;
-	batemanFitFunctions[4] = Test2DecayByActivity;
-	integralFitFunctions[4] = Test2DecayByActivityIntegral;
+	batemanFitFunctions[4] = Test5DecayByActivity;
+	integralFitFunctions[4] = Test5DecayByActivityIntegral;
 }
 
 Double_t FitFunction::Test1DecayByActivity(Double_t *x, Double_t *par)
@@ -200,7 +200,7 @@ Double_t FitFunction::Test4DecayByActivityIntegral(Double_t *x, Double_t *par)
 	return f;
 }
 
-Double_t FitFunction::Test2DecayByActivity(Double_t *x, Double_t *par)
+Double_t FitFunction::Test5DecayByActivity(Double_t *x, Double_t *par)
 {
 	Float_t timeVar = x[0];
 	Double_t Test10 = par[0];
@@ -211,33 +211,33 @@ Double_t FitFunction::Test2DecayByActivity(Double_t *x, Double_t *par)
 	Double_t lambdaTest3 = par[5];
 	Double_t Test40 = par[6];
 	Double_t lambdaTest4 = par[7];
-	Double_t Test20 = par[8];
-	Double_t lambdaTest2 = par[9];
+	Double_t Test50 = par[8];
+	Double_t lambdaTest5 = par[9];
 
-	Double_t f = (Test20 * lambdaTest2 * (TMath::Exp(-lambdaTest2 * timeVar)));
+	Double_t f = (Test50 * lambdaTest5 * (TMath::Exp(-lambdaTest5 * timeVar)));
 
-	f += (Test10 * lambdaTest2 * lambdaTest1 * lambdaTest2 * lambdaTest3 * lambdaTest4 * ((TMath::Exp(-lambdaTest1 * timeVar)) / ((lambdaTest2-lambdaTest1)*(lambdaTest3-lambdaTest1)*(lambdaTest4-lambdaTest1)*(lambdaTest2-lambdaTest1))));
-	f += (Test10 * lambdaTest2 * lambdaTest1 * lambdaTest2 * lambdaTest3 * lambdaTest4 * ((TMath::Exp(-lambdaTest2 * timeVar)) / ((lambdaTest1-lambdaTest2)*(lambdaTest3-lambdaTest2)*(lambdaTest4-lambdaTest2)*(lambdaTest2-lambdaTest2))));
-	f += (Test10 * lambdaTest2 * lambdaTest1 * lambdaTest2 * lambdaTest3 * lambdaTest4 * ((TMath::Exp(-lambdaTest3 * timeVar)) / ((lambdaTest1-lambdaTest3)*(lambdaTest2-lambdaTest3)*(lambdaTest4-lambdaTest3)*(lambdaTest2-lambdaTest3))));
-	f += (Test10 * lambdaTest2 * lambdaTest1 * lambdaTest2 * lambdaTest3 * lambdaTest4 * ((TMath::Exp(-lambdaTest4 * timeVar)) / ((lambdaTest1-lambdaTest4)*(lambdaTest2-lambdaTest4)*(lambdaTest3-lambdaTest4)*(lambdaTest2-lambdaTest4))));
-	f += (Test10 * lambdaTest2 * lambdaTest1 * lambdaTest2 * lambdaTest3 * lambdaTest4 * ((TMath::Exp(-lambdaTest2 * timeVar)) / ((lambdaTest1-lambdaTest2)*(lambdaTest2-lambdaTest2)*(lambdaTest3-lambdaTest2)*(lambdaTest4-lambdaTest2))));
+	f += (Test10 * lambdaTest5 * lambdaTest1 * lambdaTest2 * lambdaTest3 * lambdaTest4 * ((TMath::Exp(-lambdaTest1 * timeVar)) / ((lambdaTest2-lambdaTest1)*(lambdaTest3-lambdaTest1)*(lambdaTest4-lambdaTest1)*(lambdaTest5-lambdaTest1))));
+	f += (Test10 * lambdaTest5 * lambdaTest1 * lambdaTest2 * lambdaTest3 * lambdaTest4 * ((TMath::Exp(-lambdaTest2 * timeVar)) / ((lambdaTest1-lambdaTest2)*(lambdaTest3-lambdaTest2)*(lambdaTest4-lambdaTest2)*(lambdaTest5-lambdaTest2))));
+	f += (Test10 * lambdaTest5 * lambdaTest1 * lambdaTest2 * lambdaTest3 * lambdaTest4 * ((TMath::Exp(-lambdaTest3 * timeVar)) / ((lambdaTest1-lambdaTest3)*(lambdaTest2-lambdaTest3)*(lambdaTest4-lambdaTest3)*(lambdaTest5-lambdaTest3))));
+	f += (Test10 * lambdaTest5 * lambdaTest1 * lambdaTest2 * lambdaTest3 * lambdaTest4 * ((TMath::Exp(-lambdaTest4 * timeVar)) / ((lambdaTest1-lambdaTest4)*(lambdaTest2-lambdaTest4)*(lambdaTest3-lambdaTest4)*(lambdaTest5-lambdaTest4))));
+	f += (Test10 * lambdaTest5 * lambdaTest1 * lambdaTest2 * lambdaTest3 * lambdaTest4 * ((TMath::Exp(-lambdaTest5 * timeVar)) / ((lambdaTest1-lambdaTest5)*(lambdaTest2-lambdaTest5)*(lambdaTest3-lambdaTest5)*(lambdaTest4-lambdaTest5))));
 
-	f += (Test20 * lambdaTest2 * lambdaTest2 * lambdaTest3 * lambdaTest4 * ((TMath::Exp(-lambdaTest2 * timeVar)) / ((lambdaTest3-lambdaTest2)*(lambdaTest4-lambdaTest2)*(lambdaTest2-lambdaTest2))));
-	f += (Test20 * lambdaTest2 * lambdaTest2 * lambdaTest3 * lambdaTest4 * ((TMath::Exp(-lambdaTest3 * timeVar)) / ((lambdaTest2-lambdaTest3)*(lambdaTest4-lambdaTest3)*(lambdaTest2-lambdaTest3))));
-	f += (Test20 * lambdaTest2 * lambdaTest2 * lambdaTest3 * lambdaTest4 * ((TMath::Exp(-lambdaTest4 * timeVar)) / ((lambdaTest2-lambdaTest4)*(lambdaTest3-lambdaTest4)*(lambdaTest2-lambdaTest4))));
-	f += (Test20 * lambdaTest2 * lambdaTest2 * lambdaTest3 * lambdaTest4 * ((TMath::Exp(-lambdaTest2 * timeVar)) / ((lambdaTest2-lambdaTest2)*(lambdaTest3-lambdaTest2)*(lambdaTest4-lambdaTest2))));
+	f += (Test20 * lambdaTest5 * lambdaTest2 * lambdaTest3 * lambdaTest4 * ((TMath::Exp(-lambdaTest2 * timeVar)) / ((lambdaTest3-lambdaTest2)*(lambdaTest4-lambdaTest2)*(lambdaTest5-lambdaTest2))));
+	f += (Test20 * lambdaTest5 * lambdaTest2 * lambdaTest3 * lambdaTest4 * ((TMath::Exp(-lambdaTest3 * timeVar)) / ((lambdaTest2-lambdaTest3)*(lambdaTest4-lambdaTest3)*(lambdaTest5-lambdaTest3))));
+	f += (Test20 * lambdaTest5 * lambdaTest2 * lambdaTest3 * lambdaTest4 * ((TMath::Exp(-lambdaTest4 * timeVar)) / ((lambdaTest2-lambdaTest4)*(lambdaTest3-lambdaTest4)*(lambdaTest5-lambdaTest4))));
+	f += (Test20 * lambdaTest5 * lambdaTest2 * lambdaTest3 * lambdaTest4 * ((TMath::Exp(-lambdaTest5 * timeVar)) / ((lambdaTest2-lambdaTest5)*(lambdaTest3-lambdaTest5)*(lambdaTest4-lambdaTest5))));
 
-	f += (Test30 * lambdaTest2 * lambdaTest3 * lambdaTest4 * ((TMath::Exp(-lambdaTest3 * timeVar)) / ((lambdaTest4-lambdaTest3)*(lambdaTest2-lambdaTest3))));
-	f += (Test30 * lambdaTest2 * lambdaTest3 * lambdaTest4 * ((TMath::Exp(-lambdaTest4 * timeVar)) / ((lambdaTest3-lambdaTest4)*(lambdaTest2-lambdaTest4))));
-	f += (Test30 * lambdaTest2 * lambdaTest3 * lambdaTest4 * ((TMath::Exp(-lambdaTest2 * timeVar)) / ((lambdaTest3-lambdaTest2)*(lambdaTest4-lambdaTest2))));
+	f += (Test30 * lambdaTest5 * lambdaTest3 * lambdaTest4 * ((TMath::Exp(-lambdaTest3 * timeVar)) / ((lambdaTest4-lambdaTest3)*(lambdaTest5-lambdaTest3))));
+	f += (Test30 * lambdaTest5 * lambdaTest3 * lambdaTest4 * ((TMath::Exp(-lambdaTest4 * timeVar)) / ((lambdaTest3-lambdaTest4)*(lambdaTest5-lambdaTest4))));
+	f += (Test30 * lambdaTest5 * lambdaTest3 * lambdaTest4 * ((TMath::Exp(-lambdaTest5 * timeVar)) / ((lambdaTest3-lambdaTest5)*(lambdaTest4-lambdaTest5))));
 
-	f += (Test40 * lambdaTest2 * lambdaTest4 * ((TMath::Exp(-lambdaTest4 * timeVar)) / ((lambdaTest2-lambdaTest4))));
-	f += (Test40 * lambdaTest2 * lambdaTest4 * ((TMath::Exp(-lambdaTest2 * timeVar)) / ((lambdaTest4-lambdaTest2))));
+	f += (Test40 * lambdaTest5 * lambdaTest4 * ((TMath::Exp(-lambdaTest4 * timeVar)) / ((lambdaTest5-lambdaTest4))));
+	f += (Test40 * lambdaTest5 * lambdaTest4 * ((TMath::Exp(-lambdaTest5 * timeVar)) / ((lambdaTest4-lambdaTest5))));
 
 	return f;
 }
 
-Double_t FitFunction::Test2DecayByActivityIntegral(Double_t *x, Double_t *par)
+Double_t FitFunction::Test5DecayByActivityIntegral(Double_t *x, Double_t *par)
 {
 	Float_t timeVar = x[0];
 	Double_t Test10 = par[0];
@@ -248,28 +248,28 @@ Double_t FitFunction::Test2DecayByActivityIntegral(Double_t *x, Double_t *par)
 	Double_t lambdaTest3 = par[5];
 	Double_t Test40 = par[6];
 	Double_t lambdaTest4 = par[7];
-	Double_t Test20 = par[8];
-	Double_t lambdaTest2 = par[9];
+	Double_t Test50 = par[8];
+	Double_t lambdaTest5 = par[9];
 
-	Double_t f = Test20 * (1.0 - TMath::Exp(-lambdaTest2 * timeVar));
+	Double_t f = Test50 * (1.0 - TMath::Exp(-lambdaTest5 * timeVar));
 
-	f += Test10 * lambdaTest2 * lambdaTest3 * lambdaTest4 * lambdaTest2 * (1.0 - TMath::Exp(-lambdaTest1 * timeVar)) / ((lambdaTest2-lambdaTest1)*(lambdaTest3-lambdaTest1)*(lambdaTest4-lambdaTest1)*(lambdaTest2-lambdaTest1));
-	f += Test10 * lambdaTest1 * lambdaTest3 * lambdaTest4 * lambdaTest2 * (1.0 - TMath::Exp(-lambdaTest2 * timeVar)) / ((lambdaTest1-lambdaTest2)*(lambdaTest3-lambdaTest2)*(lambdaTest4-lambdaTest2)*(lambdaTest2-lambdaTest2));
-	f += Test10 * lambdaTest1 * lambdaTest2 * lambdaTest4 * lambdaTest2 * (1.0 - TMath::Exp(-lambdaTest3 * timeVar)) / ((lambdaTest1-lambdaTest3)*(lambdaTest2-lambdaTest3)*(lambdaTest4-lambdaTest3)*(lambdaTest2-lambdaTest3));
-	f += Test10 * lambdaTest1 * lambdaTest2 * lambdaTest3 * lambdaTest2 * (1.0 - TMath::Exp(-lambdaTest4 * timeVar)) / ((lambdaTest1-lambdaTest4)*(lambdaTest2-lambdaTest4)*(lambdaTest3-lambdaTest4)*(lambdaTest2-lambdaTest4));
-	f += Test10 * lambdaTest1 * lambdaTest2 * lambdaTest3 * lambdaTest4 * (1.0 - TMath::Exp(-lambdaTest2 * timeVar)) / ((lambdaTest1-lambdaTest2)*(lambdaTest2-lambdaTest2)*(lambdaTest3-lambdaTest2)*(lambdaTest4-lambdaTest2));
+	f += Test10 * lambdaTest2 * lambdaTest3 * lambdaTest4 * lambdaTest5 * (1.0 - TMath::Exp(-lambdaTest1 * timeVar)) / ((lambdaTest2-lambdaTest1)*(lambdaTest3-lambdaTest1)*(lambdaTest4-lambdaTest1)*(lambdaTest5-lambdaTest1));
+	f += Test10 * lambdaTest1 * lambdaTest3 * lambdaTest4 * lambdaTest5 * (1.0 - TMath::Exp(-lambdaTest2 * timeVar)) / ((lambdaTest1-lambdaTest2)*(lambdaTest3-lambdaTest2)*(lambdaTest4-lambdaTest2)*(lambdaTest5-lambdaTest2));
+	f += Test10 * lambdaTest1 * lambdaTest2 * lambdaTest4 * lambdaTest5 * (1.0 - TMath::Exp(-lambdaTest3 * timeVar)) / ((lambdaTest1-lambdaTest3)*(lambdaTest2-lambdaTest3)*(lambdaTest4-lambdaTest3)*(lambdaTest5-lambdaTest3));
+	f += Test10 * lambdaTest1 * lambdaTest2 * lambdaTest3 * lambdaTest5 * (1.0 - TMath::Exp(-lambdaTest4 * timeVar)) / ((lambdaTest1-lambdaTest4)*(lambdaTest2-lambdaTest4)*(lambdaTest3-lambdaTest4)*(lambdaTest5-lambdaTest4));
+	f += Test10 * lambdaTest1 * lambdaTest2 * lambdaTest3 * lambdaTest4 * (1.0 - TMath::Exp(-lambdaTest5 * timeVar)) / ((lambdaTest1-lambdaTest5)*(lambdaTest2-lambdaTest5)*(lambdaTest3-lambdaTest5)*(lambdaTest4-lambdaTest5));
 
-	f += Test20 * lambdaTest3 * lambdaTest4 * lambdaTest2 * (1.0 - TMath::Exp(-lambdaTest2 * timeVar)) / ((lambdaTest3-lambdaTest2)*(lambdaTest4-lambdaTest2)*(lambdaTest2-lambdaTest2));
-	f += Test20 * lambdaTest2 * lambdaTest4 * lambdaTest2 * (1.0 - TMath::Exp(-lambdaTest3 * timeVar)) / ((lambdaTest2-lambdaTest3)*(lambdaTest4-lambdaTest3)*(lambdaTest2-lambdaTest3));
-	f += Test20 * lambdaTest2 * lambdaTest3 * lambdaTest2 * (1.0 - TMath::Exp(-lambdaTest4 * timeVar)) / ((lambdaTest2-lambdaTest4)*(lambdaTest3-lambdaTest4)*(lambdaTest2-lambdaTest4));
-	f += Test20 * lambdaTest2 * lambdaTest3 * lambdaTest4 * (1.0 - TMath::Exp(-lambdaTest2 * timeVar)) / ((lambdaTest2-lambdaTest2)*(lambdaTest3-lambdaTest2)*(lambdaTest4-lambdaTest2));
+	f += Test20 * lambdaTest3 * lambdaTest4 * lambdaTest5 * (1.0 - TMath::Exp(-lambdaTest2 * timeVar)) / ((lambdaTest3-lambdaTest2)*(lambdaTest4-lambdaTest2)*(lambdaTest5-lambdaTest2));
+	f += Test20 * lambdaTest2 * lambdaTest4 * lambdaTest5 * (1.0 - TMath::Exp(-lambdaTest3 * timeVar)) / ((lambdaTest2-lambdaTest3)*(lambdaTest4-lambdaTest3)*(lambdaTest5-lambdaTest3));
+	f += Test20 * lambdaTest2 * lambdaTest3 * lambdaTest5 * (1.0 - TMath::Exp(-lambdaTest4 * timeVar)) / ((lambdaTest2-lambdaTest4)*(lambdaTest3-lambdaTest4)*(lambdaTest5-lambdaTest4));
+	f += Test20 * lambdaTest2 * lambdaTest3 * lambdaTest4 * (1.0 - TMath::Exp(-lambdaTest5 * timeVar)) / ((lambdaTest2-lambdaTest5)*(lambdaTest3-lambdaTest5)*(lambdaTest4-lambdaTest5));
 
-	f += Test30 * lambdaTest4 * lambdaTest2 * (1.0 - TMath::Exp(-lambdaTest3 * timeVar)) / ((lambdaTest4-lambdaTest3)*(lambdaTest2-lambdaTest3));
-	f += Test30 * lambdaTest3 * lambdaTest2 * (1.0 - TMath::Exp(-lambdaTest4 * timeVar)) / ((lambdaTest3-lambdaTest4)*(lambdaTest2-lambdaTest4));
-	f += Test30 * lambdaTest3 * lambdaTest4 * (1.0 - TMath::Exp(-lambdaTest2 * timeVar)) / ((lambdaTest3-lambdaTest2)*(lambdaTest4-lambdaTest2));
+	f += Test30 * lambdaTest4 * lambdaTest5 * (1.0 - TMath::Exp(-lambdaTest3 * timeVar)) / ((lambdaTest4-lambdaTest3)*(lambdaTest5-lambdaTest3));
+	f += Test30 * lambdaTest3 * lambdaTest5 * (1.0 - TMath::Exp(-lambdaTest4 * timeVar)) / ((lambdaTest3-lambdaTest4)*(lambdaTest5-lambdaTest4));
+	f += Test30 * lambdaTest3 * lambdaTest4 * (1.0 - TMath::Exp(-lambdaTest5 * timeVar)) / ((lambdaTest3-lambdaTest5)*(lambdaTest4-lambdaTest5));
 
-	f += Test40 * lambdaTest2 * (1.0 - TMath::Exp(-lambdaTest4 * timeVar)) / ((lambdaTest2-lambdaTest4));
-	f += Test40 * lambdaTest4 * (1.0 - TMath::Exp(-lambdaTest2 * timeVar)) / ((lambdaTest4-lambdaTest2));
+	f += Test40 * lambdaTest5 * (1.0 - TMath::Exp(-lambdaTest4 * timeVar)) / ((lambdaTest5-lambdaTest4));
+	f += Test40 * lambdaTest4 * (1.0 - TMath::Exp(-lambdaTest5 * timeVar)) / ((lambdaTest4-lambdaTest5));
 
 	return f;
 }
