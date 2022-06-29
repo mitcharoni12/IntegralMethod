@@ -209,7 +209,7 @@ void Run::CreateTotalBatemanMultiRunHistos()
     //creates the histograms
     for(int i = 0; i < numElements; i++)
     {
-        parameterValue = TMath::LogE()/(element->GetElementParameters(i));
+        parameterValue = TMath::Log(2)/(element->GetElementParameters(i));
         //totalBatemanMultiRunFitHisto[i] = new TH1D((elementNameStrs[i] + " Fit Result Total Bateman Histo").c_str(), (elementNameStrs[i] + " Fit Result Total Bateman Histo").c_str(), 500, parameterValue*0, parameterValue*2.5);
         totalBatemanMultiRunFitHisto[i] = new TH1D("Fitted Bateman Method Values", "Fitted Bateman Method Values", 500, parameterValue*0, parameterValue*5);
         totalBatemanMultiRunFitHisto[i]->GetXaxis()->SetTitle("Fitted Half-Life(S)");
@@ -225,7 +225,7 @@ void Run::CreateTotalIntegralMultiRunHistos()
     //creates the histograms
     for(int i = 0; i < numElements; i++)
     {
-        parameterValue = TMath::LogE()/(element->GetElementParameters(i));
+        parameterValue = TMath::Log(2)/(element->GetElementParameters(i));
         //totalIntegralMultiRunFitHisto[i] = new TH1D((elementNameStrs[i] + " Fit Result Total Integral Histo").c_str(), (elementNameStrs[i] + " Fit Result Total Integral Histo").c_str(), 500, parameterValue*0, parameterValue*2.5);
         totalIntegralMultiRunFitHisto[i] = new TH1D("Fitted Integral Method Values", "Fitted Integral Method Values", 500, parameterValue*0, parameterValue*5);
         totalIntegralMultiRunFitHisto[i]->GetXaxis()->SetTitle("Fitted Half-Life(S)");
