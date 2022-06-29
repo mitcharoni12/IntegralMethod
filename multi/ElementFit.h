@@ -722,7 +722,7 @@ void ElementFit::FitTotalBatemanHistos(Int_t cycleIndex, Int_t runIndex)
     //retry fit if it fails
     for(int i = 0; i < 1; i++)
     {
-        fitResult = tempHisto->Fit(batemanFunction, "QLSMULTITHREAD", "", startFit, endFit);
+        fitResult = tempHisto->Fit(batemanFunction, "LSMULTITHREAD", "", startFit, endFit);
     }
     
     for(int elementIndex = 0; elementIndex < numElements; elementIndex++)
@@ -784,7 +784,7 @@ void ElementFit::FitTotalIntegralHistos(Int_t cycleIndex, Int_t runIndex)
     tempHisto = integralHisto->GetAHisto(cycleIndex, runIndex);
 
     cout << "FITTING TOTAL INTEGRAL CYCLE: " << cycleIndex << " RUN: " << runIndex << endl;
-    fitResult = tempHisto->Fit(integralFunction, "QLSMULTITHREAD", "", startFit, endFit);
+    fitResult = tempHisto->Fit(integralFunction, "LSMULTITHREAD", "", startFit, endFit);
 
     for(int i = 0; i < numElements; i++)
     {   
