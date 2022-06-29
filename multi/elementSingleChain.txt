@@ -93,4 +93,4 @@ element 5 half life lower(s):.000001
 element 5 half life upper(s):100000.0
 element 5 fix half life(1) don't fix(2):1
 
-Create Fit Functions(1) Dont Create Fit Function(2):1
+Create Fit Functions(1) Dont Create Fit Function(2):2
