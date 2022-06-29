@@ -1,6 +1,6 @@
-Number of Elements:5
+Number of Elements:1
 Histo events:10
-Background events:0
+Background events:100000
 Histo Bins(only if rebin):100
 Input Histo Bin Number:12000
 Bin Width(S):0.001
