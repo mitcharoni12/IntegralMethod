@@ -184,7 +184,7 @@ void Run::CreateSingleBatemanMultiRunHistos()
     for(int i = 0; i < numElements; i++)
     {
         parameterValue = TMath::LogE()/(element->GetElementParameters(i));
-        singleBatemanMultiRunFitHisto[i] = new TH1D((elementNameStrs[i] + " Fit Result Single Bateman Histo").c_str(), (elementNameStrs[i] + " Fit Result Single Bateman Histo").c_str(), 500, parameterValue*0, parameterValue*2.5);
+        singleBatemanMultiRunFitHisto[i] = new TH1D((elementNameStrs[i] + " Fit Result Single Bateman Histo").c_str(), (elementNameStrs[i] + " Fit Result Single Bateman Histo").c_str(), 500, parameterValue*0, parameterValue*5);
     }
 }
 
@@ -197,7 +197,7 @@ void Run::CreateSingleIntegralMultiRunHistos()
     for(int i = 0; i < numElements; i++)
     {
         parameterValue = TMath::LogE()/(element->GetElementParameters(i));
-        singleIntegralMultiRunFitHisto[i] = new TH1D((elementNameStrs[i] + " Fit Result Single Integral Histo").c_str(), (elementNameStrs[i] + " Fit Result Single Integral Histo").c_str(), 500, parameterValue*0, parameterValue*2.5);
+        singleIntegralMultiRunFitHisto[i] = new TH1D((elementNameStrs[i] + " Fit Result Single Integral Histo").c_str(), (elementNameStrs[i] + " Fit Result Single Integral Histo").c_str(), 500, parameterValue*0, parameterValue*5);
     }
 }
 
