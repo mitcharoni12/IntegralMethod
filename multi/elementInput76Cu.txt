@@ -1,0 +1,62 @@
+bateman background value:10
+bateman background value lower:0
+bateman background value upper:1000000
+bateman background fix value(1) don't fix(2):2
+
+integral background value:200
+integral background value lower:0
+integral background value upper:10000000
+integral background fix value(1) don't fix(2):2
+
+element 1 Name:CU
+
+element 1 Bateman N0 value:0.05
+element 1 Bateman N0 lower:0
+element 1 Bateman N0 upper:100000
+element 1 fix N0(1) don't fix(2):2
+
+element 1 Integral N0 value:10
+element 1 Integral N0 lower:0
+element 1 Integral N0 upper:100000
+element 1 fix N0(1) don't fix(2):2
+
+element 1 half life value(s):0.641
+element 1 half life lower(s):.001
+element 1 half life upper(s):30
+element 1 fix half life(1) don't fix(2):2
+
+element 2 Name:ZN
+
+element 2 Bateman N0 value:0
+element 2 Bateman N0 lower:0
+element 2 Bateman N0 upper:100000
+element 2 fix N0(1) don't fix(2):2
+
+element 2 Integral N0 value:0
+element 2 Integral N0 lower:0
+element 2 Integral N0 upper:100000
+element 2 fix N0(1) don't fix(2):2
+
+element 2 half life value(s):5.7
+element 2 half life lower(s):.001
+element 2 half life upper(s):200
+element 2 fix half life(1) don't fix(2):1
+
+element 3 Name:GA
+
+element 3 Bateman N0 value:0
+element 3 Bateman N0 lower:0
+element 3 Bateman N0 upper:100000
+element 3 fix N0(1) don't fix(2):2
+
+element 3 Integral N0 value:0
+element 3 Integral N0 lower:0
+element 3 Integral N0 upper:100000
+element 3 fix N0(1) don't fix(2):2
+
+element 3 half life value(s):32.6
+element 3 half life lower(s):.001
+element 3 half life upper(s):6000
+element 3 fix half life(1) don't fix(2):1
+
+Create Fit Functions(1) Dont Create Fit Function(2):2

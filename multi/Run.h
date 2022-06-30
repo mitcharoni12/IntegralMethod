@@ -97,6 +97,7 @@ public:
     TH1D** GetTotalIntegralMultiRunFitHisto(){return totalIntegralMultiRunFitHisto;}
     string* GetElementStringNames(){return elementNameStrs;}
     Int_t GetNumRuns(){return numRuns;}
+    Double_t GetCycleMean(ChainRunFitValues* fittedValues, Int_t elementIndex);
     //setter function
     void setNumRuns(Int_t numRuns){this->numRuns = numRuns;}
 };
@@ -358,9 +359,9 @@ void Run::FillTotalBatemanMultiRunHistos()
                 failedRuns++;
             }
         }
-        cout << "Element " << i << " Bateman mean: " << totalBatemanMultiRunFitHisto[i]->GetMean() << endl;
+        cout << "Element " << i << " Bateman mean: " << GetCycleMean(batemanFitValues, i) << endl;
     }
-        cout << "Bateman failed runs: " << failedRuns/numElements << endl;
+    cout << "Bateman failed runs: " << failedRuns/numElements << endl;
 }
 
 /// \brief Fills the data storage histograms with fitted total integral half lives from the runs.
@@ -381,9 +382,22 @@ void Run::FillTotalIntegralMultiRunHistos()
                 failedRuns++;
             }
         }
-        cout << "Element " << i << " integral mean: " << totalIntegralMultiRunFitHisto[i]->GetMean() << endl;
+        cout << "Element " << i << " integral mean: " << GetCycleMean(integralFitValues, i) << endl;
     }
-        cout << "Integral failed runs " << failedRuns/numElements << endl;
+    cout << "Integral failed runs " << failedRuns/numElements << endl;
+}
+
+/// \brief Gets the mean of the multiple runs in a cycle (instead of pulling it from the histogram which can leave out values)
+Double_t Run::GetCycleMean(ChainRunFitValues* fittedValues, Int_t elementIndex)
+{
+    Double_t tempMean = 0.0f;
+    for(int runIndex = 0; runIndex < numRuns; runIndex++)
+    {
+        tempMean += fittedValues->GetAnHalfLife(runIndex, elementIndex);
+    }
+    tempMean = tempMean / ((Double_t)numRuns);
+
+    return tempMean;
 }
 
 /// \brief Dynamically allocates the graphs to display the fit values of the single bateman histograms for the different runs.

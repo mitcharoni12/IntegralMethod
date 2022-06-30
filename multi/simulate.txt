@@ -1,10 +1,10 @@
 Number of Elements:3
-Histo events:10000
-Background events:80000
+Histo events:10
+Background events:64000
 Histo Bins(only if rebin):100
 Input Histo Bin Number:12000
-Bin Width(S):0.010
-Inital Time Fit Simulated Histograms(S):400
+Bin Width(S):0.050
+Inital Time Fit Simulated Histograms(S):320
 Inital Time Fit Start Input Histogram(10^-8s):350000000
 Inital Time Fit End Input Histograms(10^-8s):450000000
 Input Histogram Time End(10^-8s):500000000
@@ -15,6 +15,6 @@ leave out x first bins of simulated histograms:0
 leave out x last bins of simulated histograms:0
 leave out x first bins of input histograms:0
 leave out x last bins of input histograms:0
-Element data File:elementInput144Cs.txt
+Element data File:elementInput76Cu.txt
 Root File Path:~/Mg15510_000.root
 Histogram Name:septarCountsVsTime
