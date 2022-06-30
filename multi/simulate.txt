@@ -1,9 +1,9 @@
 Number of Elements:3
 Histo events:10
-Background events:64000
+Background events:0
 Histo Bins(only if rebin):100
 Input Histo Bin Number:12000
-Bin Width(S):0.050
+Bin Width(S):0.100
 Inital Time Fit Simulated Histograms(S):320
 Inital Time Fit Start Input Histogram(10^-8s):350000000
 Inital Time Fit End Input Histograms(10^-8s):450000000
