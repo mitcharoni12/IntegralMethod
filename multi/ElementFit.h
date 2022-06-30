@@ -1099,7 +1099,7 @@ void ElementFit::SetSingleBatemanParameterLimits()
             if(paraVals[k]->GetFixBatemanN0()){
                 singleBatemanFitFunctions[i]->FixParameter((k*2), paraVals[k]->GetBatemanN0());
             }else{
-                singleBatemanFitFunctions[i]->SetParLimits((k*2), 0., doubleNumEvents*10000);
+                singleBatemanFitFunctions[i]->SetParLimits((k*2), paraVals[k]->GetLowerRangeBatemanN0(), paraVals[k]->GetUpperRangeBatemanN0());
             }
             //Setting limits for decay constant
             if(paraVals[k]->GetFixDecayConst()){
@@ -1123,13 +1123,13 @@ void ElementFit::SetSingleIntegralParameterLimits()
             if(paraVals[k]->GetFixIntegralN0()){
                 singleIntegralFitFunctions[i]->FixParameter((k*2), paraVals[k]->GetIntegralN0());
             }else{
-                singleIntegralFitFunctions[i]->SetParLimits((k*2), 0., doubleNumEvents*10000);
+                singleIntegralFitFunctions[i]->SetParLimits((k*2), paraVals[k]->GetLowerRangeIntegralN0(), paraVals[k]->GetUpperRangeIntegralN0());
             }
             //Setting limits for decay constant
             if(paraVals[k]->GetFixDecayConst()){
                 singleIntegralFitFunctions[i]->FixParameter((k*2)+1, paraVals[k]->GetDecayConst());
             }else{
-                singleIntegralFitFunctions[i]->SetParLimits((k*2)+1, paraVals[k]->GetLowerRangeDecayConst(), (paraVals[k]->GetUpperRangeDecayConst()));
+                singleIntegralFitFunctions[i]->SetParLimits((k*2)+1, paraVals[k]->GetLowerRangeDecayConst(), paraVals[k]->GetUpperRangeDecayConst());
             }
         }
     }
@@ -1147,13 +1147,13 @@ void ElementFit::SetTotalBatemanParameterLimits()
             if(paraVals[i]->GetFixBatemanN0()){
                 batemanFunction->FixParameter((i*2), paraVals[i]->GetBatemanN0());
             }else{
-                batemanFunction->SetParLimits((i*2), 0., doubleNumEvents*10000);
+                batemanFunction->SetParLimits((i*2), paraVals[k]->GetLowerRangeBatemanN0(), paraVals[k]->GetUpperRangeBatemanN0());
             }
             //Setting limits for decay constant
             if(paraVals[i]->GetFixDecayConst()){
                 batemanFunction->FixParameter((i*2)+1, paraVals[i]->GetDecayConst());
             }else{
-                batemanFunction->SetParLimits((i*2)+1, (paraVals[i]->GetDecayConst() * .01), (paraVals[i]->GetDecayConst() * 100.));
+                batemanFunction->SetParLimits((i*2)+1, paraVals[k]->GetLowerRangeDecayConst(), paraVals[k]->GetUpperRangeDecayConst());
             }
             
         //2 = setting from fit parameters of fitted input histogram, use user defined limits.
@@ -1193,13 +1193,13 @@ void ElementFit::SetTotalIntegralParameterLimits()
             if(paraVals[i]->GetFixIntegralN0()){
                 integralFunction->FixParameter((i*2), paraVals[i]->GetIntegralN0());
             }else{
-                integralFunction->SetParLimits((i*2), 0., doubleNumEvents*10000);
+                integralFunction->SetParLimits((i*2), paraVals[k]->GetLowerRangeIntegralN0(), paraVals[k]->GetUpperRangeIntegralN0());
             }
             //Setting limits for decay constant
             if(paraVals[i]->GetFixDecayConst()){
                 integralFunction->FixParameter((i*2)+1, paraVals[i]->GetDecayConst());
             }else{
-                integralFunction->SetParLimits((i*2)+1, (paraVals[i]->GetDecayConst() * .01), (paraVals[i]->GetDecayConst() * 100.));
+                integralFunction->SetParLimits((i*2)+1, paraVals[k]->GetLowerRangeDecayConst(), paraVals[k]->GetUpperRangeDecayConst());
             }
             
         //2 = setting from fit parameters of fitted input histogram, use user defined limits.
@@ -1238,10 +1238,12 @@ void ElementFit::DisplayParameterLimits()
         for(int i = 0; i < numElements; i++)
         {
             cout << elementNames[i] << ":" << endl;
-            cout << "\tInitial Lower Range: 0" << endl;
-            cout << "\tInitial Upper Range: " << doubleNumEvents*10000 << endl;
-            cout << "\tHalf Life Lower Range: " << paraVals[i]->GetHalfLife() * .01 << endl;
-            cout << "\tHalf Life Upper Range: " << paraVals[i]->GetHalfLife() * 100. << endl;
+            cout << "\tBateman Initial Lower Range: " << paraVals[i]->GetLowerRangeBatemanN0() << endl;
+            cout << "\tBateman Initial Upper Range: " << paraVals[i]->GetUpperRangeBatemanN0() << endl;
+            cout << "\tIntegral Initial Lower Range: " << paraVals[i]->GetLowerRangeIntegralN0() << endl;
+            cout << "\tIntegral Initial Upper Range: " << paraVals[i]->GetUpperRangeIntegralN0() << endl;
+            cout << "\tHalf Life Lower Range: " << paraVals[k]->GetLowerRangeDecayConst() << endl;
+            cout << "\tHalf Life Upper Range: " << paraVals[k]->GetUpperRangeDecayConst() << endl;
             cout << endl;
         }
         cout << endl;
@@ -1251,10 +1253,10 @@ void ElementFit::DisplayParameterLimits()
         for(int i = 0; i < numElements; i++)
         {
             cout << elementNames[i] << ":" << endl;
-            cout << "\tBateman initial Lower Range: " << paraVals[i]->GetUpperRangeBatemanN0() << endl;
-            cout << "\tBateman initial Upper Range: " << paraVals[i]->GetUpperRangeBatemanN0() << endl;
-            cout << "\tIntegral initial Lower Range: " << paraVals[i]->GetUpperRangeIntegralN0() << endl;
-            cout << "\tIntegral initial Upper Range: " << paraVals[i]->GetUpperRangeIntegralN0() << endl;
+            cout << "\tBateman Initial Lower Range: " << paraVals[i]->GetUpperRangeBatemanN0() << endl;
+            cout << "\tBateman Initial Upper Range: " << paraVals[i]->GetUpperRangeBatemanN0() << endl;
+            cout << "\tIntegral Initial Lower Range: " << paraVals[i]->GetUpperRangeIntegralN0() << endl;
+            cout << "\tIntegral Initial Upper Range: " << paraVals[i]->GetUpperRangeIntegralN0() << endl;
             cout << "\tHalf Life Lower Range: " << paraVals[i]->GetLowerRangeHalfLife() << endl;
             cout << "\tHalf Life Upper Range: " << paraVals[i]->GetUpperRangeHalfLife() << endl;
             cout << endl;
