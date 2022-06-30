@@ -1147,13 +1147,13 @@ void ElementFit::SetTotalBatemanParameterLimits()
             if(paraVals[i]->GetFixBatemanN0()){
                 batemanFunction->FixParameter((i*2), paraVals[i]->GetBatemanN0());
             }else{
-                batemanFunction->SetParLimits((i*2), paraVals[k]->GetLowerRangeBatemanN0(), paraVals[k]->GetUpperRangeBatemanN0());
+                batemanFunction->SetParLimits((i*2), paraVals[i]->GetLowerRangeBatemanN0(), paraVals[i]->GetUpperRangeBatemanN0());
             }
             //Setting limits for decay constant
             if(paraVals[i]->GetFixDecayConst()){
                 batemanFunction->FixParameter((i*2)+1, paraVals[i]->GetDecayConst());
             }else{
-                batemanFunction->SetParLimits((i*2)+1, paraVals[k]->GetLowerRangeDecayConst(), paraVals[k]->GetUpperRangeDecayConst());
+                batemanFunction->SetParLimits((i*2)+1, paraVals[i]->GetLowerRangeDecayConst(), paraVals[i]->GetUpperRangeDecayConst());
             }
             
         //2 = setting from fit parameters of fitted input histogram, use user defined limits.
@@ -1193,13 +1193,13 @@ void ElementFit::SetTotalIntegralParameterLimits()
             if(paraVals[i]->GetFixIntegralN0()){
                 integralFunction->FixParameter((i*2), paraVals[i]->GetIntegralN0());
             }else{
-                integralFunction->SetParLimits((i*2), paraVals[k]->GetLowerRangeIntegralN0(), paraVals[k]->GetUpperRangeIntegralN0());
+                integralFunction->SetParLimits((i*2), paraVals[i]->GetLowerRangeIntegralN0(), paraVals[i]->GetUpperRangeIntegralN0());
             }
             //Setting limits for decay constant
             if(paraVals[i]->GetFixDecayConst()){
                 integralFunction->FixParameter((i*2)+1, paraVals[i]->GetDecayConst());
             }else{
-                integralFunction->SetParLimits((i*2)+1, paraVals[k]->GetLowerRangeDecayConst(), paraVals[k]->GetUpperRangeDecayConst());
+                integralFunction->SetParLimits((i*2)+1, paraVals[i]->GetLowerRangeDecayConst(), paraVals[i]->GetUpperRangeDecayConst());
             }
             
         //2 = setting from fit parameters of fitted input histogram, use user defined limits.
@@ -1242,8 +1242,8 @@ void ElementFit::DisplayParameterLimits()
             cout << "\tBateman Initial Upper Range: " << paraVals[i]->GetUpperRangeBatemanN0() << endl;
             cout << "\tIntegral Initial Lower Range: " << paraVals[i]->GetLowerRangeIntegralN0() << endl;
             cout << "\tIntegral Initial Upper Range: " << paraVals[i]->GetUpperRangeIntegralN0() << endl;
-            cout << "\tHalf Life Lower Range: " << paraVals[k]->GetLowerRangeDecayConst() << endl;
-            cout << "\tHalf Life Upper Range: " << paraVals[k]->GetUpperRangeDecayConst() << endl;
+            cout << "\tHalf Life Lower Range: " << paraVals[i]->GetLowerRangeDecayConst() << endl;
+            cout << "\tHalf Life Upper Range: " << paraVals[i]->GetUpperRangeDecayConst() << endl;
             cout << endl;
         }
         cout << endl;
