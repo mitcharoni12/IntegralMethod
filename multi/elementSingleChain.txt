@@ -10,7 +10,7 @@ integral background fix value(1) don't fix(2):1
 
 element 1 Name:Test1
 
-element 1 Bateman N0 value:1000.0
+element 1 Bateman N0 value:1.000
 element 1 Bateman N0 lower:0
 element 1 Bateman N0 upper:10000000
 element 1 fix N0(1) don't fix(2):2
@@ -20,9 +20,77 @@ element 1 Integral N0 lower:0
 element 1 Integral N0 upper:10000000
 element 1 fix N0(1) don't fix(2):2
 
-element 1 half life value(s):1
+element 1 half life value(s):0.001
 element 1 half life lower(s):0.0
 element 1 half life upper(s):100000.0
 element 1 fix half life(1) don't fix(2):2
+
+element 2 Name:Test2
+
+element 2 Bateman N0 value:0.00
+element 2 Bateman N0 lower:0
+element 2 Bateman N0 upper:10000000
+element 2 fix N0(1) don't fix(2):2
+
+element 2 Integral N0 value:0.00
+element 2 Integral N0 lower:0
+element 2 Integral N0 upper:10000000
+element 2 fix N0(1) don't fix(2):2
+
+element 2 half life value(s):0.010
+element 2 half life lower(s):0.0
+element 2 half life upper(s):100000.0
+element 2 fix half life(1) don't fix(2):1
+
+element 3 Name:Test3
+
+element 3 Bateman N0 value:0.00
+element 3 Bateman N0 lower:0
+element 3 Bateman N0 upper:10000000
+element 3 fix N0(1) don't fix(2):2
+
+element 3 Integral N0 value:0.00
+element 3 Integral N0 lower:0
+element 3 Integral N0 upper:10000000
+element 3 fix N0(1) don't fix(2):2
+
+element 3 half life value(s):0.100
+element 3 half life lower(s):0.0
+element 3 half life upper(s):100000.0
+element 3 fix half life(1) don't fix(2):1
+
+element 4 Name:Test4
+
+element 4 Bateman N0 value:0.00
+element 4 Bateman N0 lower:0
+element 4 Bateman N0 upper:10000000
+element 4 fix N0(1) don't fix(2):2
+
+element 4 Integral N0 value:0.00
+element 4 Integral N0 lower:0
+element 4 Integral N0 upper:10000000
+element 4 fix N0(1) don't fix(2):2
+
+element 4 half life value(s):1.000
+element 4 half life lower(s):0.0
+element 4 half life upper(s):100000.0
+element 4 fix half life(1) don't fix(2):1
+
+element 5 Name:Test5
+
+element 5 Bateman N0 value:0.00
+element 5 Bateman N0 lower:0
+element 5 Bateman N0 upper:10000000
+element 5 fix N0(1) don't fix(2):2
+
+element 5 Integral N0 value:0.00
+element 5 Integral N0 lower:0
+element 5 Integral N0 upper:10000000
+element 5 fix N0(1) don't fix(2):2
+
+element 5 half life value(s):10.000
+element 5 half life lower(s):0.0
+element 5 half life upper(s):100000.0
+element 5 fix half life(1) don't fix(2):1
 
 Create Fit Functions(1) Dont Create Fit Function(2):2
