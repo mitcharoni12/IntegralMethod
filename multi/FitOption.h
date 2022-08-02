@@ -276,19 +276,19 @@ void FitOption::CreateShiftedBinEdges(Int_t numBins, Double_t binWidth, Double_t
 
     binEdges[0] = 0.0;
     //CHANGE BELOW HERE
-    binEdges[1] = (binWidth / 2.0);
-    for(int i = 2; i < (numBins + 2); i++)
-    {
-        binEdges[i] = ((i-1) * binWidth) + (binWidth / 2.0);
-        //outfile << (binEdges[i] - (binWidth/2.0)) << endl;
-    }
+    //binEdges[1] = (binWidth / 2.0);
+    //for(int i = 2; i < (numBins + 2); i++)
+    //{
+    //    binEdges[i] = ((i-1) * binWidth) + (binWidth / 2.0);
+    //    //outfile << (binEdges[i] - (binWidth/2.0)) << endl;
+    //}
 
     //outfile.close();
 
-    //for(int i = 2; i < (numBins+2); i++)
-    //{
-    //    binEdges[i-1] = ((i-1) * binWidth);
-    //}
+    for(int i = 2; i < (numBins+2); i++)
+    {
+        binEdges[i-1] = ((i-1) * binWidth);
+    }
 }
 
 FitOption::~FitOption()
